@@ -30,15 +30,15 @@ END;
 $$;
 
 -- Create trigger to automatically update status when end date is reached
-DROP TRIGGER IF EXISTS check_contest_status ON leaderboard_config;
+DROP TRIGGER IF EXISTS check_contest_status ON contests;
 CREATE TRIGGER check_contest_status
   BEFORE UPDATE OR INSERT
-  ON leaderboard_config
+  ON contests
   FOR EACH ROW
   EXECUTE FUNCTION update_contest_status();
 
 -- Update any existing contests that have ended
-UPDATE leaderboard_config
+UPDATE contests
 SET 
   status = 'completed',
   updated_at = now()

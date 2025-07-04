@@ -1,8 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { Crown, Medal, Star, ArrowUp, ArrowDown, Minus, Clock, Trophy, Link as LinkIcon, Plus, X, Loader2, Play, Share2, Globe, Gift } from 'lucide-react';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import {
+  Crown,
+  Medal,
+  Star,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  Clock,
+  Trophy,
+  Link as LinkIcon,
+  Plus,
+  X,
+  Loader2,
+  Play,
+  Share2,
+  Globe,
+  Gift,
+} from "lucide-react";
+import toast from "react-hot-toast";
 
 interface Participant {
   id: string;
@@ -20,12 +37,18 @@ interface ContestDetails {
   status: string;
   start_date: string;
   end_date: string;
-  prize_tier: string;
+  prize_tier?: string;
   prize_per_winner: number;
-  prize_titles: { rank: number; title: string; }[];
+  prize_titles: { rank: number; title: string }[];
   music_category: string;
   cover_image?: string;
-  resources?: any[];
+  resources?: Resource[];
+}
+
+interface Resource {
+  title: string;
+  description?: string;
+  url: string;
 }
 
 export function ContestDetails() {
@@ -34,22 +57,22 @@ export function ContestDetails() {
   const [contest, setContest] = useState<ContestDetails | null>(null);
   const [showAddResource, setShowAddResource] = useState(false);
   const [savingResource, setSavingResource] = useState(false);
-  const [selectedPrize, setSelectedPrize] = useState<{ rank: number; prize: string | number } | null>(null);
+  const [selectedPrize, setSelectedPrize] = useState<{
+    rank: number;
+    prize: string | number;
+  } | null>(null);
   const [newResource, setNewResource] = useState<Resource>({
-    title: '',
-    description: '',
-    url: ''
+    title: "",
+    description: "",
+    url: "",
   });
   const [session, setSession] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [timeLeft, setTimeLeft] = useState<string>('');
-  const [participants, setParticipants] = useState<Participant[]>([
-    { id: '1', username: 'baeb__8', full_name: 'Mukonazwothe Khabubu', views: 1200000, rank: 1, previousRank: 2 },
-    { id: '2', username: 'lordmust', full_name: 'Lordmust Sadulloev', views: 850000, rank: 2, previousRank: 1 },
-    { id: '3', username: 'glen_versoza', full_name: 'Glen Versoza', views: 620000, rank: 3, previousRank: 3 },
-    { id: '4', username: 'dance_queen', full_name: 'Sarah Johnson', views: 450000, rank: 4, previousRank: 5 },
-    { id: '5', username: 'beatmaster', full_name: 'James Wilson', views: 380000, rank: 5, previousRank: 4 }
-  ]);
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const [participants, setParticipants] = useState<Participant[]>([]);
+
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -59,7 +82,9 @@ export function ContestDetails() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session?.user?.id) {
         fetchProfile(session.user.id);
@@ -83,12 +108,16 @@ export function ContestDetails() {
         const distance = endDate - now;
 
         if (distance < 0) {
-          setTimeLeft('Contest Ended');
+          setTimeLeft("Contest Ended");
           clearInterval(timer);
         } else {
           const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const hours = Math.floor(
+            (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor(
+            (distance % (1000 * 60 * 60)) / (1000 * 60)
+          );
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
           setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
@@ -99,36 +128,63 @@ export function ContestDetails() {
     }
   }, [contest?.end_date]);
 
+  // Fetch live leaderboard data
+  useEffect(() => {
+    if (!id) return;
+
+    let interval: any;
+
+    const fetchLeaderboard = async () => {
+      try {
+        const res = await fetch(
+          `${backendUrl}/api/v1/contests/${id}/leaderboard?limit=200`
+        );
+        if (!res.ok) throw new Error("Failed to fetch leaderboard");
+        const json = await res.json();
+        if (json?.data?.leaderboard) {
+          setParticipants(json.data.leaderboard);
+        }
+      } catch (err) {
+        console.error("Error fetching leaderboard:", err);
+      }
+    };
+
+    fetchLeaderboard();
+    interval = setInterval(fetchLeaderboard, 30000); // 30-sec refresh
+
+    return () => clearInterval(interval);
+  }, [id, backendUrl]);
+
   const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
         .single();
 
       if (error) throw error;
       setProfile(data);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error("Error fetching profile:", error);
     }
   };
 
-  const isOrganizer = profile?.role === 'organizer';
+  const isOrganizer = profile?.role === "organizer";
 
   const fetchContestDetails = async () => {
     try {
       const { data, error } = await supabase
-        .from('leaderboard_config')
-        .select('*')
-        .eq('id', id)
+        .from("contests")
+        .select("*")
+        .eq("id", id as string)
         .maybeSingle();
 
       if (error) throw error;
-      setContest(data);
+      setContest(data as unknown as ContestDetails);
     } catch (error) {
-      console.error('Error fetching contest details:', error);
-      toast.error('Failed to load contest details');
+      console.error("Error fetching contest details:", error);
+      toast.error("Failed to load contest details");
       setContest(null);
     } finally {
       setLoading(false);
@@ -138,18 +194,18 @@ export function ContestDetails() {
   const handleShare = async () => {
     try {
       await navigator.share({
-        title: contest?.name || 'Contest Details',
-        text: contest?.description || 'Check out this contest!',
-        url: window.location.href
+        title: contest?.name || "Contest Details",
+        text: contest?.description || "Check out this contest!",
+        url: window.location.href,
       });
     } catch (error) {
       navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard!');
+      toast.success("Link copied to clipboard!");
     }
   };
 
   const handlePlayVideo = () => {
-    toast.success('Video player coming soon!');
+    toast.success("Video player coming soon!");
   };
 
   const getRankIcon = (rank: number) => {
@@ -167,7 +223,7 @@ export function ContestDetails() {
 
   const getRankChangeIcon = (currentRank: number, previousRank?: number) => {
     if (!previousRank) return <Minus className="h-4 w-4 text-gray-400" />;
-    
+
     if (currentRank < previousRank) {
       return <ArrowUp className="h-4 w-4 text-green-500" />;
     } else if (currentRank > previousRank) {
@@ -179,29 +235,29 @@ export function ContestDetails() {
   const getRankColor = (rank: number) => {
     switch (rank) {
       case 1:
-        return 'text-yellow-500';
+        return "text-yellow-500";
       case 2:
-        return 'text-gray-400';
+        return "text-gray-400";
       case 3:
-        return 'text-amber-700';
+        return "text-amber-700";
       default:
-        return 'text-gray-400';
+        return "text-gray-400";
     }
   };
 
   const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US').format(num);
+    return new Intl.NumberFormat("en-US").format(num);
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return 'Not set';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true
+    if (!dateString) return "Not set";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
     });
   };
 
@@ -220,8 +276,12 @@ export function ContestDetails() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Contest not found</h2>
-          <p className="mt-2 text-gray-600">This contest may have ended or been removed.</p>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Contest not found
+          </h2>
+          <p className="mt-2 text-gray-600">
+            This contest may have ended or been removed.
+          </p>
           <Link
             to="/"
             className="inline-flex items-center gap-2 px-4 py-2 mt-4 bg-black text-white rounded-md hover:bg-gray-900"
@@ -250,11 +310,13 @@ export function ContestDetails() {
                 <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 to-gray-900" />
               </div>
             )}
-            
+
             <div className="relative">
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div className="flex-1">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-white">{contest.name}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                    {contest.name}
+                  </h1>
                   <div className="mt-2 flex flex-wrap items-center gap-3 text-gray-300 text-sm">
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-4 w-4" />
@@ -264,7 +326,7 @@ export function ContestDetails() {
                     <span>{formatDate(contest.start_date)}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                   <button
                     onClick={handleShare}
@@ -294,38 +356,60 @@ export function ContestDetails() {
                 <Trophy className="h-5 w-5 text-yellow-500" />
                 Prize Distribution
               </h2>
-              <span className="text-sm text-gray-500">{contest.prize_titles.length} Winners</span>
+              <span className="text-sm text-gray-500">
+                {contest.prize_titles.length} Winners
+              </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               {contest.prize_titles.map((prize, index) => (
                 <button
                   key={index}
-                  onClick={() => setSelectedPrize({
-                    rank: index + 1,
-                    prize: contest.prize_tier === 'monetary'
-                      ? contest.prize_per_winner * (1 - index * 0.2)
-                      : prize.title
-                  })}
+                  onClick={() =>
+                    setSelectedPrize({
+                      rank: index + 1,
+                      prize:
+                        contest.prize_tier === "monetary"
+                          ? contest.prize_per_winner * (1 - index * 0.2)
+                          : prize.title,
+                    })
+                  }
                   className={`
                     p-4 rounded-lg border hover:border-gray-300 transition-all
-                    ${index === 0 ? 'bg-yellow-50 border-yellow-200' :
-                      index === 1 ? 'bg-gray-50 border-gray-200' :
-                      index === 2 ? 'bg-amber-50 border-amber-200' :
-                      'bg-white border-gray-200'}
+                    ${
+                      index === 0
+                        ? "bg-yellow-50 border-yellow-200"
+                        : index === 1
+                        ? "bg-gray-50 border-gray-200"
+                        : index === 2
+                        ? "bg-amber-50 border-amber-200"
+                        : "bg-white border-gray-200"
+                    }
                   `}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     {getRankIcon(index + 1)}
-                    <span className={`text-sm font-medium ${getRankColor(index + 1)}`}>
-                      {index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'}
+                    <span
+                      className={`text-sm font-medium ${getRankColor(
+                        index + 1
+                      )}`}
+                    >
+                      {index + 1}
+                      {index === 0
+                        ? "st"
+                        : index === 1
+                        ? "nd"
+                        : index === 2
+                        ? "rd"
+                        : "th"}
                     </span>
                   </div>
                   <div className="text-sm font-medium">
-                    {contest.prize_tier === 'monetary'
-                      ? `$${formatNumber(contest.prize_per_winner * (1 - index * 0.2))}`
-                      : prize.title
-                    }
+                    {contest.prize_tier === "monetary"
+                      ? `$${formatNumber(
+                          contest.prize_per_winner * (1 - index * 0.2)
+                        )}`
+                      : prize.title}
                   </div>
                 </button>
               ))}
@@ -345,14 +429,22 @@ export function ContestDetails() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
-                        <span className={`font-medium ${getRankColor(participant.rank)}`}>
+                        <span
+                          className={`font-medium ${getRankColor(
+                            participant.rank
+                          )}`}
+                        >
                           #{participant.rank}
                         </span>
                         {getRankIcon(participant.rank)}
                       </div>
                       <div>
-                        <div className="font-medium">{participant.username}</div>
-                        <div className="text-sm text-gray-500">{formatNumber(participant.views)} views</div>
+                        <div className="font-medium">
+                          {participant.username}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {formatNumber(participant.views)} views
+                        </div>
                       </div>
                     </div>
                     <button
@@ -371,10 +463,18 @@ export function ContestDetails() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Participant</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Rank
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Participant
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Views
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -383,17 +483,27 @@ export function ContestDetails() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           {getRankIcon(participant.rank)}
-                          <span className={`font-medium ${getRankColor(participant.rank)}`}>
+                          <span
+                            className={`font-medium ${getRankColor(
+                              participant.rank
+                            )}`}
+                          >
                             #{participant.rank}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-medium">{participant.username}</div>
-                        <div className="text-sm text-gray-500">{participant.full_name}</div>
+                        <div className="font-medium">
+                          {participant.username}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {participant.full_name}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <span className="font-medium">{formatNumber(participant.views)}</span>
+                        <span className="font-medium">
+                          {formatNumber(participant.views)}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <button
@@ -420,7 +530,15 @@ export function ContestDetails() {
               <div className="flex items-center gap-2">
                 {getRankIcon(selectedPrize.rank)}
                 <h3 className="text-lg font-semibold">
-                  {selectedPrize.rank}{selectedPrize.rank === 1 ? 'st' : selectedPrize.rank === 2 ? 'nd' : selectedPrize.rank === 3 ? 'rd' : 'th'} Place
+                  {selectedPrize.rank}
+                  {selectedPrize.rank === 1
+                    ? "st"
+                    : selectedPrize.rank === 2
+                    ? "nd"
+                    : selectedPrize.rank === 3
+                    ? "rd"
+                    : "th"}{" "}
+                  Place
                 </h3>
               </div>
               <button
@@ -432,7 +550,7 @@ export function ContestDetails() {
             </div>
             <div className="p-4">
               <div className="text-center">
-                {contest.prize_tier === 'monetary' ? (
+                {contest.prize_tier === "monetary" ? (
                   <>
                     <div className="text-2xl font-bold text-green-600">
                       ${formatNumber(selectedPrize.prize as number)}
@@ -444,7 +562,9 @@ export function ContestDetails() {
                     <div className="text-2xl font-bold text-blue-600">
                       {selectedPrize.prize}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">Achievement Title</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Achievement Title
+                    </p>
                   </>
                 )}
               </div>

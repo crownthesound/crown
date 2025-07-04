@@ -1,30 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { PlusCircle, Trash2, Edit2, EyeOff, Eye, Loader2, Clock, Globe, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+import {
+  PlusCircle,
+  Trash2,
+  Edit2,
+  EyeOff,
+  Eye,
+  Loader2,
+  Clock,
+  Globe,
+  Menu,
+  X,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Database } from "../lib/database.types";
+import { useAuth } from "../contexts/AuthContext";
 
-interface Contest {
-  id: string;
-  name: string;
-  status: string;
-  start_date: string;
-  end_date: string;
-  prize_per_winner: number;
-  prize_tier: string;
-  music_category: string;
-  created_at: string;
-  description: string;
-  cover_image?: string;
-}
+type Contest = Database["public"]["Tables"]["contests"]["Row"];
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export function Contests() {
+  const { session, profile } = useAuth();
   const [contests, setContests] = useState<Contest[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'draft' | 'active' | 'completed' | 'hidden'>('all');
+  const [activeTab, setActiveTab] = useState<
+    "all" | "draft" | "active" | "completed" | "hidden"
+  >("all");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Check if user can manage contests
+  const canManageContests =
+    profile?.role === "organizer" || profile?.role === "admin";
 
   useEffect(() => {
     fetchContests();
@@ -33,72 +43,110 @@ export function Contests() {
   const fetchContests = async () => {
     try {
       const { data, error } = await supabase
-        .from('leaderboard_config')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("contests")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      setContests(data || []);
+      if (data) {
+        setContests(data);
+      }
     } catch (error) {
-      console.error('Error fetching contests:', error);
-      toast.error('Failed to load contests');
+      console.error("Error fetching contests:", error);
+      toast.error("Failed to load contests");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (contestId: string) => {
-    if (!confirm('Are you sure you want to delete this draft? This action cannot be undone.')) {
+  const handleDelete = async (contestId: string, contestStatus: string) => {
+    const isDraft = contestStatus === "draft";
+    const confirmMessage = isDraft
+      ? "Are you sure you want to delete this draft? This action cannot be undone."
+      : "Are you sure you want to delete this contest? This action cannot be undone and will affect all participants.";
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    if (!session?.access_token) {
+      toast.error("Authentication required");
       return;
     }
 
     setDeleting(contestId);
     try {
-      const { error } = await supabase
-        .from('leaderboard_config')
-        .delete()
-        .eq('id', contestId)
-        .eq('status', 'draft');
+      const response = await fetch(
+        `${backendUrl}/api/v1/contests/${contestId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to delete contest");
+      }
 
-      setContests(contests.filter(contest => contest.id !== contestId));
-      toast.success('Draft deleted successfully');
+      setContests(contests.filter((contest) => contest.id !== contestId));
+      toast.success(`${isDraft ? "Draft" : "Contest"} deleted successfully`);
     } catch (error) {
-      console.error('Error deleting contest:', error);
-      toast.error('Failed to delete draft');
+      console.error("Error deleting contest:", error);
+      toast.error(`Failed to delete ${isDraft ? "draft" : "contest"}`);
     } finally {
       setDeleting(null);
     }
   };
 
-  const handleToggleVisibility = async (contestId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'active' ? 'hidden' : 'active';
-    const actionText = currentStatus === 'active' ? 'hide' : 'unhide';
-    
+  const handleToggleVisibility = async (
+    contestId: string,
+    currentStatus: string
+  ) => {
+    const newStatus = currentStatus === "active" ? "hidden" : "active";
+    const actionText = currentStatus === "active" ? "hide" : "unhide";
+
     if (!confirm(`Are you sure you want to ${actionText} this contest?`)) {
+      return;
+    }
+
+    if (!session?.access_token) {
+      toast.error("Authentication required");
       return;
     }
 
     setUpdating(contestId);
     try {
-      const { error } = await supabase
-        .from('leaderboard_config')
-        .update({ status: newStatus })
-        .eq('id', contestId);
+      const response = await fetch(
+        `${backendUrl}/api/v1/contests/${contestId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update contest");
+      }
 
-      setContests(contests.map(contest => 
-        contest.id === contestId 
-          ? { ...contest, status: newStatus }
-          : contest
-      ));
-      
-      toast.success(`Contest ${actionText}n successfully`);
+      setContests(
+        contests.map((contest) =>
+          contest.id === contestId ? { ...contest, status: newStatus } : contest
+        )
+      );
+
+      toast.success(`Contest ${actionText}d successfully`);
     } catch (error) {
-      console.error('Error updating contest visibility:', error);
+      console.error("Error updating contest visibility:", error);
       toast.error(`Failed to ${actionText} contest`);
     } finally {
       setUpdating(null);
@@ -106,22 +154,27 @@ export function Contests() {
   };
 
   const getFilteredContests = () => {
-    if (activeTab === 'all') return contests;
-    return contests.filter(contest => contest.status === activeTab);
+    if (activeTab === "all") return contests;
+    if (activeTab === "completed") {
+      // Map 'ended' status to 'completed' for filtering
+      return contests.filter((contest) => contest.status === "ended");
+    }
+    return contests.filter((contest) => contest.status === activeTab);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | null) => {
     switch (status) {
-      case 'draft':
-        return 'bg-gray-100 text-gray-800';
-      case 'active':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'hidden':
-        return 'bg-purple-100 text-purple-800';
+      case "draft":
+        return "bg-gray-100 text-gray-800";
+      case "active":
+        return "bg-blue-100 text-blue-800";
+      case "ended":
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "hidden":
+        return "bg-purple-100 text-purple-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -130,16 +183,29 @@ export function Contests() {
     const now = new Date().getTime();
     const distance = end - now;
 
-    if (distance < 0) return 'Ended';
+    if (distance < 0) return "Ended";
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 
-    return `${days}d ${hours}h left`;
+    if (days > 0) {
+      return `${days}d ${hours}h left`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m left`;
+    } else if (minutes > 0) {
+      return `${minutes}m left`;
+    } else {
+      return "Ending soon";
+    }
   };
 
   const renderActionButtons = (contest: Contest) => {
-    if (contest.status === 'draft') {
+    if (!canManageContests) return null;
+
+    if (contest.status === "draft") {
       return (
         <div className="flex items-center gap-2">
           <Link
@@ -150,39 +216,94 @@ export function Contests() {
             <Edit2 className="h-5 w-5" />
           </Link>
           <button
-            onClick={() => handleDelete(contest.id)}
+            onClick={() => handleDelete(contest.id, contest.status || "draft")}
             disabled={deleting === contest.id}
             className={`p-2 text-gray-400 hover:text-red-600 transition-colors ${
-              deleting === contest.id ? 'opacity-50 cursor-not-allowed' : ''
+              deleting === contest.id ? "opacity-50 cursor-not-allowed" : ""
             }`}
             title="Delete draft"
           >
-            <Trash2 className={`h-5 w-5 ${deleting === contest.id ? 'animate-pulse' : ''}`} />
+            <Trash2
+              className={`h-5 w-5 ${
+                deleting === contest.id ? "animate-pulse" : ""
+              }`}
+            />
           </button>
         </div>
       );
     }
 
-    if (contest.status === 'active' || contest.status === 'hidden') {
+    if (contest.status === "active" || contest.status === "hidden") {
       return (
-        <button
-          onClick={() => handleToggleVisibility(contest.id, contest.status)}
-          disabled={updating === contest.id}
-          className={`p-2 text-gray-400 hover:text-purple-600 transition-colors ${
-            updating === contest.id ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          title={contest.status === 'active' ? 'Hide contest' : 'Unhide contest'}
-        >
-          {contest.status === 'active' ? (
-            <EyeOff className={`h-5 w-5 ${updating === contest.id ? 'animate-pulse' : ''}`} />
-          ) : (
-            <Eye className={`h-5 w-5 ${updating === contest.id ? 'animate-pulse' : ''}`} />
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to={`/build/${contest.id}`}
+            className="p-2 text-gray-400 hover:text-blue-600"
+            title="Edit contest"
+          >
+            <Edit2 className="h-5 w-5" />
+          </Link>
+          <button
+            onClick={() =>
+              contest.status &&
+              handleToggleVisibility(contest.id, contest.status)
+            }
+            disabled={updating === contest.id}
+            className={`p-2 text-gray-400 hover:text-purple-600 transition-colors ${
+              updating === contest.id ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            title={
+              contest.status === "active" ? "Hide contest" : "Unhide contest"
+            }
+          >
+            {contest.status === "active" ? (
+              <EyeOff
+                className={`h-5 w-5 ${
+                  updating === contest.id ? "animate-pulse" : ""
+                }`}
+              />
+            ) : (
+              <Eye
+                className={`h-5 w-5 ${
+                  updating === contest.id ? "animate-pulse" : ""
+                }`}
+              />
+            )}
+          </button>
+        </div>
+      );
+    }
+
+    if (contest.status === "ended") {
+      return (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleDelete(contest.id, contest.status || "ended")}
+            disabled={deleting === contest.id}
+            className={`p-2 text-gray-400 hover:text-red-600 transition-colors ${
+              deleting === contest.id ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            title="Delete contest"
+          >
+            <Trash2
+              className={`h-5 w-5 ${
+                deleting === contest.id ? "animate-pulse" : ""
+              }`}
+            />
+          </button>
+        </div>
       );
     }
 
     return null;
+  };
+
+  const getTabCount = (tab: string) => {
+    if (tab === "all") return contests.length;
+    if (tab === "completed") {
+      return contests.filter((c) => c.status === "ended").length;
+    }
+    return contests.filter((c) => c.status === tab).length;
   };
 
   return (
@@ -204,19 +325,21 @@ export function Contests() {
                 )}
               </button>
             </div>
-            <Link
-              to="/build"
-              className="inline-flex items-center justify-center gap-2 px-6 py-2 bg-black text-white rounded-md hover:bg-gray-900 w-full sm:w-auto transition-colors"
-            >
-              <PlusCircle className="h-5 w-5" />
-              <span>New Contest</span>
-            </Link>
+            {canManageContests && (
+              <Link
+                to="/build"
+                className="inline-flex items-center justify-center gap-2 px-6 py-2 bg-black text-white rounded-md hover:bg-gray-900 w-full sm:w-auto transition-colors"
+              >
+                <PlusCircle className="h-5 w-5" />
+                <span>New Contest</span>
+              </Link>
+            )}
           </div>
 
           {/* Filter Tabs */}
-          <div className={`${showFilters ? 'block' : 'hidden'} sm:block pb-4`}>
+          <div className={`${showFilters ? "block" : "hidden"} sm:block pb-4`}>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-              {['all', 'draft', 'active', 'hidden', 'completed'].map((tab) => (
+              {["all", "draft", "active", "hidden", "completed"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => {
@@ -225,15 +348,13 @@ export function Contests() {
                   }}
                   className={`flex items-center justify-between px-4 py-2 rounded-md whitespace-nowrap transition-colors ${
                     activeTab === tab
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? "bg-gray-900 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
                   <span>{tab.charAt(0).toUpperCase() + tab.slice(1)}</span>
                   <span className="ml-2 bg-white bg-opacity-20 px-2 py-0.5 rounded-full text-sm">
-                    {tab === 'all'
-                      ? contests.length
-                      : contests.filter(c => c.status === tab).length}
+                    {getTabCount(tab)}
                   </span>
                 </button>
               ))}
@@ -255,7 +376,7 @@ export function Contests() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {getFilteredContests().map(contest => (
+            {getFilteredContests().map((contest) => (
               <div
                 key={contest.id}
                 className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-gray-300 transition-colors"
@@ -266,14 +387,23 @@ export function Contests() {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
                           <h3 className="text-lg font-semibold truncate">
-                            {contest.name || 'Untitled Contest'}
+                            {contest.name || "Untitled Contest"}
                           </h3>
-                          <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(contest.status)}`}>
-                            {contest.status.charAt(0).toUpperCase() + contest.status.slice(1)}
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
+                              contest.status
+                            )}`}
+                          >
+                            {contest.status === "ended"
+                              ? "Completed"
+                              : contest.status
+                              ? contest.status.charAt(0).toUpperCase() +
+                                contest.status.slice(1)
+                              : "Draft"}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 line-clamp-2">
-                          {contest.description || 'No description provided'}
+                          {contest.description || "No description provided"}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -288,16 +418,17 @@ export function Contests() {
                       </div>
                       {contest.music_category && (
                         <div>
-                          <span className="font-medium">Category:</span>{' '}
+                          <span className="font-medium">Category:</span>{" "}
                           {contest.music_category}
                         </div>
                       )}
-                      {contest.prize_tier === 'monetary' && (
-                        <div>
-                          <span className="font-medium">Prize:</span>{' '}
-                          ${contest.prize_per_winner.toLocaleString()}
-                        </div>
-                      )}
+                      {contest.prize_per_winner &&
+                        contest.prize_per_winner > 0 && (
+                          <div>
+                            <span className="font-medium">Prize:</span> $
+                            {contest.prize_per_winner.toLocaleString()}
+                          </div>
+                        )}
                     </div>
 
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-4 border-t border-gray-100">
@@ -307,14 +438,16 @@ export function Contests() {
                       >
                         View Details
                       </Link>
-                      {contest.status === 'active' && (
+                      {contest.status === "active" && (
                         <Link
                           to={`/l/${contest.id}`}
                           target="_blank"
                           className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm group"
                         >
                           <Globe className="h-4 w-4" />
-                          <span className="group-hover:underline">Public Leaderboard</span>
+                          <span className="group-hover:underline">
+                            Public Leaderboard
+                          </span>
                         </Link>
                       )}
                     </div>
