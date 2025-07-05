@@ -456,7 +456,13 @@ export function HomeContent({
                     hint: error.hint,
                     code: error.code
                   });
-                  toast.error(`Database error: ${error.message}`);
+                  
+                  // Check if it's a duplicate TikTok account error
+                  if (error.code === '23505' || error.message.includes('duplicate') || error.message.includes('already exists')) {
+                    toast.error("This TikTok account is already connected to another Crown account. Please disconnect it first or use a different TikTok account.");
+                  } else {
+                    toast.error(`Failed to save TikTok profile: ${error.message}`);
+                  }
                   return;
                 }
 
