@@ -433,17 +433,16 @@ export function HomeContent({
                   .upsert({
                     user_id: session.user.id,
                     tiktok_user_id: userInfo.open_id || userInfo.union_id,
-                    username: userInfo.username,
-                    display_name: userInfo.display_name,
-                    avatar_url: userInfo.avatar_url,
+                    username: userInfo.username || null,
+                    display_name: userInfo.display_name || null,
+                    avatar_url: userInfo.avatar_url || null,
                     follower_count: userInfo.follower_count || 0,
                     following_count: userInfo.following_count || 0,
                     access_token: accessToken,
                     refresh_token: refreshToken,
                     updated_at: new Date().toISOString()
-                  }, {
-                    onConflict: 'user_id'
-                  });
+                  })
+                  .select(); // Add select() to return the inserted data
 
                 if (error) {
                   console.error("❌ Supabase save error:", error);
