@@ -10,7 +10,7 @@ export const useTikTokConnection = () => {
   const [isReconnecting, setIsReconnecting] = useState(false);
 
   // Get backend URL from environment or default
-  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3001";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
   useEffect(() => {
     if (!session) {
@@ -33,11 +33,12 @@ export const useTikTokConnection = () => {
         .from("tiktok_profiles")
         .select("*")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle() instead of single() to avoid errors when no row exists
 
       console.log("🔍 TikTok profile query result:", { data, error });
 
-      if (error && error.code !== "PGRST116") {
+      if (error) {
+        console.error("❌ TikTok profile query error:", error);
         throw error;
       }
 
