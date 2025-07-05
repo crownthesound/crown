@@ -154,7 +154,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
         .select("*")
         .eq("contest_id", contest.id)
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
 
       if (checkError && checkError.code !== "PGRST116") {
         throw checkError;
@@ -296,7 +296,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
         .from("tiktok_profiles")
         .select("username")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
 
       const username = tikTokProfileData?.username || "username";
 
