@@ -427,26 +427,37 @@ export function HomeContent({
                 const userInfo = JSON.parse(decodeURIComponent(tiktokUser));
                 console.log("🔍 Saving TikTok profile:", userInfo);
 
+                // Prepare data payload for debugging
+                const profileData = {
+                  user_id: session.user.id,
+                  tiktok_user_id: userInfo.open_id || userInfo.union_id,
+                  username: userInfo.username || null,
+                  display_name: userInfo.display_name || null,
+                  avatar_url: userInfo.avatar_url || null,
+                  follower_count: userInfo.follower_count || 0,
+                  following_count: userInfo.following_count || 0,
+                  access_token: accessToken,
+                  refresh_token: refreshToken,
+                  updated_at: new Date().toISOString()
+                };
+                
+                console.log("📊 Profile data to insert:", profileData);
+
                 // Save directly to Supabase instead of going through backend
                 const { data, error } = await supabase
                   .from('tiktok_profiles')
-                  .upsert({
-                    user_id: session.user.id,
-                    tiktok_user_id: userInfo.open_id || userInfo.union_id,
-                    username: userInfo.username || null,
-                    display_name: userInfo.display_name || null,
-                    avatar_url: userInfo.avatar_url || null,
-                    follower_count: userInfo.follower_count || 0,
-                    following_count: userInfo.following_count || 0,
-                    access_token: accessToken,
-                    refresh_token: refreshToken,
-                    updated_at: new Date().toISOString()
-                  })
-                  .select(); // Add select() to return the inserted data
+                  .upsert(profileData)
+                  .select();
 
                 if (error) {
-                  console.error("❌ Supabase save error:", error);
-                  throw error;
+                  console.error("❌ Supabase save error details:", {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                  });
+                  toast.error(`Database error: ${error.message}`);
+                  return;
                 }
 
                 console.log("✅ TikTok profile saved to Supabase:", data);
