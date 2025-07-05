@@ -427,34 +427,30 @@ export function HomeContent({
                 const userInfo = JSON.parse(decodeURIComponent(tiktokUser));
                 console.log("🔍 Saving TikTok profile:", userInfo);
 
-                const backendUrl =
-                  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-                const response = await fetch(
-                  `${backendUrl}/api/v1/tiktok/profile/save`,
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${session.access_token}`,
-                    },
-                    body: JSON.stringify({
-                      accessToken,
-                      refreshToken,
-                      userInfo,
-                    }),
-                  }
-                );
+                // Save directly to Supabase instead of going through backend
+                const { data, error } = await supabase
+                  .from('tiktok_profiles')
+                  .upsert({
+                    user_id: session.user.id,
+                    tiktok_user_id: userInfo.open_id || userInfo.union_id,
+                    username: userInfo.username,
+                    display_name: userInfo.display_name,
+                    avatar_url: userInfo.avatar_url,
+                    follower_count: userInfo.follower_count || 0,
+                    following_count: userInfo.following_count || 0,
+                    access_token: accessToken,
+                    refresh_token: refreshToken,
+                    updated_at: new Date().toISOString()
+                  }, {
+                    onConflict: 'user_id'
+                  });
 
-                if (!response.ok) {
-                  const errorText = await response.text();
-                  console.error("❌ Failed to save TikTok profile:", errorText);
-                  throw new Error(
-                    `Failed to save TikTok profile: ${response.status}`
-                  );
+                if (error) {
+                  console.error("❌ Supabase save error:", error);
+                  throw error;
                 }
 
-                const result = await response.json();
-                console.log("✅ TikTok profile saved to database:", result);
+                console.log("✅ TikTok profile saved to Supabase:", data);
                 return true;
               }
               return false;
