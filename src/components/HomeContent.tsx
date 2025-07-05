@@ -282,8 +282,24 @@ export function HomeContent({
     if (tiktokConnected === "true") {
       if (!session) {
         console.log(
-          "⚠️ TikTok connected but no session, waiting for session..."
+          "⚠️ TikTok connected but no session, attempting to restore..."
         );
+        
+        // Try to restore session using the userToken from OAuth callback
+        if (userToken) {
+          console.log("🔄 Attempting session restoration with userToken...");
+          supabase.auth.setSession({
+            access_token: userToken,
+            refresh_token: userToken, // TikTok callback includes both
+          }).then(({ data, error }) => {
+            if (error) {
+              console.error("❌ Session restoration failed:", error);
+            } else {
+              console.log("✅ Session restored successfully:", data);
+            }
+          });
+        }
+        
         // Store the callback data temporarily and wait for session
         localStorage.setItem(
           "tiktok_callback_data",
@@ -294,6 +310,7 @@ export function HomeContent({
             tiktokUser,
             isPartial: urlParams.get("partial"),
             isMock,
+            timestamp: Date.now(), // Add timestamp to prevent stale data
           })
         );
         return;
@@ -394,7 +411,15 @@ export function HomeContent({
             tiktokUser,
             isPartial,
             isMock,
+            timestamp,
           } = JSON.parse(storedCallbackData);
+          
+          // Check if data is stale (older than 5 minutes)
+          if (timestamp && Date.now() - timestamp > 5 * 60 * 1000) {
+            console.log("⚠️ Stored callback data is stale, removing...");
+            localStorage.removeItem("tiktok_callback_data");
+            return;
+          }
 
           const saveTikTokProfile = async () => {
             try {
