@@ -467,6 +467,16 @@ export function HomeContent({
                 }
 
                 console.log("✅ TikTok profile saved to Supabase:", data);
+                toast.success("TikTok profile connected successfully!");
+                
+                // Clear ALL callback data after successful save
+                localStorage.removeItem('tiktok_callback_data');
+                localStorage.removeItem('tiktok_access_token');
+                localStorage.removeItem('tiktok_refresh_token');
+                localStorage.removeItem('tiktok_user');
+                
+                // Refresh connection status
+                await refreshConnection();
                 return true;
               }
               return false;
