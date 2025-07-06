@@ -488,6 +488,30 @@ export function HomeContent({
                 
                 // Refresh connection status
                 await refreshConnection();
+                
+                // Automatically fetch TikTok videos after successful connection
+                console.log("🎬 Automatically fetching TikTok videos after connection...");
+                try {
+                  const videoResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/tiktok/videos`, {
+                    method: 'GET',
+                    headers: {
+                      'Authorization': `Bearer ${session.access_token}`,
+                      'Content-Type': 'application/json'
+                    }
+                  });
+                  
+                  if (videoResponse.ok) {
+                    const videos = await videoResponse.json();
+                    console.log("✅ Successfully fetched TikTok videos:", videos);
+                    toast.success(`Connected and loaded ${videos.length || 0} TikTok videos!`);
+                  } else {
+                    console.warn("⚠️  Video fetch failed but connection succeeded:", videoResponse.status);
+                  }
+                } catch (videoError) {
+                  console.error("❌ Error fetching videos after connection:", videoError);
+                  // Don't show error toast here - connection was successful
+                }
+                
                 return true;
               }
               return false;
@@ -515,7 +539,11 @@ export function HomeContent({
             toast.success(
               "TikTok connected successfully! Full access granted."
             );
-            saveTikTokProfile();
+            saveTikTokProfile().then((success) => {
+              if (success) {
+                console.log("Successfully saved full TikTok profile and fetched videos");
+              }
+            });
           }
 
           refreshConnection();
