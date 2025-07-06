@@ -558,6 +558,7 @@ export function HomeContent({
           );
           localStorage.removeItem("tiktok_callback_data");
         }
+        }
       }, 1000); // 1 second debounce to prevent rapid consecutive calls
       
       return () => clearTimeout(processCallbackTimeout);
