@@ -267,6 +267,11 @@ export function HomeContent({
     const userToken = urlParams.get("user_token");
     const tiktokUser = urlParams.get("tiktok_user");
 
+    // Only process if there are actual callback parameters to prevent excessive checks
+    if (!tiktokConnected && !error && !accessToken && !userToken) {
+      return; // Skip processing if no relevant callback parameters
+    }
+
     // Debug logging
     console.log("🔍 TikTok callback check:", {
       tiktokConnected,

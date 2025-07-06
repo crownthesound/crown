@@ -179,6 +179,12 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
 
   const loadTikTokVideos = async () => {
     if (!session) return;
+    
+    // Check if already loading videos to prevent duplicate calls
+    if (isLoadingVideos) {
+      console.log("🔄 TikTok videos already loading, skipping...");
+      return;
+    }
 
     setIsLoadingVideos(true);
     try {
