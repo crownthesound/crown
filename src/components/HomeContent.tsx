@@ -266,6 +266,7 @@ export function HomeContent({
     const refreshToken = urlParams.get("refresh_token");
     const userToken = urlParams.get("user_token");
     const tiktokUser = urlParams.get("tiktok_user");
+    const grantedScopes = urlParams.get("granted_scopes");
 
     // Only process if there are actual callback parameters to prevent excessive checks
     if (!tiktokConnected && !error && !accessToken && !userToken) {
@@ -315,6 +316,7 @@ export function HomeContent({
             tiktokUser,
             isPartial: urlParams.get("partial"),
             isMock,
+            grantedScopes, // Add granted scopes
             timestamp: Date.now(), // Add timestamp to prevent stale data
             processed: false, // Flag to prevent duplicate processing
           })
@@ -425,6 +427,7 @@ export function HomeContent({
             isMock,
             timestamp,
             processed, // Add flag to prevent duplicate processing
+            grantedScopes, // Add granted scopes
           } = JSON.parse(storedCallbackData);
           
           // Skip if already processed
@@ -456,6 +459,7 @@ export function HomeContent({
                   following_count: userInfo.following_count || 0,
                   access_token: accessToken,
                   refresh_token: refreshToken,
+                  granted_scopes: grantedScopes || "", // Add granted scopes
                   updated_at: new Date().toISOString()
                 };
                 

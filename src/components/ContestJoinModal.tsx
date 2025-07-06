@@ -206,11 +206,22 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
         // Handle specific error cases
         if (response.status === 403) {
           console.error("❌ TikTok API 403 Forbidden - likely token/permission issue");
-          setTikTokConnectionError("permissions");
-          toast.error(
-            "TikTok access forbidden. Your TikTok connection may have expired. Please reconnect your account.",
-            { duration: 6000 }
-          );
+          console.error("🔍 Error details:", errorData);
+          
+          // Check if it's specifically about video permissions
+          if (errorData.message && errorData.message.includes("video permissions")) {
+            setTikTokConnectionError("permissions");
+            toast.error(
+              "TikTok video access denied. Please reconnect and grant video permissions to load your TikTok videos.",
+              { duration: 8000 }
+            );
+          } else {
+            setTikTokConnectionError("permissions");
+            toast.error(
+              "TikTok access forbidden. Your TikTok connection may have expired. Please reconnect your account.",
+              { duration: 6000 }
+            );
+          }
         } else if (
           errorData.error_code === "PERMISSION_DENIED" ||
           (errorData.message &&
