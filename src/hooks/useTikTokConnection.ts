@@ -8,9 +8,13 @@ export const useTikTokConnection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [tikTokProfile, setTikTokProfile] = useState<any>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
+  const [lastCheckTime, setLastCheckTime] = useState(0);
 
   // Get backend URL from environment or default
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+  // Debounce interval (5 seconds)
+  const DEBOUNCE_INTERVAL = 5000;
 
   useEffect(() => {
     if (!session) {
@@ -20,13 +24,29 @@ export const useTikTokConnection = () => {
       return;
     }
 
-    checkTikTokConnection();
+    // Only check if enough time has passed since last check
+    const now = Date.now();
+    if (now - lastCheckTime > DEBOUNCE_INTERVAL) {
+      checkTikTokConnection();
+    } else {
+      // Use cached state, don't make new API call
+      setIsLoading(false);
+    }
   }, [session]);
 
-  const checkTikTokConnection = async () => {
+  const checkTikTokConnection = async (force = false) => {
     if (!session) return;
 
+    // Debounce: only check if forced or enough time has passed
+    const now = Date.now();
+    if (!force && now - lastCheckTime < DEBOUNCE_INTERVAL) {
+      console.log("🔄 Skipping TikTok connection check (debounced)");
+      return;
+    }
+
     setIsLoading(true);
+    setLastCheckTime(now);
+    
     try {
       console.log("🔍 Checking TikTok connection for user:", session.user.id);
       const { data, error } = await supabase
@@ -56,7 +76,7 @@ export const useTikTokConnection = () => {
   };
 
   const refreshConnection = () => {
-    checkTikTokConnection();
+    checkTikTokConnection(true); // Force check on manual refresh
   };
 
   const connectWithVideoPermissions = async () => {

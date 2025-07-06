@@ -398,11 +398,13 @@ export function HomeContent({
     }
   }, [refreshConnection, session]);
 
-  // Handle stored TikTok callback data when session becomes available
+  // Handle stored TikTok callback data when session becomes available (with debouncing)
   useEffect(() => {
     if (session) {
-      const storedCallbackData = localStorage.getItem("tiktok_callback_data");
-      if (storedCallbackData) {
+      // Add debouncing to prevent excessive callback processing
+      const processCallbackTimeout = setTimeout(() => {
+        const storedCallbackData = localStorage.getItem("tiktok_callback_data");
+        if (storedCallbackData) {
         console.log("🔍 Processing stored TikTok callback data...");
         try {
           const {
@@ -528,7 +530,9 @@ export function HomeContent({
           );
           localStorage.removeItem("tiktok_callback_data");
         }
-      }
+      }, 1000); // 1 second debounce to prevent rapid consecutive calls
+      
+      return () => clearTimeout(processCallbackTimeout);
     }
   }, [session]); // Remove refreshConnection to prevent infinite loops
 
