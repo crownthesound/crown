@@ -406,6 +406,10 @@ export function HomeContent({
         const storedCallbackData = localStorage.getItem("tiktok_callback_data");
         if (storedCallbackData) {
         console.log("🔍 Processing stored TikTok callback data...");
+        
+        // Immediately remove from localStorage to prevent re-processing
+        localStorage.removeItem("tiktok_callback_data");
+        
         try {
           const {
             accessToken,
@@ -420,15 +424,13 @@ export function HomeContent({
           
           // Skip if already processed
           if (processed) {
-            console.log("🔄 Callback data already processed, cleaning up...");
-            localStorage.removeItem("tiktok_callback_data");
+            console.log("🔄 Callback data already processed, skipping...");
             return;
           }
           
           // Check if data is stale (older than 5 minutes)
           if (timestamp && Date.now() - timestamp > 5 * 60 * 1000) {
-            console.log("⚠️ Stored callback data is stale, removing...");
-            localStorage.removeItem("tiktok_callback_data");
+            console.log("⚠️ Stored callback data is stale, skipping...");
             return;
           }
 
@@ -457,7 +459,10 @@ export function HomeContent({
                 // Save directly to Supabase instead of going through backend
                 const { data, error } = await supabase
                   .from('tiktok_profiles')
-                  .upsert(profileData)
+                  .upsert(profileData, { 
+                    onConflict: 'user_id',
+                    ignoreDuplicates: false
+                  })
                   .select();
 
                 if (error) {
