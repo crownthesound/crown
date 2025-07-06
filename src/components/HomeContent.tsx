@@ -431,7 +431,7 @@ export function HomeContent({
                 const profileData = {
                   user_id: session.user.id,
                   tiktok_user_id: userInfo.open_id || userInfo.union_id,
-                  username: userInfo.username || null,
+                  username: userInfo.username || userInfo.display_name || `user_${userInfo.open_id?.slice(-8) || 'unknown'}`,
                   display_name: userInfo.display_name || null,
                   avatar_url: userInfo.avatar_url || null,
                   follower_count: userInfo.follower_count || 0,
