@@ -427,7 +427,7 @@ export function HomeContent({
             isMock,
             timestamp,
             processed, // Add flag to prevent duplicate processing
-            // grantedScopes, // TODO: Use after database migration
+            grantedScopes, // Add granted scopes
           } = JSON.parse(storedCallbackData);
           
           // Skip if already processed
@@ -459,7 +459,7 @@ export function HomeContent({
                   following_count: userInfo.following_count || 0,
                   access_token: accessToken,
                   refresh_token: refreshToken,
-                  // granted_scopes: grantedScopes || "", // TODO: Add after database migration
+                  granted_scopes: grantedScopes || "", // Add granted scopes
                   updated_at: new Date().toISOString()
                 };
                 
