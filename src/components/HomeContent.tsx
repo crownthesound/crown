@@ -311,6 +311,7 @@ export function HomeContent({
             isPartial: urlParams.get("partial"),
             isMock,
             timestamp: Date.now(), // Add timestamp to prevent stale data
+            processed: false, // Flag to prevent duplicate processing
           })
         );
         return;
@@ -412,7 +413,15 @@ export function HomeContent({
             isPartial,
             isMock,
             timestamp,
+            processed, // Add flag to prevent duplicate processing
           } = JSON.parse(storedCallbackData);
+          
+          // Skip if already processed
+          if (processed) {
+            console.log("🔄 Callback data already processed, cleaning up...");
+            localStorage.removeItem("tiktok_callback_data");
+            return;
+          }
           
           // Check if data is stale (older than 5 minutes)
           if (timestamp && Date.now() - timestamp > 5 * 60 * 1000) {
@@ -510,7 +519,7 @@ export function HomeContent({
           refreshConnection();
           setShowTikTokModal(false);
 
-          // Clean up stored data
+          // Mark as processed and clean up stored data
           localStorage.removeItem("tiktok_callback_data");
         } catch (error) {
           console.error(
@@ -521,7 +530,7 @@ export function HomeContent({
         }
       }
     }
-  }, [session, refreshConnection]);
+  }, [session]); // Remove refreshConnection to prevent infinite loops
 
   const getRankIcon = (rank: number) => {
     const colors = {
