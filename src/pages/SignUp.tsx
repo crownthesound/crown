@@ -4,12 +4,15 @@ import { supabase } from '../lib/supabase';
 import { Loader2, Crown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Footer } from '../components/Footer';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 export function SignUp() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
   const navigate = useNavigate();
 
   const validatePassword = (password: string): boolean => {
@@ -48,6 +51,7 @@ export function SignUp() {
               id: user.id,
               email: user.email,
               full_name: fullName,
+              phone_number: phoneNumber || null,
               role: 'user',
             },
           ]);
@@ -100,6 +104,23 @@ export function SignUp() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
                 required
+              />
+            </div>
+
+            <div>
+              <PhoneInput
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={setPhoneNumber}
+                defaultCountry="US"
+                className="phone-input"
+                style={{
+                  '--PhoneInputCountryFlag-borderColor': 'transparent',
+                  '--PhoneInput-color--focus': '#ffffff',
+                }}
+                numberInputProps={{
+                  className: "w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+                }}
               />
             </div>
 
