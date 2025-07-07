@@ -62,11 +62,13 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
     refreshConnection: refreshTikTokConnection,
     connectWithVideoPermissions,
   } = useTikTokConnection();
-  const [step, setStep] = useState<"join" | "select-video">("join");
+  type Step = "join" | "select-video" | "post-video";
+  const [step, setStep] = useState<Step>("join");
   const [isJoining, setIsJoining] = useState(false);
   const [isLoadingVideos, setIsLoadingVideos] = useState(false);
   const [videos, setVideos] = useState<TikTokVideo[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<TikTokVideo | null>(null);
+  const [agreedGuidelines, setAgreedGuidelines] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConnectingTikTok, setIsConnectingTikTok] = useState(false);
   const [tikTokConnectionError, setTikTokConnectionError] = useState<
@@ -179,7 +181,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
 
   const loadTikTokVideos = async () => {
     if (!session) return;
-    
+
     // Check if already loading videos to prevent duplicate calls
     if (isLoadingVideos) {
       console.log("🔄 TikTok videos already loading, skipping...");
@@ -205,11 +207,16 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
 
         // Handle specific error cases
         if (response.status === 403) {
-          console.error("❌ TikTok API 403 Forbidden - likely token/permission issue");
+          console.error(
+            "❌ TikTok API 403 Forbidden - likely token/permission issue"
+          );
           console.error("🔍 Error details:", errorData);
-          
+
           // Check if it's specifically about video permissions
-          if (errorData.message && errorData.message.includes("video permissions")) {
+          if (
+            errorData.message &&
+            errorData.message.includes("video permissions")
+          ) {
             setTikTokConnectionError("permissions");
             toast.error(
               "TikTok video access denied. Please reconnect and grant video permissions to load your TikTok videos.",
@@ -397,11 +404,15 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1A1A1A] rounded-2xl border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-0 sm:p-4">
+      <div className="bg-[#1A1A1A] border border-white/10 w-full h-full sm:h-auto sm:max-h-[90vh] max-w-none sm:max-w-4xl overflow-hidden rounded-none sm:rounded-2xl flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-2xl font-bold text-white">
-            {step === "join" ? "Join Contest" : "Select Video"}
+          <h2 className="text-xl sm:text-2xl font-bold text-white">
+            {step === "join"
+              ? "Join Contest"
+              : step === "select-video"
+              ? "Select Video"
+              : "Post Video"}
           </h2>
           <button
             onClick={onClose}
@@ -411,7 +422,8 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
           </button>
         </div>
 
-        <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+        {/* Scrollable body – flex-1 pushes footer to the bottom */}
+        <div className="overflow-y-auto flex-1">
           {step === "join" ? (
             <div className="p-6">
               <div className="flex flex-col lg:flex-row gap-6">
@@ -564,37 +576,9 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                 )}
               </div>
 
-              <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-white/10">
-                <button
-                  onClick={onClose}
-                  className="px-6 py-2 text-white/60 hover:text-white border border-white/20 rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleJoinContest}
-                  disabled={isJoining || !isTikTokConnected || isTikTokLoading}
-                  className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                >
-                  {isJoining ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Joining...</span>
-                    </>
-                  ) : isTikTokLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Checking TikTok...</span>
-                    </>
-                  ) : !isTikTokConnected ? (
-                    <span>Connect TikTok First</span>
-                  ) : (
-                    <span>Join Contest</span>
-                  )}
-                </button>
-              </div>
+              {/* Buttons now live in the global sticky footer to avoid duplicates */}
             </div>
-          ) : (
+          ) : step === "select-video" ? (
             <div className="p-6">
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-white mb-2">
@@ -654,7 +638,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                   )}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                   {videos.map((video) => {
                     const isEligible =
                       Date.now() / 1000 - (video.create_time || 0) <
@@ -674,6 +658,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                             return;
                           }
                           setSelectedVideo(video);
+                          // Wait for user to press "Next" before moving to post-video step
                         }}
                         className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                           selectedVideo?.id === video.id
@@ -684,13 +669,16 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                         }`}
                       >
                         <div className="aspect-[9/16] relative">
-                          <iframe
-                            src={`https://www.tiktok.com/embed/v2/${video.id}`}
-                            allow="encrypted-media; fullscreen"
-                            scrolling="no"
-                            className="absolute inset-0 w-full h-full"
-                            frameBorder="0"
-                          ></iframe>
+                          <img
+                            src={video.cover_image_url}
+                            alt={
+                              video.title ||
+                              video.video_description ||
+                              "TikTok thumbnail"
+                            }
+                            className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                          />
                           {!isEligible && (
                             <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-xs text-center px-2">
                               Video too old (24h+)
@@ -701,23 +689,8 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                               <Check className="h-4 w-4 text-white" />
                             </div>
                           )}
-                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded text-white text-xs">
+                          <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/60 rounded text-white text-[10px]">
                             {formatDuration(video.duration)}
-                          </div>
-                        </div>
-                        <div className="p-3">
-                          <p className="text-white text-sm font-medium line-clamp-2 mb-1">
-                            {video.title ||
-                              video.video_description ||
-                              "Untitled"}
-                          </p>
-                          <div className="flex items-center space-x-3 text-xs text-white/60">
-                            <span>
-                              {video.view_count?.toLocaleString() || 0} views
-                            </span>
-                            <span>
-                              {video.like_count?.toLocaleString() || 0} likes
-                            </span>
                           </div>
                         </div>
                       </div>
@@ -759,58 +732,142 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                 )}
               </div>
 
-              <div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
-                <button
-                  onClick={() => setStep("join")}
-                  className="px-4 py-2 text-white/60 hover:text-white transition-colors"
-                >
-                  ← Back
-                </button>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={onClose}
-                    className="px-6 py-2 text-white/60 hover:text-white border border-white/20 rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSubmitVideo}
-                    disabled={
-                      !selectedVideo ||
-                      isSubmitting ||
-                      (selectedVideo &&
-                        Date.now() / 1000 - (selectedVideo.create_time || 0) >
-                          24 * 60 * 60)
-                    }
-                    className="px-6 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Submitting...</span>
-                      </>
-                    ) : (
-                      <span>Submit Video</span>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Selected video preview */}
+              {/* footer handled globally */}
+            </div>
+          ) : (
+            /** POST-VIDEO STEP  */
+            <div className="p-6 space-y-6">
               {selectedVideo && (
-                <div className="flex justify-center mb-6">
-                  <iframe
-                    src={`https://www.tiktok.com/embed/v2/${selectedVideo.id}`}
-                    width="320"
-                    height="560"
-                    allow="encrypted-media; fullscreen"
-                    scrolling="no"
-                    frameBorder="0"
-                    className="rounded-lg shadow-lg"
-                  ></iframe>
+                <div className="flex justify-center">
+                  <img
+                    src={selectedVideo.cover_image_url}
+                    alt="Selected video thumbnail"
+                    className="w-40 sm:w-56 rounded-lg shadow-lg"
+                  />
                 </div>
               )}
+
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-3">
+                  Creator Guidelines
+                </h3>
+                <ul className="list-disc pl-5 space-y-1 text-white/80 text-sm">
+                  <li>
+                    I have read and followed the project overview and rules
+                  </li>
+                  <li>
+                    I will not boost this post or purchase non-organic
+                    engagement
+                  </li>
+                  <li>
+                    I will keep this submission up for at least 365 days if
+                    selected as a winner
+                  </li>
+                </ul>
+
+                <label className="flex items-center mt-4 text-sm text-white/80 gap-2">
+                  <input
+                    type="checkbox"
+                    className="form-checkbox h-4 w-4 text-blue-600"
+                    checked={agreedGuidelines}
+                    onChange={(e) => setAgreedGuidelines(e.target.checked)}
+                  />
+                  <span>I understand and agree to the creator guidelines</span>
+                </label>
+              </div>
+
+              {/* footer handled globally */}
             </div>
+          )}
+        </div>
+        {/* ───────────────────── STICKY FOOTER ───────────────────── */}
+        <div className="border-t border-white/10 p-4 sm:p-6 flex-shrink-0 flex justify-between items-center bg-[#1A1A1A]">
+          {step === "join" && (
+            <div className="w-full flex justify-end space-x-3">
+              <button
+                onClick={onClose}
+                className="px-3 py-2 sm:px-6 text-sm sm:text-base text-white/60 hover:text-white border border-white/20 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleJoinContest}
+                disabled={isJoining || !isTikTokConnected || isTikTokLoading}
+                className="px-3 py-2 sm:px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-sm sm:text-base text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {isJoining ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Joining...</span>
+                  </>
+                ) : (
+                  <span>Join Contest</span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {step === "select-video" && (
+            <>
+              <button
+                onClick={() => setStep("join")}
+                className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white/60 hover:text-white transition-colors"
+              >
+                ← Back
+              </button>
+              <div className="flex space-x-3">
+                <button
+                  onClick={onClose}
+                  className="px-3 py-2 sm:px-6 text-sm sm:text-base text-white/60 hover:text-white border border-white/20 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => setStep("post-video")}
+                  disabled={
+                    !selectedVideo ||
+                    Date.now() / 1000 - (selectedVideo?.create_time || 0) >
+                      24 * 60 * 60
+                  }
+                  className="px-3 py-2 sm:px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-sm sm:text-base text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </>
+          )}
+
+          {step === "post-video" && (
+            <>
+              <button
+                onClick={() => setStep("select-video")}
+                className="px-3 py-2 sm:px-4 text-sm sm:text-base text-white/60 hover:text-white transition-colors"
+              >
+                ← Back
+              </button>
+              <div className="flex space-x-3">
+                <button
+                  onClick={onClose}
+                  className="px-3 py-2 sm:px-6 text-sm sm:text-base text-white/60 hover:text-white border border-white/20 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitVideo}
+                  disabled={!agreedGuidelines || isSubmitting}
+                  className="px-3 py-2 sm:px-6 bg-gradient-to-r from-green-500 to-blue-600 text-sm sm:text-base text-white rounded-lg hover:from-green-600 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <span>Submit Content</span>
+                  )}
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
