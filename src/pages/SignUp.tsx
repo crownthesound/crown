@@ -7,6 +7,25 @@ import { Footer } from '../components/Footer';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 
+// Custom styles for phone input
+const phoneInputStyles = `
+  .phone-input .PhoneInputCountrySelect {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0.5rem !important;
+    color: white !important;
+  }
+  .phone-input .PhoneInputCountrySelect:focus {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+    outline: none !important;
+  }
+  .phone-input .PhoneInputCountrySelectArrow {
+    color: white !important;
+    opacity: 0.8 !important;
+  }
+`;
+
 export function SignUp() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -71,7 +90,9 @@ export function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A] flex flex-col">
+    <>
+      <style dangerouslySetInnerHTML={{ __html: phoneInputStyles }} />
+      <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A] flex flex-col">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 w-full">
         <Link to="/" className="flex items-center gap-3">
           <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
@@ -117,6 +138,14 @@ export function SignUp() {
                 style={{
                   '--PhoneInputCountryFlag-borderColor': 'transparent',
                   '--PhoneInput-color--focus': '#ffffff',
+                  '--PhoneInputCountrySelectArrow-color': '#ffffff',
+                  '--PhoneInputCountrySelectArrow-opacity': '0.8',
+                  '--PhoneInputCountrySelect-backgroundColor': 'rgba(255, 255, 255, 0.05)',
+                  '--PhoneInputCountrySelect-borderColor': 'rgba(255, 255, 255, 0.1)',
+                  '--PhoneInputCountrySelect-borderRadius': '0.5rem',
+                  '--PhoneInputCountrySelect-borderWidth': '1px',
+                  '--PhoneInputCountrySelect--focus-borderColor': 'rgba(255, 255, 255, 0.2)',
+                  '--PhoneInputCountrySelect--focus-boxShadow': '0 0 0 2px rgba(255, 255, 255, 0.2)',
                 }}
                 numberInputProps={{
                   className: "w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
@@ -179,7 +208,8 @@ export function SignUp() {
         </div>
       </div>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 }
