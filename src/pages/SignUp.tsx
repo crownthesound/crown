@@ -32,6 +32,7 @@ export function SignUp() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
+  const [smsConsent, setSmsConsent] = useState(false);
   const navigate = useNavigate();
 
   const validatePassword = (password: string): boolean => {
@@ -45,6 +46,10 @@ export function SignUp() {
     try {
       if (!validatePassword(password)) {
         throw new Error('Password must be at least 6 characters long');
+      }
+
+      if (!smsConsent) {
+        throw new Error('You must agree to receive text messages to create an account');
       }
 
       const { data: { user }, error: signUpError } = await supabase.auth.signUp({
@@ -166,6 +171,23 @@ export function SignUp() {
               <p className="text-xs text-white/40 mt-2">
                 Password must be at least 6 characters long
               </p>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="smsConsent"
+                checked={smsConsent}
+                onChange={(e) => setSmsConsent(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border border-white/10 bg-white/5 text-white focus:ring-2 focus:ring-white/20 focus:ring-offset-0"
+                required
+              />
+              <label htmlFor="smsConsent" className="text-xs text-white/60 leading-relaxed">
+                By checking this box you agree to receive text messages from Crown. Reply STOP to opt out; Reply HELP for help; Message frequency varies; Message and data rates may apply.{' '}
+                <Link to="/privacy" className="text-white hover:underline">
+                  Privacy Policy
+                </Link>
+              </label>
             </div>
 
             <button
