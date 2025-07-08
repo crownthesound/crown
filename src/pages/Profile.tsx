@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -13,17 +13,138 @@ import {
   Shield,
   Star,
   Trophy,
-  Settings
+  Settings,
+  Play,
+  Eye,
+  ExternalLink,
+  Clock,
+  Award,
+  Upload,
+  Trash2,
+  Edit,
+  BarChart3
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
 
+interface Contest {
+  id: string;
+  name: string;
+  description: string;
+  cover_image: string | null;
+  start_date: string;
+  end_date: string;
+  status: string;
+  music_category: string;
+  prize_per_winner: number;
+  num_winners: number;
+  joined_at?: string;
+}
+
+interface Submission {
+  id: string;
+  title: string;
+  url: string;
+  thumbnail: string;
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  created_at: string;
+  contest_id: string;
+  contest_name: string;
+  tiktok_video_id?: string;
+  embed_code?: string;
+}
+
 export function Profile() {
   const { session, profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'overview' | 'contests' | 'submissions'>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(profile?.full_name || '');
   const [saving, setSaving] = useState(false);
+  const [joinedContests, setJoinedContests] = useState<Contest[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (session && (activeTab === 'contests' || activeTab === 'submissions')) {
+      fetchUserData();
+    }
+  }, [session, activeTab]);
+
+  const fetchUserData = async () => {
+    if (!session?.user?.id) return;
+    
+    setLoading(true);
+    try {
+      // Fetch joined contests
+      const { data: participantData, error: participantError } = await supabase
+        .from('contest_participants')
+        .select(`
+          joined_at,
+          contests (
+            id,
+            name,
+            description,
+            cover_image,
+            start_date,
+            end_date,
+            status,
+            music_category,
+            prize_per_winner,
+            num_winners
+          )
+        `)
+        .eq('user_id', session.user.id);
+
+      if (participantError) throw participantError;
+
+      const contests = participantData?.map(p => ({
+        ...p.contests,
+        joined_at: p.joined_at
+      })) || [];
+      setJoinedContests(contests);
+
+      // Fetch user submissions
+      const { data: submissionData, error: submissionError } = await supabase
+        .from('contest_links')
+        .select(`
+          id,
+          title,
+          url,
+          thumbnail,
+          views,
+          likes,
+          comments,
+          shares,
+          created_at,
+          contest_id,
+          tiktok_video_id,
+          embed_code,
+          contests (
+            name
+          )
+        `)
+        .eq('created_by', session.user.id)
+        .eq('is_contest_submission', true);
+
+      if (submissionError) throw submissionError;
+
+      const processedSubmissions = submissionData?.map(s => ({
+        ...s,
+        contest_name: s.contests?.name || 'Unknown Contest'
+      })) || [];
+      setSubmissions(processedSubmissions);
+
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      toast.error('Failed to load user data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignOut = async () => {
     try {
@@ -53,12 +174,31 @@ export function Profile() {
 
       toast.success('Profile updated successfully');
       setIsEditing(false);
-      // The profile will be updated automatically through the auth context
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteSubmission = async (submissionId: string) => {
+    if (!confirm('Are you sure you want to delete this submission?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('contest_links')
+        .delete()
+        .eq('id', submissionId)
+        .eq('created_by', session?.user?.id);
+
+      if (error) throw error;
+
+      setSubmissions(submissions.filter(s => s.id !== submissionId));
+      toast.success('Submission deleted successfully');
+    } catch (error) {
+      console.error('Error deleting submission:', error);
+      toast.error('Failed to delete submission');
     }
   };
 
@@ -105,6 +245,29 @@ export function Profile() {
     });
   };
 
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`;
+    }
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`;
+    }
+    return num.toString();
+  };
+
+  const getContestStatus = (contest: Contest) => {
+    const now = new Date();
+    const endDate = new Date(contest.end_date);
+    
+    if (contest.status === 'completed' || endDate < now) {
+      return { label: 'Completed', color: 'text-green-400', bgColor: 'bg-green-400/10' };
+    }
+    if (contest.status === 'active') {
+      return { label: 'Active', color: 'text-blue-400', bgColor: 'bg-blue-400/10' };
+    }
+    return { label: 'Draft', color: 'text-gray-400', bgColor: 'bg-gray-400/10' };
+  };
+
   if (!session || !profile) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A] flex items-center justify-center">
@@ -119,11 +282,11 @@ export function Profile() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black text-white mb-2">Profile</h1>
-          <p className="text-white/60">Manage your account settings</p>
+          <p className="text-white/60">Manage your account and track your progress</p>
         </div>
 
         {/* Profile Card */}
@@ -189,82 +352,288 @@ export function Profile() {
                   </span>
                 </div>
               </div>
+
+              {/* Quick Stats */}
+              <div className="flex gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-white">{joinedContests.length}</p>
+                  <p className="text-xs text-white/60">Contests</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-white">{submissions.length}</p>
+                  <p className="text-xs text-white/60">Submissions</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Profile Details */}
-          <div className="p-8 space-y-6">
-            {/* Account Information */}
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Account Information
-              </h3>
-              <div className="grid gap-4">
-                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                  <Mail className="h-5 w-5 text-white/60" />
-                  <div>
-                    <p className="text-sm text-white/60">Email Address</p>
-                    <p className="text-white font-medium">{profile.email || 'Not provided'}</p>
+          {/* Tabs */}
+          <div className="border-b border-white/10">
+            <nav className="flex">
+              {[
+                { id: 'overview', label: 'Overview', icon: Settings },
+                { id: 'contests', label: 'My Contests', icon: Trophy },
+                { id: 'submissions', label: 'My Submissions', icon: Upload }
+              ].map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors border-b-2 ${
+                      activeTab === tab.id
+                        ? 'text-white border-white'
+                        : 'text-white/60 hover:text-white border-transparent'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-8">
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Account Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Account Information
+                  </h3>
+                  <div className="grid gap-4">
+                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
+                      <Mail className="h-5 w-5 text-white/60" />
+                      <div>
+                        <p className="text-sm text-white/60">Email Address</p>
+                        <p className="text-white font-medium">{profile.email || 'Not provided'}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
+                      <Calendar className="h-5 w-5 text-white/60" />
+                      <div>
+                        <p className="text-sm text-white/60">Member Since</p>
+                        <p className="text-white font-medium">
+                          {profile.created_at ? formatDate(profile.created_at) : 'Unknown'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
+                      <RoleIcon className={`h-5 w-5 ${roleInfo.color}`} />
+                      <div>
+                        <p className="text-sm text-white/60">Account Type</p>
+                        <p className={`font-medium ${roleInfo.color}`}>{roleInfo.label}</p>
+                        <p className="text-xs text-white/40 mt-1">{roleInfo.description}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                  <Calendar className="h-5 w-5 text-white/60" />
-                  <div>
-                    <p className="text-sm text-white/60">Member Since</p>
-                    <p className="text-white font-medium">
-                      {profile.created_at ? formatDate(profile.created_at) : 'Unknown'}
-                    </p>
+                {/* Activity Stats */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Activity Stats
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <Star className="h-6 w-6 text-yellow-400 mx-auto mb-2" />
+                      <p className="text-2xl font-bold text-white">{joinedContests.length}</p>
+                      <p className="text-sm text-white/60">Contests Joined</p>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <Trophy className="h-6 w-6 text-blue-400 mx-auto mb-2" />
+                      <p className="text-2xl font-bold text-white">0</p>
+                      <p className="text-sm text-white/60">Wins</p>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <Crown className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+                      <p className="text-2xl font-bold text-white">
+                        {submissions.reduce((total, sub) => total + (sub.views || 0), 0)}
+                      </p>
+                      <p className="text-sm text-white/60">Total Views</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                  <RoleIcon className={`h-5 w-5 ${roleInfo.color}`} />
-                  <div>
-                    <p className="text-sm text-white/60">Account Type</p>
-                    <p className={`font-medium ${roleInfo.color}`}>{roleInfo.label}</p>
-                    <p className="text-xs text-white/40 mt-1">{roleInfo.description}</p>
-                  </div>
+                {/* Sign Out Button */}
+                <div className="pt-6 border-t border-white/10">
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 group"
+                  >
+                    <LogOut className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    <span className="font-medium">Sign Out</span>
+                  </button>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Stats Section (placeholder for future features) */}
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Trophy className="h-5 w-5" />
-                Activity Stats
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
-                  <Star className="h-6 w-6 text-yellow-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">0</p>
-                  <p className="text-sm text-white/60">Contests Joined</p>
+            {activeTab === 'contests' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <Trophy className="h-5 w-5" />
+                    Joined Contests ({joinedContests.length})
+                  </h3>
                 </div>
-                <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
-                  <Trophy className="h-6 w-6 text-blue-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">0</p>
-                  <p className="text-sm text-white/60">Wins</p>
-                </div>
-                <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
-                  <Crown className="h-6 w-6 text-purple-400 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-white">0</p>
-                  <p className="text-sm text-white/60">Points</p>
-                </div>
+
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+                    <p className="text-white/60 mt-4">Loading contests...</p>
+                  </div>
+                ) : joinedContests.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Trophy className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                    <h4 className="text-lg font-medium text-white mb-2">No contests joined yet</h4>
+                    <p className="text-white/60 mb-6">Start participating in contests to see them here</p>
+                    <button
+                      onClick={() => navigate('/')}
+                      className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                    >
+                      Browse Contests
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {joinedContests.map((contest) => {
+                      const status = getContestStatus(contest);
+                      return (
+                        <div key={contest.id} className="bg-white/5 rounded-lg border border-white/10 p-6">
+                          <div className="flex items-start gap-4">
+                            {contest.cover_image && (
+                              <img
+                                src={contest.cover_image}
+                                alt={contest.name}
+                                className="w-16 h-16 rounded-lg object-cover"
+                              />
+                            )}
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between mb-2">
+                                <h4 className="text-lg font-semibold text-white">{contest.name}</h4>
+                                <div className={`px-2 py-1 rounded-full text-xs font-medium ${status.bgColor} ${status.color}`}>
+                                  {status.label}
+                                </div>
+                              </div>
+                              <p className="text-white/60 text-sm mb-3 line-clamp-2">{contest.description}</p>
+                              <div className="flex items-center gap-4 text-xs text-white/40">
+                                <span>Joined: {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}</span>
+                                <span>•</span>
+                                <span>Category: {contest.music_category}</span>
+                                <span>•</span>
+                                <span>Prize: ${contest.prize_per_winner}</span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => navigate(`/l/${contest.id}`)}
+                              className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                              title="View contest"
+                            >
+                              <ExternalLink className="h-4 w-4 text-white/60" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
-            {/* Sign Out Button */}
-            <div className="pt-6 border-t border-white/10">
-              <button
-                onClick={handleSignOut}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 group"
-              >
-                <LogOut className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                <span className="font-medium">Sign Out</span>
-              </button>
-            </div>
+            {activeTab === 'submissions' && (
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                    <Upload className="h-5 w-5" />
+                    My Submissions ({submissions.length})
+                  </h3>
+                </div>
+
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+                    <p className="text-white/60 mt-4">Loading submissions...</p>
+                  </div>
+                ) : submissions.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Upload className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                    <h4 className="text-lg font-medium text-white mb-2">No submissions yet</h4>
+                    <p className="text-white/60 mb-6">Submit your first video to a contest to see it here</p>
+                    <button
+                      onClick={() => navigate('/')}
+                      className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                    >
+                      Join a Contest
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {submissions.map((submission) => (
+                      <div key={submission.id} className="bg-white/5 rounded-lg border border-white/10 p-6">
+                        <div className="flex items-start gap-4">
+                          <img
+                            src={submission.thumbnail}
+                            alt={submission.title}
+                            className="w-20 h-20 rounded-lg object-cover"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <h4 className="text-lg font-semibold text-white">{submission.title}</h4>
+                                <p className="text-white/60 text-sm">{submission.contest_name}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => window.open(submission.url, '_blank')}
+                                  className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                                  title="View video"
+                                >
+                                  <Play className="h-4 w-4 text-white/60" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSubmission(submission.id)}
+                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
+                                  title="Delete submission"
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-400" />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3">
+                              <div className="text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.views || 0)}</p>
+                                <p className="text-xs text-white/60">Views</p>
+                              </div>
+                              <div className="text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.likes || 0)}</p>
+                                <p className="text-xs text-white/60">Likes</p>
+                              </div>
+                              <div className="text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.comments || 0)}</p>
+                                <p className="text-xs text-white/60">Comments</p>
+                              </div>
+                              <div className="text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.shares || 0)}</p>
+                                <p className="text-xs text-white/60">Shares</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4 text-xs text-white/40">
+                              <span>Submitted: {formatDate(submission.created_at)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
