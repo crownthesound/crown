@@ -14,6 +14,7 @@ import { ContestDetails } from "./pages/ContestDetails";
 import { PublicLeaderboard } from "./pages/PublicLeaderboard";
 import { PastContests } from "./pages/PastContests";
 import { ContestsPage } from "./pages/ContestsPage";
+import { ContestManagement } from "./pages/ContestManagement";
 import { Start } from "./pages/Start";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
@@ -288,6 +289,12 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/start" element={<Start />} />
           <Route path="/contests-page" element={<ContestsPage />} />
+          <Route 
+            path="/contest-management/:id" 
+            element={
+              session ? <ContestManagement /> : <Navigate to="/signin" replace />
+            } 
+          />
           <Route
             path="/profile"
             element={

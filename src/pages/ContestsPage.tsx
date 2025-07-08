@@ -14,7 +14,8 @@ import {
   Music,
   Loader2,
   Calendar,
-  Award
+  Award,
+  Settings
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -481,11 +482,11 @@ export function ContestsPage() {
                     </Link>
                     {session && userSubmissions[contest.id] ? (
                       <button
-                        onClick={() => handleViewVideo(userSubmissions[contest.id])}
+                        onClick={() => navigate(`/contest-management/${contest.id}`)}
                         className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
                       >
-                        <Star className="h-4 w-4" />
-                        View Your Video
+                        <Settings className="h-4 w-4" />
+                        Manage
                       </button>
                     ) : (
                       <button
