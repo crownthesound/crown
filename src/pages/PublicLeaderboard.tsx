@@ -972,7 +972,7 @@ export function PublicLeaderboard() {
               <div className="max-w-6xl mx-auto mt-4">
                 <button
                   onClick={handleJoinCompetition}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                 >
                   <UserPlus className="h-4 w-4" />
                   Join Contest
