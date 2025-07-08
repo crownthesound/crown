@@ -40,6 +40,8 @@ import {
   Settings2,
   Trophy,
   User,
+  Gift,
+  UserPlus,
 } from "lucide-react";
 import { useAuth } from "./contexts/AuthContext";
 import { useScrollToTop } from "./hooks/useScrollToTop";
@@ -338,98 +340,41 @@ function App() {
         <footer className="fixed bottom-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-lg border-t border-white/10 safe-area-bottom pb-[env(safe-area-inset-bottom)]">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex justify-center">
-              <nav
-                className={`grid ${
-                  isOrganizer
-                    ? "grid-cols-7 w-[700px]"
-                    : "grid-cols-4 w-[400px]"
-                } gap-1`}
-              >
-                <Link
-                  to="/"
-                  className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
-                    currentPage === "home"
-                      ? "text-white"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  <Home className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="text-xs font-medium">Home</span>
-                </Link>
-
-                <Link
-                  to="/past"
-                  className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
-                    currentPage === "past"
-                      ? "text-white"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  <History className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="text-xs font-medium">Past</span>
-                </Link>
-
-                {isOrganizer && (
-                  <>
-                    <Link
-                      to="/contests"
-                      className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
-                        currentPage === "contests"
-                          ? "text-white"
-                          : "text-white/60 hover:text-white"
-                      }`}
-                    >
-                      <ListTodo className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                      <span className="text-xs font-medium">Manage</span>
-                    </Link>
-
-                    <Link
-                      to="/build"
-                      className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
-                        currentPage === "build"
-                          ? "text-white"
-                          : "text-white/60 hover:text-white"
-                      }`}
-                    >
-                      <Plus className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                      <span className="text-xs font-medium">Create</span>
-                    </Link>
-
-                    <Link
-                      to="/admin"
-                      className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
-                        currentPage === "admin"
-                          ? "text-white"
-                          : "text-white/60 hover:text-white"
-                      }`}
-                    >
-                      <Settings2 className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                      <span className="text-xs font-medium">Admin</span>
-                    </Link>
-                  </>
-                )}
-
-                <div className="flex flex-col items-center justify-center py-3 px-4 rounded-lg text-white/60">
-                  <User
-                    className={`h-6 w-6 mb-1 ${getRoleColor(
-                      profile?.role || "user"
-                    )}`}
-                  />
-                  <span
-                    className={`text-xs font-medium capitalize ${getRoleColor(
-                      profile?.role || "user"
-                    )}`}
-                  >
-                    {profile?.role || "User"}
-                  </span>
-                </div>
-
+              <nav className="grid grid-cols-3 w-[400px] gap-1">
+                {/* Rewards Button - Far Left */}
                 <button
-                  onClick={handleSignOut}
-                  className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 text-white/60 hover:text-white group"
+                  onClick={() => {
+                    // TODO: Navigate to rewards page or show rewards modal
+                    toast.success("Rewards coming soon!");
+                  }}
+                  className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
                 >
-                  <LogOut className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="text-xs font-medium">Sign Out</span>
+                  <Gift className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                  <span className="text-xs font-medium">Rewards</span>
+                </button>
+
+                {/* Join Contest Button - Middle */}
+                <button
+                  onClick={() => {
+                    // TODO: Navigate to contest selection or show join modal
+                    toast.success("Join Contest coming soon!");
+                  }}
+                  className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                >
+                  <UserPlus className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                  <span className="text-xs font-medium">Join Contest</span>
+                </button>
+
+                {/* Profile Button - Far Right */}
+                <button
+                  onClick={() => {
+                    // TODO: Navigate to profile page or show profile modal
+                    toast.success("Profile coming soon!");
+                  }}
+                  className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                >
+                  <User className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                  <span className="text-xs font-medium">Profile</span>
                 </button>
               </nav>
             </div>
