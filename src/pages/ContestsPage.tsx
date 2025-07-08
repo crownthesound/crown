@@ -435,19 +435,41 @@ export function ContestsPage() {
                   </div>
 
                   {/* Prize Info */}
-                  <div className="bg-white/5 rounded-lg p-3">
+                  <div className="bg-black/30 backdrop-blur-sm rounded-lg p-2">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <Gift className="h-4 w-4 text-yellow-400" />
-                        <span className="text-sm font-medium text-white">Prizes</span>
+                        <Trophy className="h-4 w-4 text-yellow-400" />
+                        <h4 className="text-xs font-medium text-white">Prizes</h4>
                       </div>
-                      <span className="text-xs text-white/60">{contest.num_winners} Winners</span>
+                      <div className="text-xs text-white/60">
+                        {contest.num_winners} Winners
+                      </div>
                     </div>
-                    <div className="text-lg font-bold text-white">
-                      {contest.prize_tier === "monetary" 
-                        ? `$${formatNumber(contest.total_prize || (contest.prize_per_winner || 0) * (contest.num_winners || 1))}`
-                        : "Title Rewards"
-                      }
+                    <div className="flex gap-1 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide">
+                      {contest.prize_titles
+                        .slice(0, contest.num_winners || contest.prize_titles.length)
+                        .map((prize: any, index: number) => (
+                          <div
+                            key={index}
+                            className="p-1.5 rounded-lg border snap-start flex-shrink-0 min-w-[70px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
+                          >
+                            <div className="flex items-center gap-1 mb-0.5">
+                              {getRankIcon(index + 1)}
+                              <span className={`text-[10px] font-medium ${
+                                index === 0 ? "text-yellow-400" :
+                                index === 1 ? "text-gray-400" :
+                                index === 2 ? "text-amber-600" : "text-white/60"
+                              }`}>
+                                {index + 1}{index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"}
+                              </span>
+                            </div>
+                            <div className="text-[10px] font-medium leading-tight line-clamp-2 text-white">
+                              {contest.prize_tier === "monetary"
+                                ? `$${formatNumber((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                                : prize.title}
+                            </div>
+                          </div>
+                        ))}
                     </div>
                   </div>
 
