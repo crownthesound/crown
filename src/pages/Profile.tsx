@@ -284,10 +284,27 @@ export function Profile() {
     <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
       {/* Header with Logo */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-        <Link to="/" className="flex items-center gap-3">
-          <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-          <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+            <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
+          </Link>
+          {session && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  console.log("🔍 TikTok Settings button clicked");
+                  setShowTikTokSettings(true);
+                  console.log("🔍 showTikTokSettings set to true");
+                }}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">TikTok</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -642,19 +659,6 @@ export function Profile() {
                 )}
               </div>
             )}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  console.log("🔍 TikTok Settings button clicked");
-                  setShowTikTokSettings(true);
-                  console.log("🔍 showTikTokSettings set to true");
-                }}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">TikTok</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>
