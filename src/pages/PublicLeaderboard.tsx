@@ -941,7 +941,7 @@ export function PublicLeaderboard() {
                         <div className="flex-1">
                           <button
                             onClick={() => navigate(`/contest-management/${id}`)}
-                            className="w-full px-4 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
+                            className="w-full px-3 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5"
                           >
                             <Settings className="h-4 w-4" />
                             <span>Manage</span>
@@ -950,7 +950,7 @@ export function PublicLeaderboard() {
                         <div className="flex-1">
                           <button
                             onClick={() => navigate(`/share/${id}`)}
-                            className="w-full px-4 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
+                            className="w-full px-3 py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
                           >
                             <Share2 className="h-4 w-4" />
                             <span>Share</span>

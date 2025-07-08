@@ -354,18 +354,18 @@ export function ContestsPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-8 pr-6 py-1.5 text-xs bg-white/5 border border-white/10 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[140px] sm:w-auto"
+                className="pl-8 pr-6 py-1 text-xs bg-white/5 border border-white/10 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[120px] sm:w-auto"
                 style={{ WebkitAppearance: "none", MozAppearance: "none" }}
               >
                 {MUSIC_CATEGORIES.map(category => (
-                  <option key={category} value={category} className="bg-[#1A1A1A] text-white text-xs py-1">
+                  <option key={category} value={category} className="bg-[#1A1A1A] text-white text-[10px] py-0.5">
                     {category}
                   </option>
                 ))}
               </select>
               {/* Custom dropdown arrow */}
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-2.5 h-2.5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-2 h-2 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>

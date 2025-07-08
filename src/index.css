@@ -241,16 +241,21 @@ select {
 
 /* Style dropdown options */
 select option {
-  padding: 8px;
+  padding: 4px 6px;
   background-color: #1A1A1A;
   color: white;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 /* Fix dropdown on mobile */
 @media (max-width: 640px) {
   select {
     background-color: #1A1A1A;
+    font-size: 0.7rem;
+  }
+  
+  select option {
+    padding: 3px 4px;
   }
 }
 
