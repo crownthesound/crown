@@ -460,51 +460,38 @@ export function ContestManagement() {
                       <img
                         src={userSubmission.thumbnail || ''}
                         alt={userSubmission.title || 'Video thumbnail'}
-                        className="w-full sm:w-40 h-40 rounded-xl object-cover shadow-lg flex-shrink-0 mb-6"
+                        className="w-full sm:w-40 h-40 rounded-xl object-cover shadow-lg flex-shrink-0 mb-4"
                       />
-                      <div className="w-full">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-xl font-semibold text-white mb-3 line-clamp-2">{userSubmission.title}</h4>
-                          <p className="text-white/60 mb-4">
-                            Submitted {formatDate(userSubmission.created_at)}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-white/60 mb-4">
-                            <span className="flex items-center gap-1">
-                              <Eye className="h-4 w-4 text-white/40" />
-                              {formatNumber(userSubmission.views || 0)} views
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Heart className="h-4 w-4 text-white/40" />
-                              {formatNumber(userSubmission.likes || 0)} likes
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <MessageCircle className="h-4 w-4 text-white/40" />
-                              {formatNumber(userSubmission.comments || 0)} comments
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Share className="h-4 w-4 text-white/40" />
-                              {formatNumber(userSubmission.shares || 0)} shares
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex gap-3 mt-4 w-full">
-                          <button
-                            onClick={() => setShowViewModal(true)}
-                            className="flex-1 px-3 sm:px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2 text-sm font-medium whitespace-nowrap"
-                          >
-                            <Play className="h-4 w-4" />
-                            <span>View Video</span>
-                          </button>
-                          <button
-                            onClick={() => setShowDeleteConfirm(true)}
-                            className="flex-1 px-3 sm:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2 text-sm font-medium whitespace-nowrap"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            <span className="hidden xs:inline">Remove</span>
-                            <span className="xs:hidden">Delete</span>
-                          </button>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-xl font-semibold text-white mb-3 line-clamp-2">{userSubmission.title}</h4>
+                        <p className="text-white/60 mb-4">
+                          Submitted {formatDate(userSubmission.created_at)}
+                        </p>
+                        <div className="flex items-center gap-6 text-sm text-white/60 mb-4">
+                          <span>{formatNumber(userSubmission.views || 0)} views</span>
+                          <span>•</span>
+                          <span>{formatNumber(userSubmission.likes || 0)} likes</span>
+                          <span>•</span>
+                          <span>{formatNumber(userSubmission.comments || 0)} comments</span>
                         </div>
                       </div>
+                    </div>
+                    <div className="flex gap-3 mt-4 w-full">
+                      <button
+                        onClick={() => setShowViewModal(true)}
+                        className="flex-1 px-3 sm:px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2 text-sm font-medium whitespace-nowrap"
+                      >
+                        <Play className="h-4 w-4" />
+                        <span>View Video</span>
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="flex-1 px-3 sm:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2 text-sm font-medium whitespace-nowrap"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="hidden xs:inline">Remove</span>
+                        <span className="xs:hidden">Delete</span>
+                      </button>
                     </div>
                   </div>
                 </div>
