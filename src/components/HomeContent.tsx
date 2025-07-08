@@ -774,7 +774,7 @@ export function HomeContent({
                 onClick={() => onShowAuth(true)}
                 className="bg-white text-[#1A1A1A] px-3 sm:px-6 py-2 rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-sm sm:text-base font-medium"
               >
-                Sign Up to Join
+                Sign Up
               </button>
             </div>
           )}
