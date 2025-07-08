@@ -937,22 +937,26 @@ export function PublicLeaderboard() {
                 <div className="flex justify-center">
                   <div className="flex gap-4 w-full max-w-md">
                     {userSubmission && (
-                      <>
-                        <button
-                          onClick={() => navigate(`/contest-management/${id}`)}
-                          className="flex-1 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
-                        >
-                          <Settings className="h-4 w-4" />
-                          <span>Manage</span>
-                        </button>
-                        <button
-                          onClick={() => navigate(`/share/${id}`)}
-                          className="flex-1 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
-                        >
-                          <Share2 className="h-4 w-4" />
-                          <span>Share</span>
-                        </button>
-                      </>
+                      <div className="flex gap-3 w-full">
+                        <div className="flex-1">
+                          <button
+                            onClick={() => navigate(`/contest-management/${id}`)}
+                            className="w-full px-4 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <Settings className="h-4 w-4" />
+                            <span>Manage</span>
+                          </button>
+                        </div>
+                        <div className="flex-1">
+                          <button
+                            onClick={() => navigate(`/share/${id}`)}
+                            className="w-full px-4 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <Share2 className="h-4 w-4" />
+                            <span>Share</span>
+                          </button>
+                        </div>
+                      </div>
                     )}
                     
                   </div>
@@ -972,7 +976,7 @@ export function PublicLeaderboard() {
               <div className="max-w-6xl mx-auto mt-2 flex justify-center">
                 <button
                   onClick={handleJoinCompetition}
-                  className="w-full max-w-md bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
+                  className="w-full max-w-md bg-white text-black font-medium py-2.5 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
                 >
                   <UserPlus className="h-4 w-4" />
                   Join Contest
