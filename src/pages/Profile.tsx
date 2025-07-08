@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   User, 
   Mail, 
@@ -282,6 +282,14 @@ export function Profile() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
+      {/* Header with Logo */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+        <Link to="/" className="flex items-center gap-3">
+          <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+          <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
+        </Link>
+      </div>
+
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
