@@ -335,7 +335,7 @@ export function PublicLeaderboard() {
         .eq("contest_id", id as string)
         .eq("created_by", session.user.id)
         .eq("is_contest_submission", true)
-        .single();
+        .maybeSingle();
       if (!error) {
         setUserSubmission(data);
       } else {
