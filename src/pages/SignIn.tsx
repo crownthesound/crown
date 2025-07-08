@@ -132,7 +132,7 @@ export function SignIn() {
 
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">Welcome</h2>
           <p className="text-white/60 mb-8">Sign in to your account to continue</p>
 
           <form onSubmit={handleSignIn} className="space-y-6">
