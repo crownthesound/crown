@@ -943,18 +943,6 @@ export function PublicLeaderboard() {
         {contest.status === "active" && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/95 backdrop-blur-lg border-t border-white/10">
             <div className="max-w-6xl mx-auto">
-              {session && userSubmission && (
-                <div className="mb-4">
-                  <button
-                    onClick={() => navigate(`/share/${id}`)}
-                    className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-md"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    Share
-                  </button>
-                </div>
-              )}
-              
               {session ? (
                 <div className="flex justify-center">
                   <div className="flex gap-4 w-full max-w-md">
@@ -968,13 +956,6 @@ export function PublicLeaderboard() {
                       </button>
                     )}
                     
-                    <button
-                      onClick={() => navigate(`/share/${id}`)}
-                      className="flex-1 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Share2 className="h-4 w-4" />
-                      <span>Share</span>
-                    </button>
                   </div>
                 </div>
               ) : (
