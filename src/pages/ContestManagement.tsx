@@ -300,61 +300,45 @@ export function ContestManagement() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {/* 1. Rank with Performance Metrics */}
-        <div className="mb-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center mb-4">
-                {getRankIcon(userRank)}
-              </div>
-              <div className={`text-4xl font-bold mb-2 ${getRankColor(userRank)}`}>
-                {userRank ? `#${userRank}` : 'Unranked'}
-              </div>
-              <div className="text-white/60 text-lg font-medium mb-4">Current Position</div>
-              {userRank && userRank <= 3 && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400/20 text-yellow-400 rounded-full text-sm font-medium">
-                  <Star className="h-4 w-4" />
-                  Prize Position
+        <div className="mb-6">
+          <div className="bg-white/3 backdrop-blur-sm rounded-lg border border-white/5 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center">
+                  {React.cloneElement(getRankIcon(userRank), { className: "h-5 w-5" })}
                 </div>
-              )}
-            </div>
+                <div>
+                  <div className={`text-lg font-semibold ${getRankColor(userRank)}`}>
+                    {userRank ? `#${userRank}` : 'Unranked'}
+                  </div>
+                  <div className="text-white/40 text-xs">Current Position</div>
+                </div>
+                {userRank && userRank <= 3 && (
+                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-400/10 text-yellow-400 rounded text-xs font-medium">
+                    <Star className="h-3 w-3" />
+                    Prize
+                  </div>
+                )}
+              </div>
 
-            {/* Performance Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-white/5 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <Eye className="h-5 w-5 text-blue-400" />
+              {/* Compact Performance Metrics */}
+              <div className="flex items-center gap-4 text-xs text-white/60">
+                <div className="flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  <span className="font-medium text-white">{formatNumber(userSubmission.views || 0)}</span>
                 </div>
-                <div className="text-2xl font-bold text-white mb-1">
-                  {formatNumber(userSubmission.views || 0)}
+                <div className="flex items-center gap-1">
+                  <Heart className="h-3 w-3" />
+                  <span className="font-medium text-white">{formatNumber(userSubmission.likes || 0)}</span>
                 </div>
-                <div className="text-xs text-white/60 font-medium">Views</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <Heart className="h-5 w-5 text-red-400" />
+                <div className="flex items-center gap-1">
+                  <MessageCircle className="h-3 w-3" />
+                  <span className="font-medium text-white">{formatNumber(userSubmission.comments || 0)}</span>
                 </div>
-                <div className="text-2xl font-bold text-white mb-1">
-                  {formatNumber(userSubmission.likes || 0)}
+                <div className="flex items-center gap-1">
+                  <Share className="h-3 w-3" />
+                  <span className="font-medium text-white">{formatNumber(userSubmission.shares || 0)}</span>
                 </div>
-                <div className="text-xs text-white/60 font-medium">Likes</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <MessageCircle className="h-5 w-5 text-green-400" />
-                </div>
-                <div className="text-2xl font-bold text-white mb-1">
-                  {formatNumber(userSubmission.comments || 0)}
-                </div>
-                <div className="text-xs text-white/60 font-medium">Comments</div>
-              </div>
-              <div className="text-center p-4 bg-white/5 rounded-lg">
-                <div className="flex items-center justify-center mb-2">
-                  <Share className="h-5 w-5 text-purple-400" />
-                </div>
-                <div className="text-2xl font-bold text-white mb-1">
-                  {formatNumber(userSubmission.shares || 0)}
-                </div>
-                <div className="text-xs text-white/60 font-medium">Shares</div>
               </div>
             </div>
           </div>
