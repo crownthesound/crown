@@ -19,6 +19,7 @@ import { SignUp } from "./pages/SignUp";
 import { AdminPage } from "./pages/AdminPage";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
+import { Profile } from "./pages/Profile";
 import { HomeContent } from "./components/HomeContent";
 import { supabase } from "./lib/supabase";
 import { Toaster } from "react-hot-toast";
@@ -286,6 +287,12 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/start" element={<Start />} />
           <Route
+            path="/profile"
+            element={
+              session ? <Profile /> : <Navigate to="/signin" replace />
+            }
+          />
+          <Route
             path="/past"
             element={
               session ? <PastContests /> : <Navigate to="/signin" replace />
@@ -368,10 +375,13 @@ function App() {
                 {/* Profile Button - Far Right */}
                 <button
                   onClick={() => {
-                    // TODO: Navigate to profile page or show profile modal
-                    toast.success("Profile coming soon!");
+                    navigate('/profile');
                   }}
-                  className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                  className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
+                    currentPage === "profile"
+                      ? "text-white"
+                      : "text-white/60 hover:text-white"
+                  }`}
                 >
                   <User className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
                   <span className="text-xs font-medium">Profile</span>
