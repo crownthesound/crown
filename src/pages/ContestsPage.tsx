@@ -252,7 +252,7 @@ export function ContestsPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-10 pr-8 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none cursor-pointer min-w-[200px]"
+                className="pl-10 pr-8 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[200px] sm:w-auto"
               >
                 {MUSIC_CATEGORIES.map(category => (
                   <option key={category} value={category} className="bg-[#1A1A1A] text-white">
@@ -260,6 +260,12 @@ export function ContestsPage() {
                   </option>
                 ))}
               </select>
+              {/* Custom dropdown arrow */}
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
 
