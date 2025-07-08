@@ -496,7 +496,7 @@ export function ContestManagement() {
                       >
                         <Trash2 className="h-4 w-4" />
                         <span className="hidden xs:inline">Remove</span>
-                        <span className="xs:hidden">Del</span>
+                        <span className="xs:hidden text-[10px]">Del</span>
                       </button>
                     </div>
                   </div>
