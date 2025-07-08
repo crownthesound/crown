@@ -969,10 +969,10 @@ export function PublicLeaderboard() {
               )}
             </div>
             {session && !userSubmission && (
-              <div className="max-w-6xl mx-auto mt-2">
+              <div className="max-w-6xl mx-auto mt-2 flex justify-center">
                 <button
                   onClick={handleJoinCompetition}
-                  className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
+                  className="w-full max-w-md bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                 >
                   <UserPlus className="h-4 w-4" />
                   Join Contest
