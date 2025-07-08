@@ -232,6 +232,28 @@ video {
   animation: float-icon 3s ease-in-out infinite;
 }
 
+/* Fix dropdown appearance */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Style dropdown options */
+select option {
+  padding: 8px;
+  background-color: #1A1A1A;
+  color: white;
+  font-size: 0.75rem;
+}
+
+/* Fix dropdown on mobile */
+@media (max-width: 640px) {
+  select {
+    background-color: #1A1A1A;
+  }
+}
+
 /* Mapbox Popup Customization */
 .mapboxgl-popup {
   z-index: 50 !important;

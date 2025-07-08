@@ -341,30 +341,31 @@ export function ContestsPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
               <input
                 type="text"
-                placeholder="Search contests..."
+                placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20"
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20"
               />
             </div>
 
             {/* Category Filter */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 text-white/40" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-9 pr-8 py-2 text-sm bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[180px] sm:w-auto"
+                className="pl-8 pr-6 py-1.5 text-xs bg-white/5 border border-white/10 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[140px] sm:w-auto"
+                style={{ WebkitAppearance: "none", MozAppearance: "none" }}
               >
                 {MUSIC_CATEGORIES.map(category => (
-                  <option key={category} value={category} className="bg-[#1A1A1A] text-white">
+                  <option key={category} value={category} className="bg-[#1A1A1A] text-white text-xs py-1">
                     {category}
                   </option>
                 ))}
               </select>
               {/* Custom dropdown arrow */}
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-3 h-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-2.5 h-2.5 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -372,7 +373,7 @@ export function ContestsPage() {
           </div>
 
           {/* Results count */}
-          <div className="text-white/50 text-xs">
+          <div className="text-white/40 text-[10px]">
             {filteredContests.length} contest{filteredContests.length !== 1 ? 's' : ''} found
           </div>
         </div>
