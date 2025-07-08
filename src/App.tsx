@@ -13,6 +13,7 @@ import { Contests } from "./pages/Contests";
 import { ContestDetails } from "./pages/ContestDetails";
 import { PublicLeaderboard } from "./pages/PublicLeaderboard";
 import { PastContests } from "./pages/PastContests";
+import { ContestsPage } from "./pages/ContestsPage";
 import { Start } from "./pages/Start";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
@@ -286,6 +287,7 @@ function App() {
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/start" element={<Start />} />
+          <Route path="/contests-page" element={<ContestsPage />} />
           <Route
             path="/profile"
             element={
@@ -363,8 +365,7 @@ function App() {
                 {/* Join Contest Button - Middle */}
                 <button
                   onClick={() => {
-                    // TODO: Navigate to contest selection or show join modal
-                    toast.success("Join Contest coming soon!");
+                    navigate('/contests-page');
                   }}
                   className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
                 >
