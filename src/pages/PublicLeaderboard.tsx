@@ -930,11 +930,11 @@ export function PublicLeaderboard() {
             <div className="max-w-7xl mx-auto">
               {session && userSubmission ? (
                 <button
-                  onClick={() => handlePlayVideo(userSubmission)}
+                  onClick={() => navigate(`/contest-management/${id}`)}
                   className="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-medium py-3 rounded-lg hover:from-green-600 hover:to-blue-700 transition-colors flex items-center justify-center gap-2"
                 >
-                  <Play className="h-4 w-4" />
-                  View Your Video
+                  <Settings className="h-4 w-4" />
+                  Manage
                 </button>
               ) : (
                 <button
