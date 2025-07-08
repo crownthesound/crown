@@ -484,10 +484,11 @@ export function ContestManagement() {
                           </button>
                           <button
                             onClick={() => setShowDeleteConfirm(true)}
-                            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                           className="px-3 sm:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors flex items-center gap-1.5 sm:gap-2 text-sm font-medium whitespace-nowrap"
                           >
                             <Trash2 className="h-4 w-4" />
-                            Remove
+                           <span className="hidden xs:inline">Remove</span>
+                           <span className="xs:hidden">Delete</span>
                           </button>
                         </div>
                       </div>
