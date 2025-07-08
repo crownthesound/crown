@@ -24,11 +24,15 @@ import {
   Users,
   Target,
   Zap,
-  X
+  X,
+  Settings,
+  Info,
+  User
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { ViewSubmissionModal } from '../components/ViewSubmissionModal';
+import { TikTokSettingsModal } from '../components/TikTokSettingsModal';
 import toast from 'react-hot-toast';
 
 interface Contest {
@@ -83,6 +87,8 @@ export function ContestManagement() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showTikTokSettings, setShowTikTokSettings] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'performance' | 'contest-info'>('overview');
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -297,245 +303,427 @@ export function ContestManagement() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* 1. Rank with Performance Metrics */}
-        <div className="mb-6">
-          <div className="bg-white/3 backdrop-blur-sm rounded-lg border border-white/5 p-4">
-            <div className="text-white/60 text-xs mb-3 font-medium">Performance Stats</div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center">
-                  {React.cloneElement(getRankIcon(userRank), { className: "h-5 w-5" })}
-                </div>
-                <div>
-                  <div className={`text-lg font-semibold ${getRankColor(userRank)}`}>
-                    {userRank ? `#${userRank}` : 'Unranked'}
-                  </div>
-                  <div className="text-white/40 text-xs">Current Position</div>
-                </div>
-                {userRank && userRank <= 3 && (
-                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-400/10 text-yellow-400 rounded text-xs font-medium">
-                    <Star className="h-3 w-3" />
-                    Prize
-                  </div>
+      {/* Header with Logo */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+            <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
+          </Link>
+          {session && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowTikTokSettings(true)}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">TikTok</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-black text-white mb-2">Contest Management</h1>
+          <p className="text-white/60">Track your performance and manage your submission</p>
+        </div>
+
+        {/* Main Card */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+          {/* Profile Header */}
+          <div className="relative bg-gradient-to-r from-blue-500/20 to-purple-600/20 p-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-600/10"></div>
+            <div className="relative flex flex-col sm:flex-row items-center gap-6">
+              {/* Contest Image/Avatar */}
+              <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20 overflow-hidden">
+                {contest.cover_image ? (
+                  <img
+                    src={contest.cover_image}
+                    alt={contest.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Trophy className="h-12 w-12 text-white" />
                 )}
               </div>
 
-              {/* Compact Performance Metrics */}
-              <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-1">
-                  <Eye className="h-3 w-3 text-white/60" />
-                  <span className="font-medium text-white">{formatNumber(userSubmission.views || 0)}</span>
+              {/* Contest Info */}
+              <div className="flex-1 text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
+                  <h2 className="text-2xl font-bold text-white">
+                    {contest.name}
+                  </h2>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Heart className="h-3 w-3 text-white/60" />
-                  <span className="font-medium text-white">{formatNumber(userSubmission.likes || 0)}</span>
+
+                {/* Status Badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-400/10 border-green-400/20 border">
+                  <CheckCircle className="h-4 w-4 text-green-400" />
+                  <span className="text-sm font-medium text-green-400">
+                    Participating
+                  </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <MessageCircle className="h-3 w-3 text-white/60" />
-                  <span className="font-medium text-white">{formatNumber(userSubmission.comments || 0)}</span>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="flex gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-white">{userRank || '—'}</p>
+                  <p className="text-xs text-white/60">Rank</p>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Share className="h-3 w-3 text-white/60" />
-                  <span className="font-medium text-white">{formatNumber(userSubmission.shares || 0)}</span>
+                <div>
+                  <p className="text-2xl font-bold text-white">{formatNumber(userSubmission.views || 0)}</p>
+                  <p className="text-xs text-white/60">Views</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-white">{formatNumber(userSubmission.likes || 0)}</p>
+                  <p className="text-xs text-white/60">Likes</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 2. Video Submission */}
-        <div className="mb-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
-            <div className="p-6 border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-yellow-400" />
-                  Your Submission
-                </h2>
-                <div className="flex items-center gap-2">
+          {/* Tabs */}
+          <div className="border-b border-white/10">
+            <nav className="flex overflow-x-auto scrollbar-hide">
+              {[
+                { id: 'overview', label: 'Overview', icon: User },
+                { id: 'performance', label: 'Performance', icon: BarChart3 },
+                { id: 'contest-info', label: 'Contest Info', icon: Info }
+              ].map((tab) => {
+                const Icon = tab.icon;
+                return (
                   <button
-                    onClick={() => setShowViewModal(true)}
-                    className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`flex items-center gap-1.5 px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
+                      activeTab === tab.id
+                        ? 'text-white border-white'
+                        : 'text-white/60 hover:text-white border-transparent'
+                    }`}
                   >
-                    <Play className="h-4 w-4" />
-                    View
+                    <Icon className="h-4 w-4 sm:h-4 sm:w-4" />
+                    <span className="text-sm sm:text-base">{tab.label}</span>
                   </button>
-                  <button
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6">
-              <div className="flex items-start gap-6">
-                <img
-                  src={userSubmission.thumbnail}
-                  alt={userSubmission.title}
-                  className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl object-cover shadow-lg flex-shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-xl font-semibold text-white mb-3 line-clamp-2">{userSubmission.title}</h3>
-                  <p className="text-white/60 mb-4">
-                    Submitted {formatDate(userSubmission.created_at)}
-                  </p>
-                  <div className="flex items-center gap-6 text-sm text-white/60">
-                    <span>{formatNumber(userSubmission.views || 0)} views</span>
-                    <span>•</span>
-                    <span>{formatNumber(userSubmission.likes || 0)} likes</span>
-                    <span>•</span>
-                    <span>{formatNumber(userSubmission.comments || 0)} comments</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                );
+              })}
+            </nav>
           </div>
-        </div>
 
-        {/* 3. Contest Title with Contest Image */}
-        <div className="mb-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
-            {contest.cover_image ? (
-              <div className="relative h-48 sm:h-56">
-                <img
-                  src={contest.cover_image}
-                  alt={contest.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent" />
-                <div className="absolute inset-0 flex items-center">
-                  <div className="px-6 sm:px-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">{contest.name}</h1>
-                    <div className="flex items-center gap-6 text-white/80">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-5 w-5" />
-                        <span className="font-medium">{formatTimeLeft(contest.end_date)}</span>
+          {/* Tab Content */}
+          <div className="p-8">
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Current Position */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Trophy className="h-5 w-5" />
+                    Current Position
+                  </h3>
+                  <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-center">
+                          {React.cloneElement(getRankIcon(userRank), { className: "h-12 w-12" })}
+                        </div>
+                        <div>
+                          <div className={`text-3xl font-bold ${getRankColor(userRank)}`}>
+                            {userRank ? `#${userRank}` : 'Unranked'}
+                          </div>
+                          <div className="text-white/60">Current Position</div>
+                          {userRank && userRank <= contest.num_winners && (
+                            <div className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-400/10 text-yellow-400 rounded text-sm font-medium mt-2">
+                              <Star className="h-3 w-3" />
+                              Prize Position
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Trophy className="h-5 w-5" />
-                        <span className="font-medium">{contest.music_category}</span>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-white">{formatNumber(userSubmission.views || 0)}</div>
+                        <div className="text-white/60 text-sm">Total Views</div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="p-8 bg-gradient-to-r from-purple-500/10 to-blue-500/10">
-                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">{contest.name}</h1>
-                <div className="flex items-center gap-6 text-white/80">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5" />
-                    <span className="font-medium">{formatTimeLeft(contest.end_date)}</span>
+
+                {/* Your Submission */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Play className="h-5 w-5" />
+                    Your Submission
+                  </h3>
+                  <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                    <div className="flex items-start gap-6">
+                      <img
+                        src={userSubmission.thumbnail}
+                        alt={userSubmission.title}
+                        className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl object-cover shadow-lg flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-xl font-semibold text-white mb-3 line-clamp-2">{userSubmission.title}</h4>
+                        <p className="text-white/60 mb-4">
+                          Submitted {formatDate(userSubmission.created_at)}
+                        </p>
+                        <div className="flex items-center gap-6 text-sm text-white/60 mb-4">
+                          <span>{formatNumber(userSubmission.views || 0)} views</span>
+                          <span>•</span>
+                          <span>{formatNumber(userSubmission.likes || 0)} likes</span>
+                          <span>•</span>
+                          <span>{formatNumber(userSubmission.comments || 0)} comments</span>
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => setShowViewModal(true)}
+                            className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                          >
+                            <Play className="h-4 w-4" />
+                            View Video
+                          </button>
+                          <button
+                            onClick={() => setShowDeleteConfirm(true)}
+                            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5" />
-                    <span className="font-medium">{contest.music_category}</span>
+                </div>
+
+                {/* Quick Actions */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Zap className="h-5 w-5" />
+                    Quick Actions
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Link
+                      to={`/l/${contest.id}`}
+                      className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors text-center"
+                    >
+                      <ExternalLink className="h-6 w-6 text-white/60 mx-auto mb-2" />
+                      <div className="font-medium text-white">View Full Leaderboard</div>
+                      <div className="text-sm text-white/60">See all participants</div>
+                    </Link>
+                    <button
+                      onClick={() => setShowHelpModal(true)}
+                      className="p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors text-center"
+                    >
+                      <HelpCircle className="h-6 w-6 text-white/60 mx-auto mb-2" />
+                      <div className="font-medium text-white">Get Help & Support</div>
+                      <div className="text-sm text-white/60">Contact support team</div>
+                    </button>
                   </div>
                 </div>
               </div>
             )}
-          </div>
-        </div>
 
-        {/* 4. Contest Information */}
-        <div className="mb-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-yellow-400" />
-              Contest Information
-            </h2>
-            
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">Description</h3>
-                <p className="text-white/90 leading-relaxed text-lg">{contest.description}</p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {activeTab === 'performance' && (
+              <div className="space-y-6">
+                {/* Performance Metrics */}
                 <div>
-                  <h3 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">Start Date</h3>
-                  <p className="text-white/90">{formatDate(contest.start_date)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">End Date</h3>
-                  <p className="text-white/90">{formatDate(contest.end_date)}</p>
-                </div>
-              </div>
-
-              {contest.guidelines && (
-                <div>
-                  <h3 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">Guidelines</h3>
-                  <p className="text-white/90 leading-relaxed">{contest.guidelines}</p>
-                </div>
-              )}
-
-              {contest.rules && (
-                <div>
-                  <h3 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">Rules</h3>
-                  <p className="text-white/90 leading-relaxed">{contest.rules}</p>
-                </div>
-              )}
-
-              {contest.hashtags && contest.hashtags.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">Required Hashtags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {contest.hashtags.map((hashtag, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium"
-                      >
-                        #{hashtag}
-                      </span>
-                    ))}
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Performance Metrics
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <Eye className="h-6 w-6 text-blue-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{formatNumber(userSubmission.views || 0)}</div>
+                      <div className="text-sm text-white/60">Views</div>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <Heart className="h-6 w-6 text-red-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{formatNumber(userSubmission.likes || 0)}</div>
+                      <div className="text-sm text-white/60">Likes</div>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <MessageCircle className="h-6 w-6 text-green-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{formatNumber(userSubmission.comments || 0)}</div>
+                      <div className="text-sm text-white/60">Comments</div>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
+                      <Share className="h-6 w-6 text-purple-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">{formatNumber(userSubmission.shares || 0)}</div>
+                      <div className="text-sm text-white/60">Shares</div>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Contest Stats */}
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
-                <div className="text-center p-4 bg-white/5 rounded-lg">
-                  <div className="text-2xl font-bold text-white mb-1">{contest.num_winners}</div>
-                  <div className="text-sm text-white/60 font-medium">Winners</div>
+                {/* Ranking Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Trophy className="h-5 w-5" />
+                    Ranking Information
+                  </h3>
+                  <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                      <div>
+                        <div className={`text-3xl font-bold ${getRankColor(userRank)} mb-2`}>
+                          {userRank ? `#${userRank}` : '—'}
+                        </div>
+                        <div className="text-white/60">Current Rank</div>
+                      </div>
+                      <div>
+                        <div className="text-3xl font-bold text-white mb-2">{leaderboard.length}</div>
+                        <div className="text-white/60">Total Participants</div>
+                      </div>
+                      <div>
+                        <div className="text-3xl font-bold text-white mb-2">{contest.num_winners}</div>
+                        <div className="text-white/60">Prize Positions</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center p-4 bg-white/5 rounded-lg">
-                  <div className="text-2xl font-bold text-white mb-1">{leaderboard.length}</div>
-                  <div className="text-sm text-white/60 font-medium">Participants</div>
+
+                {/* Performance Tips */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Performance Tips
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                      <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                        <Share className="h-4 w-4 text-blue-400" />
+                        Increase Visibility
+                      </h4>
+                      <p className="text-white/70 text-sm">
+                        Share your video on social media platforms to increase views and engagement. More views directly impact your ranking position.
+                      </p>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                      <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                        <Users className="h-4 w-4 text-green-400" />
+                        Engage with Community
+                      </h4>
+                      <p className="text-white/70 text-sm">
+                        Respond to comments and engage with other participants to build a community around your content.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
+            )}
 
-        {/* 5. Quick Action Results */}
-        <div className="mb-8">
-          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-            <h3 className="text-xl font-bold text-white mb-6">Quick Actions</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Link
-                to={`/l/${contest.id}`}
-                className="px-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
-              >
-                <ExternalLink className="h-5 w-5" />
-                View Full Leaderboard
-              </Link>
-              <button
-                onClick={() => setShowHelpModal(true)}
-                className="px-6 py-4 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
-              >
-                <HelpCircle className="h-5 w-5" />
-                Get Help & Support
-              </button>
-            </div>
+            {activeTab === 'contest-info' && (
+              <div className="space-y-6">
+                {/* Contest Details */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Info className="h-5 w-5" />
+                    Contest Details
+                  </h3>
+                  <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">Description</h4>
+                        <p className="text-white/90 leading-relaxed">{contest.description}</p>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <h4 className="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">Category</h4>
+                          <p className="text-white/90">{contest.music_category}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">Status</h4>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span className="text-white/90 capitalize">{contest.status}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timeline */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Contest Timeline
+                  </h3>
+                  <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">Start Date</h4>
+                        <p className="text-white/90">{formatDate(contest.start_date)}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">End Date</h4>
+                        <p className="text-white/90">{formatDate(contest.end_date)}</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-white/60" />
+                        <span className="text-white/90 font-medium">{formatTimeLeft(contest.end_date)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Guidelines & Rules */}
+                {(contest.guidelines || contest.rules) && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5" />
+                      Guidelines & Rules
+                    </h3>
+                    <div className="space-y-4">
+                      {contest.guidelines && (
+                        <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                          <h4 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">Guidelines</h4>
+                          <p className="text-white/90 leading-relaxed">{contest.guidelines}</p>
+                        </div>
+                      )}
+                      {contest.rules && (
+                        <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                          <h4 className="text-sm font-semibold text-white/80 mb-3 uppercase tracking-wide">Rules</h4>
+                          <p className="text-white/90 leading-relaxed">{contest.rules}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Hashtags */}
+                {contest.hashtags && contest.hashtags.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <Zap className="h-5 w-5" />
+                      Required Hashtags
+                    </h3>
+                    <div className="bg-white/5 rounded-lg border border-white/10 p-6">
+                      <div className="flex flex-wrap gap-2">
+                        {contest.hashtags.map((hashtag, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium"
+                          >
+                            #{hashtag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* TikTok Settings Modal */}
+      <TikTokSettingsModal
+        isOpen={showTikTokSettings}
+        onClose={() => setShowTikTokSettings(false)}
+      />
 
       {/* View Submission Modal */}
       {userSubmission && (
