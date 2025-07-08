@@ -27,7 +27,6 @@ import { supabase } from "../lib/supabase";
 import { useRealtimeData } from "../hooks/useRealtimeData";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { ViewSubmissionModal } from "./ViewSubmissionModal";
-import { Settings } from "lucide-react";
 
 interface LeaderboardContest {
   id: string;
