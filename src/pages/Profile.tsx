@@ -377,7 +377,7 @@ export function Profile() {
 
           {/* Tabs */}
           <div className="border-b border-white/10">
-            <nav className="flex">
+            <nav className="flex overflow-x-auto scrollbar-hide">
               {[
                 { id: 'overview', label: 'Overview', icon: Settings },
                 { id: 'contests', label: 'My Contests', icon: Trophy },
@@ -388,14 +388,14 @@ export function Profile() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors border-b-2 ${
+                    className={`flex items-center gap-1.5 px-3 sm:px-6 py-3 sm:py-4 font-medium transition-colors border-b-2 whitespace-nowrap flex-shrink-0 ${
                       activeTab === tab.id
                         ? 'text-white border-white'
                         : 'text-white/60 hover:text-white border-transparent'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
-                    <span>{tab.label}</span>
+                    <Icon className="h-4 w-4 sm:h-4 sm:w-4" />
+                    <span className="text-sm sm:text-base">{tab.label}</span>
                   </button>
                 );
               })}
