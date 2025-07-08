@@ -20,6 +20,8 @@ import {
   Minus,
   Link as LinkIcon,
   Settings,
+  User,
+  UserPlus,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
 import { useAuth } from "../contexts/AuthContext";
@@ -940,21 +942,70 @@ export function PublicLeaderboard() {
         {/* Join Competition Button */}
         {contest.status === "active" && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/95 backdrop-blur-lg border-t border-white/10">
-            <div className="max-w-7xl mx-auto">
-              {session && userSubmission ? (
-                <button
-                  onClick={() => navigate(`/contest-management/${id}`)}
-                  className="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-medium py-3 rounded-lg hover:from-green-600 hover:to-blue-700 transition-colors flex items-center justify-center gap-2 mb-4"
-                >
-                  <Settings className="h-4 w-4" />
-                  Manage
-                </button>
+            <div className="max-w-6xl mx-auto">
+              {session && userSubmission && (
+                <div className="mb-4">
+                  <button
+                    onClick={() => navigate(`/contest-management/${id}`)}
+                    className="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-medium py-3 rounded-lg hover:from-green-600 hover:to-blue-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Manage
+                  </button>
+                </div>
+              )}
+              
+              {session ? (
+                <div className="flex justify-center">
+                  <nav className="grid grid-cols-3 w-[400px] gap-1">
+                    {/* Rewards Button - Far Left */}
+                    <button
+                      onClick={() => {
+                        toast.success("Rewards coming soon!");
+                      }}
+                      className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                    >
+                      <Gift className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                      <span className="text-xs font-medium">Rewards</span>
+                    </button>
+
+                    {/* Join Contest Button - Middle */}
+                    {!userSubmission ? (
+                      <button
+                        onClick={handleJoinCompetition}
+                        className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                      >
+                        <UserPlus className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                        <span className="text-xs font-medium">Join Contest</span>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handlePlayVideo(userSubmission)}
+                        className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                      >
+                        <Play className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                        <span className="text-xs font-medium">View Video</span>
+                      </button>
+                    )}
+
+                    {/* Profile Button - Far Right */}
+                    <button
+                      onClick={() => {
+                        navigate('/profile');
+                      }}
+                      className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                    >
+                      <User className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                      <span className="text-xs font-medium">Profile</span>
+                    </button>
+                  </nav>
+                </div>
               ) : (
                 <button
                   onClick={handleJoinCompetition}
                   className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors"
                 >
-                  Join Contest
+                  Sign up to Join Contest
                 </button>
               )}
             </div>
