@@ -941,7 +941,7 @@ export function PublicLeaderboard() {
                   onClick={handleJoinCompetition}
                   className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors"
                 >
-                  {session ? "Join Competition" : "Sign up to Join Competition"}
+                  {session ? "Join Contest" : "Sign Up"}
                 </button>
               )}
             </div>
