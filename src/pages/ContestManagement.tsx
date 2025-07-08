@@ -439,11 +439,11 @@ export function ContestManagement() {
                               Prize Position
                             </div>
                           )}
+                          <div className="mt-2 text-white/80">
+                            <span className="text-xl font-bold text-white">{formatNumber(userSubmission.views || 0)}</span>
+                            <span className="text-white/60 text-sm ml-2">Total Views</span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-white">{formatNumber(userSubmission.views || 0)}</div>
-                        <div className="text-white/60 text-sm">Total Views</div>
                       </div>
                     </div>
                   </div>
