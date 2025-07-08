@@ -329,16 +329,28 @@ export function PublicLeaderboard() {
   useEffect(() => {
     const fetchSubmission = async () => {
       if (!session || !id) return;
-      const { data, error } = await supa
-        .from("contest_links")
-        .select("*")
-        .eq("contest_id", id as string)
-        .eq("created_by", session.user.id)
-        .eq("is_contest_submission", true)
-        .maybeSingle();
-      if (!error) {
-        setUserSubmission(data);
-      } else {
+      
+      try {
+        const { data, error } = await supa
+          .from("contest_links")
+          .select("*")
+          .eq("contest_id", id as string)
+          .eq("created_by", session.user.id)
+          .eq("is_contest_submission", true)
+          .single();
+          
+        if (error) {
+          // Handle the specific case where no rows are found (PGRST116)
+          if (error.code === 'PGRST116') {
+            setUserSubmission(null);
+          } else {
+            throw error;
+          }
+        } else {
+          setUserSubmission(data);
+        }
+      } catch (error) {
+        console.error('Error fetching user submission:', error);
         setUserSubmission(null);
       }
     };
