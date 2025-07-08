@@ -302,7 +302,7 @@ export function ContestManagement() {
         {/* 1. Rank with Performance Metrics */}
         <div className="mb-6">
           <div className="bg-white/3 backdrop-blur-sm rounded-lg border border-white/5 p-4">
-            <div className="text-white/60 text-xs mb-3 font-medium">Your TikTok Video Stats</div>
+            <div className="text-white/60 text-xs mb-3 font-medium">Performance Stats</div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center">
