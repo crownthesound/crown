@@ -363,8 +363,7 @@ export function PublicLeaderboard() {
 
   const handleJoinCompetition = () => {
     if (!session) {
-      setShowAuth(true);
-      setIsSignUp(true);
+      navigate('/signin');
       return;
     }
 
@@ -941,7 +940,7 @@ export function PublicLeaderboard() {
                   onClick={handleJoinCompetition}
                   className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors"
                 >
-                  {session ? "Join Contest" : "Sign Up"}
+                  Join Contest
                 </button>
               )}
             </div>
