@@ -931,7 +931,7 @@ export function PublicLeaderboard() {
 
         {/* Join Competition Button */}
         {contest.status === "active" && (
-          <div className="fixed bottom-0 left-0 right-0 p-4 bg-black/95 backdrop-blur-lg border-t border-white/10">
+          <div className="fixed bottom-0 left-0 right-0 py-2 px-4 bg-black/95 backdrop-blur-lg border-t border-white/10">
             <div className="max-w-6xl mx-auto">
               {session ? (
                 <div className="flex justify-center">
@@ -969,7 +969,7 @@ export function PublicLeaderboard() {
               )}
             </div>
             {session && !userSubmission && (
-              <div className="max-w-6xl mx-auto mt-4">
+              <div className="max-w-6xl mx-auto mt-2">
                 <button
                   onClick={handleJoinCompetition}
                   className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
