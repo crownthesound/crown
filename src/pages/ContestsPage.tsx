@@ -477,7 +477,7 @@ export function ContestsPage() {
                       to={`/l/${contest.id}`}
                       className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-center text-sm font-medium"
                     >
-                      View Details
+                      Leaderboard
                     </Link>
                     {session && userSubmissions[contest.id] ? (
                       <button
