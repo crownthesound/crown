@@ -274,19 +274,10 @@ export function ContestManagement() {
     <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-            <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
-          </Link>
-          <Link
-            to="/contests-page"
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Contests
-          </Link>
-        </div>
+        <Link to="/" className="flex items-center gap-3">
+          <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+          <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
+        </Link>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
