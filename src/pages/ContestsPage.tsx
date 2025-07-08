@@ -334,27 +334,27 @@ export function ContestsPage() {
         </div>
 
         {/* Search and Filter */}
-        <div className="mb-8 space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="mb-6 space-y-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
               <input
                 type="text"
                 placeholder="Search contests..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full pl-9 pr-3 py-2 text-sm bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20"
               />
             </div>
 
             {/* Category Filter */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-10 pr-8 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[200px] sm:w-auto"
+                className="pl-9 pr-8 py-2 text-sm bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[180px] sm:w-auto"
               >
                 {MUSIC_CATEGORIES.map(category => (
                   <option key={category} value={category} className="bg-[#1A1A1A] text-white">
@@ -364,7 +364,7 @@ export function ContestsPage() {
               </select>
               {/* Custom dropdown arrow */}
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -372,7 +372,7 @@ export function ContestsPage() {
           </div>
 
           {/* Results count */}
-          <div className="text-white/60 text-sm">
+          <div className="text-white/50 text-xs">
             {filteredContests.length} contest{filteredContests.length !== 1 ? 's' : ''} found
           </div>
         </div>
