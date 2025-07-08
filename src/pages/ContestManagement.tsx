@@ -302,6 +302,7 @@ export function ContestManagement() {
         {/* 1. Rank with Performance Metrics */}
         <div className="mb-6">
           <div className="bg-white/3 backdrop-blur-sm rounded-lg border border-white/5 p-4">
+            <div className="text-white/60 text-xs mb-3 font-medium">Your TikTok Video Stats</div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center">
@@ -322,21 +323,21 @@ export function ContestManagement() {
               </div>
 
               {/* Compact Performance Metrics */}
-              <div className="flex items-center gap-4 text-xs text-white/60">
+              <div className="flex items-center gap-4 text-xs">
                 <div className="flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
+                  <Eye className="h-3 w-3 text-white/60" />
                   <span className="font-medium text-white">{formatNumber(userSubmission.views || 0)}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Heart className="h-3 w-3" />
+                  <Heart className="h-3 w-3 text-white/60" />
                   <span className="font-medium text-white">{formatNumber(userSubmission.likes || 0)}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <MessageCircle className="h-3 w-3" />
+                  <MessageCircle className="h-3 w-3 text-white/60" />
                   <span className="font-medium text-white">{formatNumber(userSubmission.comments || 0)}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Share className="h-3 w-3" />
+                  <Share className="h-3 w-3 text-white/60" />
                   <span className="font-medium text-white">{formatNumber(userSubmission.shares || 0)}</span>
                 </div>
               </div>
