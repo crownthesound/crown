@@ -23,24 +23,33 @@ import { TikTokConnectModal } from '../components/TikTokConnectModal';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 import toast from 'react-hot-toast';
 
-interface Contest {
+interface LeaderboardContest {
   id: string;
   name: string;
   description: string;
   cover_image: string | null;
   start_date: string;
   end_date: string;
-  status: string;
-  music_category: string;
-  prize_per_winner: number;
-  num_winners: number;
-  total_prize: number;
-  prize_titles: Array<{ rank: number; title: string }>;
-  top_participants?: Array<{
+  status: string | null;
+  music_category?: string | null;
+  prize_tier?: string | null;
+  prize_per_winner?: number | null;
+  prize_titles?: any | null;
+  num_winners?: number | null;
+  total_prize?: number | null;
+  guidelines?: string | null;
+  rules?: string | null;
+  hashtags?: string[] | null;
+  submission_deadline?: string | null;
+  max_participants?: number | null;
+  top_participants?: {
     rank: number;
     username: string;
+    full_name: string;
+    points: number;
     views: number;
-  }>;
+    previousRank?: number;
+  }[];
 }
 
 const MUSIC_CATEGORIES = [
@@ -69,15 +78,17 @@ const MUSIC_CATEGORIES = [
 export function ContestsPage() {
   const { session } = useAuth();
   const navigate = useNavigate();
-  const [contests, setContests] = useState<Contest[]>([]);
+  const [contests, setContests] = useState<LeaderboardContest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showTikTokModal, setShowTikTokModal] = useState(false);
-  const [selectedContest, setSelectedContest] = useState<Contest | null>(null);
+  const [selectedContest, setSelectedContest] = useState<LeaderboardContest | null>(null);
   
   const { isConnected: isTikTokConnected, refreshConnection } = useTikTokConnection();
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
   useEffect(() => {
     fetchContests();
@@ -93,23 +104,59 @@ export function ContestsPage() {
 
       if (error) throw error;
 
-      // Mock participants for demo
-      const mockParticipants = [
-        { rank: 1, username: 'music_star', views: 150000 },
-        { rank: 2, username: 'vocal_pro', views: 120000 },
-        { rank: 3, username: 'beat_maker', views: 95000 }
-      ];
+      const contestsWithParticipants = await Promise.all(
+        (data || []).map(async (contest) => {
+          // Fetch leaderboard data for each contest
+          let top_participants: any[] = [];
+          try {
+            const response = await fetch(
+              `${backendUrl}/api/v1/contests/${contest.id}/leaderboard?limit=${
+                contest.num_winners || 15
+              }`
+            );
+            if (response.ok) {
+              const leaderboardData = await response.json();
+              if (leaderboardData.data?.leaderboard) {
+                top_participants = leaderboardData.data.leaderboard.map(
+                  (participant: any, index: number) => ({
+                    rank: index + 1,
+                    username: participant.username || "Unknown",
+                    full_name:
+                      participant.full_name ||
+                      participant.username ||
+                      "Unknown",
+                    points: participant.views || 0,
+                    views: participant.views || 0,
+                    previousRank: participant.previousRank || index + 1,
+                  })
+                );
+              }
+            }
+          } catch (error) {
+            console.error(
+              `Error fetching leaderboard for contest ${contest.id}:`,
+              error
+            );
+          }
 
-      const contestsWithParticipants = (data || []).map(contest => ({
-        ...contest,
-        top_participants: mockParticipants,
-        prize_titles: contest.prize_titles || [
-          { rank: 1, title: 'Winner' },
-          { rank: 2, title: 'Runner-up' },
-          { rank: 3, title: 'Third Place' }
-        ]
-      }));
-
+          return {
+            ...contest,
+            cover_image: contest.cover_image || "",
+            music_category: contest.music_category || "",
+            prize_tier: contest.prize_per_winner ? "monetary" : "non-monetary",
+            prize_per_winner:
+              contest.total_prize && contest.num_winners
+                ? Math.floor(contest.total_prize / contest.num_winners)
+                : contest.prize_per_winner || 0,
+            prize_titles: contest.prize_titles || [
+              { rank: 1, title: "Winner" },
+              { rank: 2, title: "Runner-up" },
+              { rank: 3, title: "Third Place" },
+            ],
+            top_participants,
+          };
+        })
+      );
       setContests(contestsWithParticipants);
     } catch (error) {
       console.error('Error fetching contests:', error);
@@ -119,7 +166,7 @@ export function ContestsPage() {
     }
   };
 
-  const handleJoinContest = (contest: Contest) => {
+  const handleJoinContest = (contest: LeaderboardContest) => {
     if (!session) {
       navigate('/signin');
       return;
@@ -317,7 +364,7 @@ export function ContestsPage() {
 
                   {/* Category badge */}
                   <div className="absolute top-4 left-4 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">
-                    {contest.music_category}
+                    {contest.music_category || 'Music'}
                   </div>
                 </div>
 
@@ -342,7 +389,10 @@ export function ContestsPage() {
                       <span className="text-xs text-white/60">{contest.num_winners} Winners</span>
                     </div>
                     <div className="text-lg font-bold text-white">
-                      ${formatNumber(contest.total_prize || contest.prize_per_winner * contest.num_winners)}
+                      {contest.prize_tier === "monetary" 
+                        ? `$${formatNumber(contest.total_prize || (contest.prize_per_winner || 0) * (contest.num_winners || 1))}`
+                        : "Title Rewards"
+                      }
                     </div>
                   </div>
 
