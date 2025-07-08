@@ -27,6 +27,7 @@ import { supabase } from "../lib/supabase";
 import { useRealtimeData } from "../hooks/useRealtimeData";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { ViewSubmissionModal } from "./ViewSubmissionModal";
+import { Settings } from "lucide-react";
 
 interface LeaderboardContest {
   id: string;
@@ -774,7 +775,7 @@ export function HomeContent({
                 onClick={() => onShowAuth(true)}
                 className="bg-white text-[#1A1A1A] px-3 sm:px-6 py-2 rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-sm sm:text-base font-medium"
               >
-                Sign Up
+                Sign Up to Join
               </button>
             </div>
           )}
@@ -923,20 +924,18 @@ export function HomeContent({
                     {session &&
                       (userSubmissions[contest.id] ? (
                         <button
-                          onClick={() =>
-                            handleViewVideo(userSubmissions[contest.id])
-                          }
+                          onClick={() => navigate(`/contest-management/${contest.id}`)}
                           className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-green-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2"
                         >
-                          <Play className="h-4 w-4" />
-                          View Your Video
+                          <Settings className="h-4 w-4" />
+                          Manage
                         </button>
                       ) : (
                         <button
                           onClick={() => handleJoinContest(contest)}
                           className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2"
                         >
-                          <UserPlus className="h-4 w-4" />
+                          <Trophy className="h-4 w-4" />
                           Join Contest
                         </button>
                       ))}
@@ -945,7 +944,7 @@ export function HomeContent({
                       to={`/l/${contest.id}`}
                       className="w-full px-4 py-1.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 group text-xs"
                     >
-                      <span>View Details</span>
+                      <span>Leaderboard</span>
                       <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </div>
