@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import {
@@ -210,6 +210,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export function PublicLeaderboard() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { session, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [contest, setContest] = useState<ContestDetails | null>(null);
