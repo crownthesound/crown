@@ -505,7 +505,7 @@ export function ContestsPage() {
                     {session && userSubmissions[contest.id] ? (
                       <button
                         onClick={() => navigate(`/contest-management/${contest.id}`)}
-                        className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2 bg-white hover:bg-white/90 text-black rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
                       >
                         <Settings className="h-4 w-4" />
                         Manage
