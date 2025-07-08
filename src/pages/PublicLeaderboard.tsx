@@ -19,6 +19,7 @@ import {
   ArrowDown,
   Minus,
   Link as LinkIcon,
+  Settings,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
 import { useAuth } from "../contexts/AuthContext";
