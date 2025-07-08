@@ -975,7 +975,7 @@ export function PublicLeaderboard() {
                       <Share2 className="h-4 w-4" />
                       <span>Share</span>
                     </button>
-                  </nav>
+                  </div>
                 </div>
               ) : (
                 <button
