@@ -108,35 +108,57 @@ export function ContestsPage() {
         (data || []).map(async (contest) => {
           // Fetch leaderboard data for each contest
           let top_participants: any[] = [];
-          try {
-            const response = await fetch(
-              `${backendUrl}/api/v1/contests/${contest.id}/leaderboard?limit=${
-                contest.num_winners || 15
-              }`
-            );
-            if (response.ok) {
-              const leaderboardData = await response.json();
-              if (leaderboardData.data?.leaderboard) {
-                top_participants = leaderboardData.data.leaderboard.map(
-                  (participant: any, index: number) => ({
-                    rank: index + 1,
-                    username: participant.username || "Unknown",
-                    full_name:
-                      participant.full_name ||
-                      participant.username ||
-                      "Unknown",
-                    points: participant.views || 0,
-                    views: participant.views || 0,
-                    previousRank: participant.previousRank || index + 1,
-                  })
-                );
+          
+          // Only attempt to fetch leaderboard if backend URL is properly configured
+          if (backendUrl && backendUrl !== "http://localhost:3000") {
+            try {
+              // Create AbortController for timeout
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+              
+              const response = await fetch(
+                `${backendUrl}/api/v1/contests/${contest.id}/leaderboard?limit=${
+                  contest.num_winners || 15
+                }`,
+                { 
+                  signal: controller.signal,
+                  headers: {
+                    'Content-Type': 'application/json',
+                  }
+                }
+              );
+              
+              clearTimeout(timeoutId);
+              
+              if (response.ok) {
+                const leaderboardData = await response.json();
+                if (leaderboardData.data?.leaderboard) {
+                  top_participants = leaderboardData.data.leaderboard.map(
+                    (participant: any, index: number) => ({
+                      rank: index + 1,
+                      username: participant.username || "Unknown",
+                      full_name:
+                        participant.full_name ||
+                        participant.username ||
+                        "Unknown",
+                      points: participant.views || 0,
+                      views: participant.views || 0,
+                      previousRank: participant.previousRank || index + 1,
+                    })
+                  );
+                }
+              } else {
+                console.warn(`Leaderboard API returned ${response.status} for contest ${contest.id}`);
+              }
+            } catch (error) {
+              if (error instanceof Error && error.name === 'AbortError') {
+                console.warn(`Leaderboard request timeout for contest ${contest.id}`);
+              } else {
+                console.warn(`Network error fetching leaderboard for contest ${contest.id}:`, error);
               }
             }
-          } catch (error) {
-            console.error(
-              `Error fetching leaderboard for contest ${contest.id}:`,
-              error
-            );
+          } else {
+            console.warn('Backend URL not configured or using default localhost - skipping leaderboard fetch');
           }
 
           return {
