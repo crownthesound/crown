@@ -333,22 +333,17 @@ export function PublicLeaderboard() {
     const fetchSubmission = async () => {
       if (!session || !id) return;
       
-      try {
-        const { data, error } = await supa
-          .from("contest_links")
-          .select("*")
-          .eq("contest_id", id as string)
-          .eq("created_by", session.user.id)
-          .eq("is_contest_submission", true)
-          .maybeSingle();
-          
-        if (error) {
-          throw error;
-        } else {
-          setUserSubmission(data);
-        }
-      } catch (error) {
-        console.error('Error fetching user submission:', error);
+      const { data, error } = await supa
+        .from("contest_links")
+        .select("*")
+        .eq("contest_id", id as string)
+        .eq("created_by", session.user.id)
+        .eq("is_contest_submission", true)
+        .single();
+      
+      if (!error) {
+        setUserSubmission(data);
+      } else {
         setUserSubmission(null);
       }
     };
