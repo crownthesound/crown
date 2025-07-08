@@ -480,6 +480,13 @@ export function ContestManagement() {
                         <Play className="h-4 w-4" />
                         <span>View Video</span>
                       </button>
+                      <Link
+                        to={`/share/${id}`}
+                        className="flex-1 px-3 sm:px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2 text-sm font-medium whitespace-nowrap"
+                      >
+                        <Share2 className="h-4 w-4" />
+                        <span>Share</span>
+                      </Link>
                       <button
                         onClick={() => setShowDeleteConfirm(true)}
                         className="flex-1 px-3 sm:px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors flex items-center justify-center gap-1.5 sm:gap-2 text-sm font-medium whitespace-nowrap"

@@ -946,11 +946,11 @@ export function PublicLeaderboard() {
               {session && userSubmission && (
                 <div className="mb-4">
                   <button
-                    onClick={() => navigate(`/contest-management/${id}`)}
+                    onClick={() => navigate(`/share/${id}`)}
                     className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-md"
                   >
-                    <Settings className="h-4 w-4" />
-                    Manage
+                    <Share2 className="h-4 w-4" />
+                    Share
                   </button>
                 </div>
               )}

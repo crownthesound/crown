@@ -14,6 +14,7 @@ import { ContestDetails } from "./pages/ContestDetails";
 import { PublicLeaderboard } from "./pages/PublicLeaderboard";
 import { PastContests } from "./pages/PastContests";
 import { ContestsPage } from "./pages/ContestsPage";
+import { SharePage } from "./pages/SharePage";
 import { ContestManagement } from "./pages/ContestManagement";
 import { Start } from "./pages/Start";
 import { SignIn } from "./pages/SignIn";
@@ -289,6 +290,7 @@ function App() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/start" element={<Start />} />
           <Route path="/contests-page" element={<ContestsPage />} />
+          <Route path="/share/:id" element={<SharePage />} />
           <Route 
             path="/contest-management/:id" 
             element={
