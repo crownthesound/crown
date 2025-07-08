@@ -922,13 +922,10 @@ export function HomeContent({
 
                     {session &&
                       (userSubmissions[contest.id] ? (
-                        <button
-                          onClick={() => navigate(`/contest-management/${contest.id}`)}
-                          className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white text-sm font-medium rounded-lg hover:from-green-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2"
-                        >
-                          <Settings className="h-4 w-4" />
-                          Manage
-                        </button>
+                        <div className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2">
+                          <Trophy className="h-4 w-4" />
+                          Joined Contest
+                        </div>
                       ) : (
                         <button
                           onClick={() => handleJoinContest(contest)}
