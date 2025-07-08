@@ -20,6 +20,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { ContestJoinModal } from '../components/ContestJoinModal';
 import { TikTokConnectModal } from '../components/TikTokConnectModal';
+import { ViewSubmissionModal } from '../components/ViewSubmissionModal';
 import { useTikTokConnection } from '../hooks/useTikTokConnection';
 import toast from 'react-hot-toast';
 
@@ -85,6 +86,9 @@ export function ContestsPage() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showTikTokModal, setShowTikTokModal] = useState(false);
   const [selectedContest, setSelectedContest] = useState<LeaderboardContest | null>(null);
+  const [userSubmissions, setUserSubmissions] = useState<Record<string, any>>({});
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewVideo, setViewVideo] = useState<any>(null);
   
   const { isConnected: isTikTokConnected, refreshConnection } = useTikTokConnection();
 
@@ -92,6 +96,7 @@ export function ContestsPage() {
 
   useEffect(() => {
     fetchContests();
+    fetchUserSubmissions();
   }, []);
 
   const fetchContests = async () => {
@@ -188,6 +193,27 @@ export function ContestsPage() {
     }
   };
 
+  const fetchUserSubmissions = async () => {
+    if (!session) return;
+    try {
+      const { data, error } = await supabase
+        .from('contest_links')
+        .select('*')
+        .eq('created_by', session.user.id)
+        .eq('is_contest_submission', true);
+      if (error) throw error;
+      const mapping: Record<string, any> = {};
+      data.forEach((row) => {
+        if (row.contest_id) {
+          mapping[row.contest_id] = row;
+        }
+      });
+      setUserSubmissions(mapping);
+    } catch (err) {
+      console.error('Error fetching user submissions', err);
+    }
+  };
+
   const handleJoinContest = (contest: LeaderboardContest) => {
     if (!session) {
       navigate('/signin');
@@ -212,6 +238,7 @@ export function ContestsPage() {
   const handleContestJoined = () => {
     setShowJoinModal(false);
     setSelectedContest(null);
+    fetchUserSubmissions(); // Refresh user submissions after joining
     toast.success('Successfully joined contest!');
   };
 
@@ -263,6 +290,11 @@ export function ContestsPage() {
     }
 
     return <Crown className={`h-4 w-4 ${color}`} />;
+  };
+
+  const handleViewVideo = (video: any) => {
+    setViewVideo(video);
+    setShowViewModal(true);
   };
 
   if (loading) {
@@ -447,13 +479,23 @@ export function ContestsPage() {
                     >
                       View Details
                     </Link>
-                    <button
-                      onClick={() => handleJoinContest(contest)}
-                      className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
-                    >
-                      <Trophy className="h-4 w-4" />
-                      Join Contest
-                    </button>
+                    {session && userSubmissions[contest.id] ? (
+                      <button
+                        onClick={() => handleViewVideo(userSubmissions[contest.id])}
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                      >
+                        <Star className="h-4 w-4" />
+                        View Your Video
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleJoinContest(contest)}
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                      >
+                        <Trophy className="h-4 w-4" />
+                        {session ? 'Join Contest' : 'Sign Up to Join'}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -500,6 +542,14 @@ export function ContestsPage() {
           onClose={() => setShowJoinModal(false)}
           contest={selectedContest as any}
           onSuccess={handleContestJoined}
+        />
+      )}
+
+      {viewVideo && (
+        <ViewSubmissionModal
+          isOpen={!!viewVideo}
+          onClose={() => setViewVideo(null)}
+          video={viewVideo}
         />
       )}
     </div>
