@@ -957,46 +957,23 @@ export function PublicLeaderboard() {
               
               {session ? (
                 <div className="flex justify-center">
-                  <nav className="grid grid-cols-3 w-[400px] gap-1">
-                    {/* Rewards Button - Far Left */}
-                    <button
-                      onClick={() => {
-                        toast.success("Rewards coming soon!");
-                      }}
-                      className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
-                    >
-                      <Gift className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                      <span className="text-xs font-medium">Rewards</span>
-                    </button>
-
-                    {/* Join Contest Button - Middle */}
-                    {!userSubmission ? (
+                  <div className="flex gap-4 w-full max-w-md">
+                    {userSubmission && (
                       <button
-                        onClick={handleJoinCompetition}
-                        className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                        onClick={() => navigate(`/contest-management/${id}`)}
+                        className="flex-1 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                       >
-                        <UserPlus className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                        <span className="text-xs font-medium">Join Contest</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handlePlayVideo(userSubmission)}
-                        className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
-                      >
-                        <Play className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                        <span className="text-xs font-medium">View Video</span>
+                        <Settings className="h-4 w-4" />
+                        <span>Manage</span>
                       </button>
                     )}
-
-                    {/* Profile Button - Far Right */}
+                    
                     <button
-                      onClick={() => {
-                        navigate('/profile');
-                      }}
-                      className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                      onClick={() => navigate(`/share/${id}`)}
+                      className="flex-1 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2"
                     >
-                      <User className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                      <span className="text-xs font-medium">Profile</span>
+                      <Share2 className="h-4 w-4" />
+                      <span>Share</span>
                     </button>
                   </nav>
                 </div>
