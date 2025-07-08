@@ -334,38 +334,38 @@ export function ContestManagement() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8">
           {/* Current Ranking */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 text-center">
-            <div className="flex items-center justify-center mb-3">
-              <BarChart3 className="h-6 w-6 text-blue-400" />
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <BarChart3 className="h-5 w-5 text-blue-400" />
             </div>
-            <div className="text-2xl font-bold text-white mb-1">
+            <div className="text-xl sm:text-2xl font-bold text-white mb-1">
               {userRank ? `#${userRank}` : 'Unranked'}
             </div>
-            <div className="text-sm text-white/60">Current Ranking</div>
+            <div className="text-xs sm:text-sm text-white/60">Current Ranking</div>
           </div>
 
           {/* Video Performance */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 text-center">
-            <div className="flex items-center justify-center mb-3">
-              <Eye className="h-6 w-6 text-green-400" />
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Eye className="h-5 w-5 text-green-400" />
             </div>
-            <div className="text-2xl font-bold text-white mb-1">
+            <div className="text-xl sm:text-2xl font-bold text-white mb-1">
               {formatNumber(userSubmission.views || 0)}
             </div>
-            <div className="text-sm text-white/60">Total Views</div>
+            <div className="text-xs sm:text-sm text-white/60">Total Views</div>
           </div>
 
           {/* Time Remaining */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 text-center">
-            <div className="flex items-center justify-center mb-3">
-              <Calendar className="h-6 w-6 text-yellow-400" />
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 text-center">
+            <div className="flex items-center justify-center mb-2">
+              <Calendar className="h-5 w-5 text-yellow-400" />
             </div>
-            <div className="text-2xl font-bold text-white mb-1">
+            <div className="text-xl sm:text-2xl font-bold text-white mb-1">
               {formatTimeLeft(contest.end_date).split(' ')[0]}
             </div>
-            <div className="text-sm text-white/60">Time Left</div>
+            <div className="text-xs sm:text-sm text-white/60">Time Left</div>
           </div>
         </div>
 
