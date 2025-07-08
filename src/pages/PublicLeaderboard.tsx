@@ -340,15 +340,10 @@ export function PublicLeaderboard() {
           .eq("contest_id", id as string)
           .eq("created_by", session.user.id)
           .eq("is_contest_submission", true)
-          .single();
+          .maybeSingle();
           
         if (error) {
-          // Handle the specific case where no rows are found (PGRST116)
-          if (error.code === 'PGRST116') {
-            setUserSubmission(null);
-          } else {
-            throw error;
-          }
+          throw error;
         } else {
           setUserSubmission(data);
         }
