@@ -739,17 +739,6 @@ export function HomeContent({
           </Link>
           {session ? (
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  console.log("🔍 TikTok Settings button clicked");
-                  setShowTikTokSettings(true);
-                  console.log("🔍 showTikTokSettings set to true");
-                }}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">TikTok</span>
-              </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
