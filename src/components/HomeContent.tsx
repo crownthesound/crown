@@ -766,15 +766,15 @@ export function HomeContent({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onShowAuth(false)}
-                className="px-3 sm:px-6 py-2 text-white hover:text-white/80 transition-colors whitespace-nowrap text-sm sm:text-base"
+                className="px-3 sm:px-6 py-2 text-white hover:bg-white/5 rounded-xl transition-colors whitespace-nowrap text-sm sm:text-base"
               >
                 Login
               </button>
               <button
                 onClick={() => onShowAuth(true)}
-                className="px-3 sm:px-6 py-2 text-white hover:text-white/80 transition-colors whitespace-nowrap text-sm sm:text-base"
+                className="bg-white text-[#1A1A1A] px-3 sm:px-6 py-2 rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-sm sm:text-base font-medium"
               >
-                Sign Up
+                Sign Up to Join
               </button>
             </div>
           )}
