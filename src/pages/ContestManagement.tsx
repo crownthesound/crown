@@ -401,23 +401,23 @@ export function ContestManagement() {
                 <p className="text-white/60 text-sm">Submitted on {formatDate(userSubmission.created_at)}</p>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/5 rounded-lg p-3">
-                  <div className="text-lg font-bold text-white">{formatNumber(userSubmission.likes || 0)}</div>
-                  <div className="text-xs text-white/60">Likes</div>
+              <div className="flex items-center gap-6 text-sm text-white/40">
+                <div className="flex items-center gap-1">
+                  <span>{formatNumber(userSubmission.likes || 0)}</span>
+                  <span>likes</span>
                 </div>
-                <div className="bg-white/5 rounded-lg p-3">
-                  <div className="text-lg font-bold text-white">{formatNumber(userSubmission.comments || 0)}</div>
-                  <div className="text-xs text-white/60">Comments</div>
+                <div className="flex items-center gap-1">
+                  <span>{formatNumber(userSubmission.comments || 0)}</span>
+                  <span>comments</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center md:justify-end">
               <img
                 src={userSubmission.thumbnail}
                 alt={userSubmission.title}
-                className="w-32 h-32 rounded-lg object-cover"
+                className="w-48 h-48 sm:w-56 sm:h-56 rounded-xl object-cover shadow-lg"
               />
             </div>
           </div>
