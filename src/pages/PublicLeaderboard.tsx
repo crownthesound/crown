@@ -947,7 +947,7 @@ export function PublicLeaderboard() {
                 <div className="mb-4">
                   <button
                     onClick={() => navigate(`/contest-management/${id}`)}
-                    className="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-medium py-3 rounded-lg hover:from-green-600 hover:to-blue-700 transition-colors flex items-center justify-center gap-2 shadow-md"
+                    className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-2 shadow-md"
                   >
                     <Settings className="h-4 w-4" />
                     Manage
