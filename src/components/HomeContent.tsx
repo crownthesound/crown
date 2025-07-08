@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 import { VideoCarousel } from "./VideoCarousel";
 import { HowToEnterCarousel } from "./HowToEnterCarousel";
 import { TikTokConnectModal } from "./TikTokConnectModal";
+import { TikTokSettingsModal } from "./TikTokSettingsModal";
 import { ContestJoinModal } from "./ContestJoinModal";
 import { supabase } from "../lib/supabase";
 import { useRealtimeData } from "../hooks/useRealtimeData";
@@ -75,6 +76,7 @@ export function HomeContent({
   const [contests, setContests] = useState(initialContests);
   const [loading, setLoading] = useState(initialLoading);
   const [showTikTokModal, setShowTikTokModal] = useState(false);
+  const [showTikTokSettings, setShowTikTokSettings] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [selectedContest, setSelectedContest] =
     useState<LeaderboardContest | null>(null);
@@ -240,6 +242,10 @@ export function HomeContent({
     setContests(initialContests);
     setLoading(initialLoading);
   }, [initialContests, initialLoading]);
+
+  useEffect(() => {
+    console.log("🔍 showTikTokSettings changed to:", showTikTokSettings);
+  }, [showTikTokSettings]);
 
   useEffect(() => {
     fetchUserSubmissions();
@@ -733,6 +739,17 @@ export function HomeContent({
           </Link>
           {session ? (
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  console.log("🔍 TikTok Settings button clicked");
+                  setShowTikTokSettings(true);
+                  console.log("🔍 showTikTokSettings set to true");
+                }}
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
+              >
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">TikTok</span>
+              </button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
@@ -979,6 +996,11 @@ export function HomeContent({
         isOpen={showTikTokModal}
         onClose={() => setShowTikTokModal(false)}
         onSuccess={handleTikTokConnected}
+      />
+
+      <TikTokSettingsModal
+        isOpen={showTikTokSettings}
+        onClose={() => setShowTikTokSettings(false)}
       />
 
       <ContestJoinModal
