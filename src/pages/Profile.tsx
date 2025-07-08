@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
+import { TikTokSettingsModal } from '../components/TikTokSettingsModal';
 
 interface Contest {
   id: string;
@@ -67,6 +68,7 @@ export function Profile() {
   const [joinedContests, setJoinedContests] = useState<Contest[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showTikTokSettings, setShowTikTokSettings] = useState(false);
 
   useEffect(() => {
     if (session && (activeTab === 'contests' || activeTab === 'submissions')) {
@@ -307,6 +309,11 @@ export function Profile() {
         </div>
       </div>
 
+      {/* TikTok Settings Modal */}
+      <TikTokSettingsModal
+        isOpen={showTikTokSettings}
+        onClose={() => setShowTikTokSettings(false)}
+      />
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
