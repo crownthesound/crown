@@ -21,6 +21,7 @@ import {
   Heart,
   MessageCircle,
   Share,
+  Share2,
   Users,
   Target,
   Zap,
