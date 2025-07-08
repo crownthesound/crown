@@ -408,10 +408,22 @@ export function Profile() {
               <div className="space-y-6">
                 {/* Account Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <Settings className="h-5 w-5" />
-                    Account Information
-                  </h3>
+                    <h2 className="text-lg font-semibold text-white">
+                      Account Information
+                    </h2>
+                    <button
+                      onClick={() => {
+                        // Add settings functionality here
+                        toast.success('Settings coming soon!');
+                      }}
+                      className="ml-auto flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden sm:inline">Settings</span>
+                    </button>
+                  </div>
                   <div className="grid gap-4">
                     <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
                       <Mail className="h-5 w-5 text-white/60" />
