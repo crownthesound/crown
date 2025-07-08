@@ -920,22 +920,6 @@ export function HomeContent({
                         </div>
                       )}
 
-                    {session &&
-                      (userSubmissions[contest.id] ? (
-                        <div className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-green-500 to-blue-600 text-white text-sm font-medium rounded-lg flex items-center justify-center gap-2">
-                          <Trophy className="h-4 w-4" />
-                          Joined Contest
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => handleJoinContest(contest)}
-                          className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2"
-                        >
-                          <Trophy className="h-4 w-4" />
-                          Join Contest
-                        </button>
-                      ))}
-
                     <Link
                       to={`/l/${contest.id}`}
                       className="w-full px-4 py-1.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 group text-xs"
