@@ -315,10 +315,10 @@ export function ContestManagement() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowTikTokSettings(true)}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
+                className="flex items-center justify-center px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
               >
                 <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">TikTok</span>
+                <span className="hidden sm:inline ml-2">TikTok</span>
               </button>
             </div>
           )}
