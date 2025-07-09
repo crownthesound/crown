@@ -486,36 +486,36 @@ export function Profile() {
                     <span>Account Information</span>
                   </h3>
                   <div className="grid gap-5">
-                    <div className="group flex items-center gap-4 p-5 bg-gradient-to-r from-blue-500/5 to-blue-500/10 hover:from-blue-500/10 hover:to-blue-500/15 rounded-xl border border-white/10 hover:border-blue-500/20 transition-all duration-300 shadow-sm hover:shadow-md">
-                      <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                      <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <Mail className="h-5 w-5 text-blue-400" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-white/70 mb-1">Email Address</p>
-                        <p className="text-white font-medium tracking-wide group-hover:text-blue-300 transition-colors duration-300">{profile.email || 'Not provided'}</p>
+                        <p className="text-white font-medium tracking-wide">{profile.email || 'Not provided'}</p>
                       </div>
                     </div>
 
-                    <div className="group flex items-center gap-4 p-5 bg-gradient-to-r from-purple-500/5 to-purple-500/10 hover:from-purple-500/10 hover:to-purple-500/15 rounded-xl border border-white/10 hover:border-purple-500/20 transition-all duration-300 shadow-sm hover:shadow-md">
-                      <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                      <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <Calendar className="h-5 w-5 text-purple-400" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-white/70 mb-1">Member Since</p>
-                        <p className="text-white font-medium tracking-wide group-hover:text-purple-300 transition-colors duration-300">
+                        <p className="text-white font-medium tracking-wide">
                           {profile.created_at ? formatDate(profile.created_at) : 'Unknown'}
                         </p>
                       </div>
                     </div>
 
-                    <div className={`group flex items-center gap-4 p-5 bg-gradient-to-r from-${roleInfo.color.replace('text-', '')}/5 to-${roleInfo.color.replace('text-', '')}/10 hover:from-${roleInfo.color.replace('text-', '')}/10 hover:to-${roleInfo.color.replace('text-', '')}/15 rounded-xl border border-white/10 hover:border-${roleInfo.color.replace('text-', '')}/20 transition-all duration-300 shadow-sm hover:shadow-md`}>
-                      <div className={`w-12 h-12 ${roleInfo.bgColor.replace('bg-', 'bg-')}/30 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-inner`}>
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                      <div className={`w-12 h-12 ${roleInfo.bgColor} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                         <RoleIcon className={`h-5 w-5 ${roleInfo.color}`} />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm text-white/70 mb-1">Account Type</p>
                         <p className={`font-medium ${roleInfo.color} tracking-wide`}>{roleInfo.label}</p>
-                        <p className="text-xs text-white/50 mt-1.5 group-hover:text-white/70 transition-colors duration-300">{roleInfo.description}</p>
+                        <p className="text-xs text-white/50 mt-1.5">{roleInfo.description}</p>
                       </div>
                     </div>
                   </div>
@@ -527,51 +527,42 @@ export function Profile() {
                     <BarChart3 className="h-5 w-5 text-green-400" />
                     <span>Activity Stats</span>
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 relative">
-                    {/* Connecting line between cards */}
-                    <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-yellow-500/0 via-blue-500/20 to-purple-500/0 hidden sm:block"></div>
-                    
-                    <div className="group p-5 bg-gradient-to-br from-yellow-500/5 to-yellow-500/10 hover:from-yellow-500/10 hover:to-yellow-500/20 rounded-xl border border-white/10 hover:border-yellow-500/30 text-center transition-all duration-300 transform hover:translate-y-[-4px] hover:shadow-lg hover:shadow-yellow-500/5 relative z-10">
-                      <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
                         <Star className="h-6 w-6 text-yellow-400" />
                       </div>
-                      <p className="text-3xl font-bold text-white mb-1 group-hover:text-yellow-300 transition-colors duration-300">{joinedContests.length}</p>
-                      <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors duration-300">Contests Joined</p>
+                      <p className="text-2xl font-bold text-white mb-1">{joinedContests.length}</p>
+                      <p className="text-sm text-white/70">Contests Joined</p>
                     </div>
-                    <div className="group p-5 bg-gradient-to-br from-blue-500/5 to-blue-500/10 hover:from-blue-500/10 hover:to-blue-500/20 rounded-xl border border-white/10 hover:border-blue-500/30 text-center transition-all duration-300 transform hover:translate-y-[-4px] hover:shadow-lg hover:shadow-blue-500/5 relative z-10">
-                      <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
                         <Trophy className="h-6 w-6 text-blue-400" />
                       </div>
-                      <p className="text-3xl font-bold text-white mb-1 group-hover:text-blue-300 transition-colors duration-300">0</p>
-                      <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors duration-300">Wins</p>
+                      <p className="text-2xl font-bold text-white mb-1">0</p>
+                      <p className="text-sm text-white/70">Wins</p>
                     </div>
-                    <div className="group p-5 bg-gradient-to-br from-purple-500/5 to-purple-500/10 hover:from-purple-500/10 hover:to-purple-500/20 rounded-xl border border-white/10 hover:border-purple-500/30 text-center transition-all duration-300 transform hover:translate-y-[-4px] hover:shadow-lg hover:shadow-purple-500/5 relative z-10">
-                      <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
                         <Crown className="h-6 w-6 text-purple-400" />
                       </div>
-                      <div className="relative">
-                        <p className="text-3xl font-bold text-white mb-1 group-hover:text-purple-300 transition-colors duration-300">
+                      <p className="text-2xl font-bold text-white mb-1">
                         {submissions.reduce((total, sub) => total + (sub.views || 0), 0)}
-                        </p>
-                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-purple-400 rounded-full animate-ping opacity-75"></div>
-                      </div>
-                      <p className="text-sm text-white/70 group-hover:text-white/90 transition-colors duration-300">Total Views</p>
+                      </p>
+                      <p className="text-sm text-white/70">Total Views</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Sign Out Button */}
-                <div className="pt-8 mt-6 border-t border-white/10 flex justify-center">
-                  <div className="relative group">
-                    <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-red-600 rounded-xl opacity-30 blur-sm group-hover:opacity-100 transition-all duration-500"></div>
-                    <button
-                      onClick={handleSignOut}
-                      className="relative w-full sm:w-auto flex items-center justify-center gap-3 px-10 py-3.5 bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-white group shadow-sm hover:shadow-red-500/20"
-                    >
-                      <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                      <span className="font-medium tracking-wide">Sign Out</span>
-                    </button>
-                  </div>
+                <div className="pt-8 mt-4 border-t border-white/10">
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-red-300 group shadow-sm hover:shadow-md"
+                  >
+                    <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    <span className="font-medium tracking-wide">Sign Out</span>
+                  </button>
                 </div>
               </div>
             )}
