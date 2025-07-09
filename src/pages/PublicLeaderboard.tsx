@@ -944,7 +944,8 @@ export function PublicLeaderboard() {
                             className="w-full px-3 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5"
                           >
                             <Settings className="h-4 w-4" />
-                            <span>Manage</span>
+                            <span className="hidden xs:inline">Manage</span>
+                            <span className="xs:hidden">Manage</span>
                           </button>
                         </div>
                         <div className="flex-1">
@@ -953,7 +954,8 @@ export function PublicLeaderboard() {
                             className="w-full px-3 py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
                           >
                             <Share2 className="h-4 w-4" />
-                            <span>Share</span>
+                            <span className="hidden xs:inline">Share</span>
+                            <span className="xs:hidden">Share</span>
                           </button>
                         </div>
                       </div>

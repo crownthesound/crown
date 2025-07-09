@@ -920,6 +920,34 @@ export function HomeContent({
                         </div>
                       )}
 
+                    {session &&
+                      (userSubmissions[contest.id] ? (
+                        <div className="flex gap-2 mt-3">
+                          <button
+                            onClick={() => navigate(`/contest-management/${contest.id}`)}
+                            className="flex-1 px-3 py-2 bg-white/10 text-white text-sm font-medium rounded-lg hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+                          >
+                            <Settings className="h-4 w-4" />
+                            Manage
+                          </button>
+                          <button
+                            onClick={() => navigate(`/share/${contest.id}`)}
+                            className="flex-1 px-3 py-2 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 transition-all flex items-center justify-center gap-2"
+                          >
+                            <Share2 className="h-4 w-4" />
+                            Share
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleJoinContest(contest)}
+                          className="w-full mt-3 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2"
+                        >
+                          <UserPlus className="h-4 w-4" />
+                          Join Contest
+                        </button>
+                      ))}
+
                     <Link
                       to={`/l/${contest.id}`}
                       className="w-full px-4 py-1.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 group text-xs"
