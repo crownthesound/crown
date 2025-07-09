@@ -22,7 +22,8 @@ import {
   Upload,
   Trash2,
   Edit,
-  BarChart3
+  BarChart3,
+  Heart
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
@@ -605,35 +606,107 @@ export function Profile() {
                     </button>
                   </div>
                 ) : (
-                  <div className="grid gap-4">
+                  <div className="grid gap-6">
                     {submissions.map((submission) => (
-                      <div key={submission.id} className="bg-white/5 rounded-lg border border-white/10 p-6">
-                        <div className="flex items-start gap-4">
-                          <img
-                            src={submission.thumbnail}
-                            alt={submission.title}
-                            className="w-20 h-20 rounded-lg object-cover"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between mb-2">
-                              <div>
-                                <h4 className="text-lg font-semibold text-white">{submission.title}</h4>
-                                <p className="text-sm text-white/60">Contest: {submission.contest_name}</p>
+                      <div key={submission.id} className="group bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 overflow-hidden transition-all duration-300 transform hover:translate-y-[-2px]">
+                        <div className="flex flex-col sm:flex-row">
+                          {/* Thumbnail with overlay */}
+                          <div className="relative sm:w-48 h-40 flex-shrink-0">
+                            <img
+                              src={submission.thumbnail}
+                              alt={submission.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-70"></div>
+                            
+                            {/* Play button overlay */}
+                            <button
+                              onClick={() => window.open(submission.url, '_blank')}
+                              className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                              title="Play video"
+                            >
+                              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
+                                <Play className="h-6 w-6 text-white" />
                               </div>
+                            </button>
+                            
+                            {/* Stats overlay at bottom */}
+                            <div className="absolute bottom-0 left-0 right-0 p-2 flex justify-between items-center">
+                              <div className="flex items-center gap-2 text-xs text-white">
+                                <Eye className="h-3 w-3" />
+                                <span>{formatNumber(submission.views || 0)}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs text-white">
+                                <Heart className="h-3 w-3" />
+                                <span>{formatNumber(submission.likes || 0)}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1 p-4 sm:p-5 flex flex-col">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-lg font-semibold text-white truncate">{submission.title}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Trophy className="h-3.5 w-3.5 text-blue-400" />
+                                  <p className="text-sm text-white/70">{submission.contest_name}</p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Stats grid - visible on larger screens */}
+                            <div className="hidden sm:grid grid-cols-4 gap-3 mt-3 mb-4">
+                              <div className="bg-white/5 rounded-lg p-2 text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.views || 0)}</p>
+                                <p className="text-xs text-white/60">Views</p>
+                              </div>
+                              <div className="bg-white/5 rounded-lg p-2 text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.likes || 0)}</p>
+                                <p className="text-xs text-white/60">Likes</p>
+                              </div>
+                              <div className="bg-white/5 rounded-lg p-2 text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.comments || 0)}</p>
+                                <p className="text-xs text-white/60">Comments</p>
+                              </div>
+                              <div className="bg-white/5 rounded-lg p-2 text-center">
+                                <p className="text-lg font-semibold text-white">{formatNumber(submission.shares || 0)}</p>
+                                <p className="text-xs text-white/60">Shares</p>
+                              </div>
+                            </div>
+                            
+                            {/* Mobile stats - visible only on small screens */}
+                            <div className="grid grid-cols-2 gap-2 sm:hidden mt-3 mb-4">
+                              <div className="bg-white/5 rounded-lg p-2 text-center">
+                                <p className="text-base font-semibold text-white">{formatNumber(submission.views || 0)}</p>
+                                <p className="text-xs text-white/60">Views</p>
+                              </div>
+                              <div className="bg-white/5 rounded-lg p-2 text-center">
+                                <p className="text-base font-semibold text-white">{formatNumber(submission.likes || 0)}</p>
+                                <p className="text-xs text-white/60">Likes</p>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/10">
+                              <div className="text-xs text-white/40">
+                                <Calendar className="h-3 w-3 inline mr-1" />
+                                {formatDate(submission.created_at)}
+                              </div>
+                              
                               <div className="flex items-center gap-2">
                                 <Link
                                   to={`/contest-management/${submission.contest_id}`}
                                   className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                                   title="Manage submission"
                                 >
-                                  <Settings className="h-4 w-4 text-white/60" />
+                                  <Settings className="h-4 w-4 text-white/80" />
                                 </Link>
                                 <button
                                   onClick={() => window.open(submission.url, '_blank')}
                                   className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                                   title="View video"
                                 >
-                                  <Play className="h-4 w-4 text-white/60" />
+                                  <ExternalLink className="h-4 w-4 text-white/80" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteSubmission(submission.id)}
@@ -643,27 +716,6 @@ export function Profile() {
                                   <Trash2 className="h-4 w-4 text-red-400" />
                                 </button>
                               </div>
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-3">
-                              <div className="text-center">
-                                <p className="text-lg font-semibold text-white">{formatNumber(submission.views || 0)}</p>
-                                <p className="text-xs text-white/60">Views</p>
-                              </div>
-                              <div className="text-center">
-                                <p className="text-lg font-semibold text-white">{formatNumber(submission.likes || 0)}</p>
-                                <p className="text-xs text-white/60">Likes</p>
-                              </div>
-                              <div className="text-center">
-                                <p className="text-lg font-semibold text-white">{formatNumber(submission.comments || 0)}</p>
-                                <p className="text-xs text-white/60">Comments</p>
-                              </div>
-                              <div className="text-center">
-                                <p className="text-lg font-semibold text-white">{formatNumber(submission.shares || 0)}</p>
-                                <p className="text-xs text-white/60">Shares</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4 text-xs text-white/40">
-                              <span>Submitted: {formatDate(submission.created_at)}</span>
                             </div>
                           </div>
                         </div>
