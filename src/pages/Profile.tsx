@@ -365,22 +365,25 @@ export function Profile() {
       />
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8"></div>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-black text-white mb-2">Your Profile</h1>
+          <p className="text-white/60">Manage your account and track your progress</p>
+        </div>
 
         {/* Profile Card */}
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
           {/* Profile Header */}
-          <div className="relative bg-gradient-to-r from-blue-500/20 to-purple-600/20 p-8">
+          <div className="relative bg-gradient-to-r from-blue-500/20 to-purple-600/20 p-6 sm:p-8">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 animate-gradient-x"></div>
-            <div className="relative flex flex-col items-center gap-6">
+            <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
               {/* Avatar */}
-              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20">
-                <User className="h-12 w-12 text-white" />
+              <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20 mx-auto sm:mx-0">
+                <User className="h-10 w-10 text-white" />
               </div>
 
               {/* Profile Info */}
-              <div className="flex-1 text-center">
-                <div className="flex items-center justify-center gap-3 mb-2">
+              <div className="flex-1 text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
                   {isEditing ? (
                     <div className="flex items-center gap-2">
                       <input
@@ -423,7 +426,7 @@ export function Profile() {
                 </div>
 
                 {/* Role Badge */}
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${roleInfo.bgColor} ${roleInfo.borderColor} border mb-4`}>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${roleInfo.bgColor} ${roleInfo.borderColor} border mb-3`}>
                   <RoleIcon className={`h-4 w-4 ${roleInfo.color}`} />
                   <span className={`text-sm font-medium ${roleInfo.color}`}>
                     {roleInfo.label}
@@ -431,18 +434,18 @@ export function Profile() {
                 </div>
                 
                 {/* Activity Stats - Moved inside profile info */}
-                <div className="grid grid-cols-3 gap-3 mt-2 max-w-md mx-auto">
-                  <div className="p-3 bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 rounded-xl border border-yellow-500/20 text-center">
+                <div className="grid grid-cols-3 gap-3 mt-3 max-w-md mx-auto sm:mx-0">
+                  <div className="p-3 bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 rounded-xl border border-yellow-500/20 text-center transform hover:scale-105 transition-transform duration-300">
                     <Star className="h-5 w-5 text-yellow-400 mx-auto mb-1" />
                     <p className="text-xl font-bold text-white">{joinedContests.length}</p>
                     <p className="text-xs text-white/70">Contests</p>
                   </div>
-                  <div className="p-3 bg-gradient-to-br from-blue-500/20 to-blue-500/5 rounded-xl border border-blue-500/20 text-center">
+                  <div className="p-3 bg-gradient-to-br from-blue-500/20 to-blue-500/5 rounded-xl border border-blue-500/20 text-center transform hover:scale-105 transition-transform duration-300">
                     <Trophy className="h-5 w-5 text-blue-400 mx-auto mb-1" />
                     <p className="text-xl font-bold text-white">0</p>
                     <p className="text-xs text-white/70">Wins</p>
                   </div>
-                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-purple-500/5 rounded-xl border border-purple-500/20 text-center">
+                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-purple-500/5 rounded-xl border border-purple-500/20 text-center transform hover:scale-105 transition-transform duration-300">
                     <Eye className="h-5 w-5 text-purple-400 mx-auto mb-1" />
                     <p className="text-xl font-bold text-white">
                       {formatNumber(submissions.reduce((total, sub) => total + (sub.views || 0), 0))}
@@ -490,7 +493,7 @@ export function Profile() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
                     <Settings className="h-5 w-5 text-blue-400" />
-                    <span>Account Information</span>
+                    Account Information
                   </h3>
                   <div className="grid gap-5">
                     <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
@@ -529,10 +532,10 @@ export function Profile() {
                 </div>
 
                 {/* Sign Out Button */}
-                <div className="pt-8 mt-4 border-t border-white/10">
+                <div className="pt-8 mt-6 border-t border-white/10">
                   <button
                     onClick={handleSignOut}
-                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-red-300 group shadow-sm hover:shadow-md"
+                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-gradient-to-r from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-red-300 group shadow-sm hover:shadow-md"
                   >
                     <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                     <span className="font-medium tracking-wide">Sign Out</span>
@@ -546,7 +549,7 @@ export function Profile() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                     <Trophy className="h-5 w-5" />
-                    <span>Joined Contests</span>
+                    Joined Contests
                     <span className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-xs font-medium text-white/80">{joinedContests.length}</span>
                   </h3>
                 </div>
@@ -683,7 +686,8 @@ export function Profile() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                     <Upload className="h-5 w-5" />
-                    My Submissions ({submissions.length})
+                    My Submissions
+                    <span className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-xs font-medium text-white/80">{submissions.length}</span>
                   </h3>
                 </div>
 
@@ -708,7 +712,7 @@ export function Profile() {
                   <div className="grid gap-6">
                     {submissions.map((submission) => (
                       <div key={submission.id} className="group bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 overflow-hidden transition-all duration-300 transform hover:translate-y-[-2px]">
-                        <div className="flex flex-col sm:flex-row">
+                        <div className="flex flex-col md:flex-row">
                           {/* Thumbnail with overlay */}
                           <div className="relative sm:w-48 h-40 flex-shrink-0">
                             <img
@@ -743,7 +747,7 @@ export function Profile() {
                           </div>
                           
                           {/* Content */}
-                          <div className="flex-1 p-4 sm:p-5 flex flex-col">
+                          <div className="flex-1 p-4 md:p-5 flex flex-col">
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex-1 min-w-0">
                                 <h4 className="text-lg font-semibold text-white truncate">{submission.title}</h4>
@@ -755,7 +759,7 @@ export function Profile() {
                             </div>
                             
                             {/* Stats grid - visible on larger screens */}
-                            <div className="hidden sm:grid grid-cols-4 gap-3 mt-3 mb-4">
+                            <div className="hidden md:grid grid-cols-4 gap-3 mt-3 mb-4">
                               <div className="bg-white/5 rounded-lg p-2 text-center">
                                 <p className="text-lg font-semibold text-white">{formatNumber(submission.views || 0)}</p>
                                 <p className="text-xs text-white/60">Views</p>
@@ -775,7 +779,7 @@ export function Profile() {
                             </div>
                             
                             {/* Mobile stats - visible only on small screens */}
-                            <div className="grid grid-cols-2 gap-2 sm:hidden mt-3 mb-4">
+                            <div className="grid grid-cols-2 gap-2 md:hidden mt-3 mb-4">
                               <div className="bg-white/5 rounded-lg p-2 text-center">
                                 <p className="text-base font-semibold text-white">{formatNumber(submission.views || 0)}</p>
                                 <p className="text-xs text-white/60">Views</p>
