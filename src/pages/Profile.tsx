@@ -258,6 +258,19 @@ export function Profile() {
     return num.toString();
   };
 
+  const formatTimeLeft = (endDate: string) => {
+    const end = new Date(endDate).getTime();
+    const now = new Date().getTime();
+    const distance = end - now;
+
+    if (distance < 0) return 'Contest Ended';
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+    return `${days}d ${hours}h left`;
+  };
+
   const getContestStatus = (contest: Contest) => {
     const now = new Date();
     const endDate = new Date(contest.end_date);
@@ -573,12 +586,14 @@ export function Profile() {
                               <div className="mb-2">
                                 <h4 className="text-lg font-semibold text-white line-clamp-1">{contest.name}</h4>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <Clock className="h-3.5 w-3.5 text-white/60" />
-                                  <p className="text-sm text-white/70">
-                                    {new Date(contest.end_date) > new Date() 
-                                      ? `Ends ${formatDate(contest.end_date)}` 
-                                      : `Ended ${formatDate(contest.end_date)}`}
-                                  </p>
+                                  {new Date(contest.end_date) > new Date() && (
+                                    <>
+                                      <Clock className="h-3.5 w-3.5 text-white/60" />
+                                      <p className="text-sm text-white/70">
+                                        {formatTimeLeft(contest.end_date)}
+                                      </p>
+                                    </>
+                                  )}
                                 </div>
                               </div>
                               
@@ -598,8 +613,18 @@ export function Profile() {
                               
                               <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/10">
                                 <div className="text-xs text-white/40">
-                                  <Calendar className="h-3 w-3 inline mr-1" />
-                                  Joined: {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}
+                                  <div className="flex flex-col gap-1">
+                                    <div>
+                                      <Calendar className="h-3 w-3 inline mr-1" />
+                                      {new Date(contest.end_date) > new Date() 
+                                        ? `Ends ${formatDate(contest.end_date)}` 
+                                        : `Ended ${formatDate(contest.end_date)}`}
+                                    </div>
+                                    <div>
+                                      <Calendar className="h-3 w-3 inline mr-1" />
+                                      Joined: {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}
+                                    </div>
+                                  </div>
                                 </div>
                                 
                                 <div className="flex items-center gap-2">
