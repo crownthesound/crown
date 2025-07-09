@@ -617,8 +617,8 @@ export function Profile() {
                           <div className="flex-1">
                             <div className="flex items-start justify-between mb-2">
                               <div>
-                                <div className="font-medium text-white">{participant.username}</div>
-                                <div className="text-sm text-white/60">
+                                <h4 className="text-lg font-semibold text-white">{submission.title}</h4>
+                                <p className="text-sm text-white/60">Contest: {submission.contest_name}</p>
                               </div>
                               <div className="flex items-center gap-2">
                                 <button
@@ -654,18 +654,9 @@ export function Profile() {
                                 <p className="text-lg font-semibold text-white">{formatNumber(submission.shares || 0)}</p>
                                 <p className="text-xs text-white/60">Shares</p>
                               </div>
-                              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            </div>
                             <div className="flex items-center gap-4 text-xs text-white/40">
-                              <div className="flex items-center justify-between">
-                                <p className="text-white font-medium">{contest.name || 'Unknown Contest'}</p>
-                                <Link
-                                  to={`/contest-management/${contest.id}`}
-                                  className="ml-4 px-3 py-1 bg-white/10 hover:bg-white/20 text-white text-xs rounded-lg transition-colors flex items-center gap-1.5"
-                                >
-                                  <Settings className="h-3 w-3" />
-                                  <span>Manage</span>
-                                </Link>
-                              </div>
+                              <span>Submitted: {formatDate(submission.created_at)}</span>
                             </div>
                           </div>
                         </div>
