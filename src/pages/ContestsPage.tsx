@@ -473,16 +473,6 @@ export function ContestsPage() {
                             <span className="sm:hidden">Sign Up</span>
                           </>
                         )}
-                          <>
-                            <span className="hidden sm:inline">Join Contest</span>
-                            <span className="sm:hidden">Join</span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="hidden sm:inline">Sign Up to Join</span>
-                            <span className="sm:hidden">Sign Up</span>
-                          </>
-                        )}
                       </button>
                     )}
                   </div>
