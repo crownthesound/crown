@@ -70,6 +70,7 @@ export function Profile() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(false);
   const [showTikTokSettings, setShowTikTokSettings] = useState(false);
+  const [userRanks, setUserRanks] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (session && (activeTab === 'contests' || activeTab === 'submissions')) {
@@ -109,6 +110,40 @@ export function Profile() {
         joined_at: p.joined_at
       })) || [];
       setJoinedContests(contests);
+
+      // Fetch user ranks for each contest
+      if (contests.length > 0) {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+        const ranks: Record<string, number> = {};
+        
+        for (const contest of contests) {
+          try {
+            if (backendUrl && backendUrl !== "http://localhost:3000") {
+              const response = await fetch(
+                `${backendUrl}/api/v1/contests/${contest.id}/leaderboard?limit=100`
+              );
+              
+              if (response.ok) {
+                const data = await response.json();
+                if (data.data?.leaderboard) {
+                  // Find user's submission in the leaderboard
+                  const userEntry = data.data.leaderboard.find((entry: any) => 
+                    entry.user_id === session.user.id
+                  );
+                  
+                  if (userEntry) {
+                    ranks[contest.id] = userEntry.rank;
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.warn(`Could not fetch rank for contest ${contest.id}:`, error);
+          }
+        }
+        
+        setUserRanks(ranks);
+      }
 
       // Fetch user submissions
       const { data: submissionData, error: submissionError } = await supabase
@@ -603,13 +638,26 @@ export function Profile() {
                               <div className="grid grid-cols-2 gap-3 mb-4">
                                 <div className="bg-white/5 rounded-lg p-2.5">
                                   <p className="text-xs text-white/50 mb-0.5">Category</p>
-                                  <p className="text-sm font-medium text-white truncate">{contest.music_category}</p>
+                                  <p className="text-sm font-medium text-white truncate">{contest.music_category || 'Music'}</p>
                                 </div>
                                 <div className="bg-white/5 rounded-lg p-2.5">
                                   <p className="text-xs text-white/50 mb-0.5">Prize</p>
                                   <p className="text-sm font-medium text-white">${contest.prize_per_winner}</p>
                                 </div>
                               </div>
+                              
+                             {/* User's rank */}
+                             {userRanks[contest.id] && (
+                               <div className="bg-white/5 rounded-lg p-3 mb-4 flex items-center gap-3">
+                                 <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                                   <Trophy className="h-5 w-5 text-yellow-400" />
+                                 </div>
+                                 <div>
+                                   <p className="text-xs text-white/50 mb-0.5">Your Position</p>
+                                   <p className="text-lg font-bold text-white">#{userRanks[contest.id]}</p>
+                                 </div>
+                               </div>
+                             )}
                               
                               <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/10">
                                 <div className="flex flex-col gap-1.5">
@@ -630,15 +678,15 @@ export function Profile() {
                                 <div className="flex items-center gap-2">
                                   <div className="flex flex-col sm:flex-row gap-2">
                                     <Link
-                                      to={`/l/${contest.id}`}
-                                      className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-[100px]"
+                                     to={`/l/${contest.id}`} 
+                                     className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-[120px]"
                                     >
                                       <Eye className="h-3.5 w-3.5" />
                                       <span>View Leaderboard</span>
                                     </Link>
                                     <Link
                                       to={`/contest-management/${contest.id}`}
-                                      className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-[80px]"
+                                     className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-[90px]"
                                     >
                                       <Settings className="h-3.5 w-3.5" />
                                       <span>Manage</span>
