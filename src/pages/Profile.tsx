@@ -585,7 +585,7 @@ export function Profile() {
                             <div className="flex-1 p-4 sm:p-5 flex flex-col">
                               <div className="mb-2">
                                 <h4 className="text-lg font-semibold text-white line-clamp-1">{contest.name}</h4>
-                                <div className="flex items-center gap-2 mt-1.5">
+                                <div className="flex items-center gap-2 mt-1.5 mb-1">
                                   {new Date(contest.end_date) > new Date() && (
                                     <>
                                       <Clock className="h-3.5 w-3.5 text-white/60" />
@@ -601,49 +601,49 @@ export function Profile() {
                               
                               {/* Contest details */}
                               <div className="grid grid-cols-2 gap-3 mb-4">
-                                <div className="bg-white/5 rounded-lg p-2">
-                                  <p className="text-xs text-white/50 mb-1">Category</p>
-                                  <p className="text-sm font-medium text-white">{contest.music_category}</p>
+                                <div className="bg-white/5 rounded-lg p-2.5">
+                                  <p className="text-xs text-white/50 mb-0.5">Category</p>
+                                  <p className="text-sm font-medium text-white truncate">{contest.music_category}</p>
                                 </div>
-                                <div className="bg-white/5 rounded-lg p-2">
-                                  <p className="text-xs text-white/50 mb-1">Prize</p>
+                                <div className="bg-white/5 rounded-lg p-2.5">
+                                  <p className="text-xs text-white/50 mb-0.5">Prize</p>
                                   <p className="text-sm font-medium text-white">${contest.prize_per_winner}</p>
                                 </div>
                               </div>
                               
                               <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/10">
-                                <div className="text-xs text-white/50">
-                                  <div className="flex flex-col gap-1.5">
-                                    <div className="flex items-center gap-1.5">
-                                      <Calendar className="h-3.5 w-3.5 text-white/40" />
-                                      <span>
-                                        {new Date(contest.end_date) > new Date() 
-                                          ? `Ends ${formatDate(contest.end_date)}` 
-                                          : `Ended ${formatDate(contest.end_date)}`}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                      <Calendar className="h-3.5 w-3.5 text-white/40" />
-                                      <span>Joined {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}</span>
-                                    </div>
+                                <div className="flex flex-col gap-1.5">
+                                  <div className="flex items-center gap-1.5">
+                                    <Calendar className="h-3.5 w-3.5 text-white/60" />
+                                    <span className="text-xs text-white/70">
+                                      {new Date(contest.end_date) > new Date() 
+                                        ? `Ends ${formatDate(contest.end_date)}` 
+                                        : `Ended ${formatDate(contest.end_date)}`}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <Calendar className="h-3.5 w-3.5 text-white/40" />
+                                    <span className="text-xs text-white/50">Joined {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}</span>
                                   </div>
                                 </div>
                                 
                                 <div className="flex items-center gap-2">
-                                  <Link
-                                    to={`/l/${contest.id}`}
-                                    className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
-                                  >
-                                    <Eye className="h-3.5 w-3.5" />
-                                    View Leaderboard
-                                  </Link>
-                                  <Link
-                                    to={`/contest-management/${contest.id}`}
-                                    className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
-                                  >
-                                    <Settings className="h-3.5 w-3.5" />
-                                    Manage
-                                  </Link>
+                                  <div className="flex flex-col sm:flex-row gap-2">
+                                    <Link
+                                      to={`/l/${contest.id}`}
+                                      className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-[100px]"
+                                    >
+                                      <Eye className="h-3.5 w-3.5" />
+                                      <span>View Leaderboard</span>
+                                    </Link>
+                                    <Link
+                                      to={`/contest-management/${contest.id}`}
+                                      className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-[80px]"
+                                    >
+                                      <Settings className="h-3.5 w-3.5" />
+                                      <span>Manage</span>
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
                             </div>
