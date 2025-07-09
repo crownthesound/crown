@@ -372,15 +372,15 @@ export function Profile() {
           {/* Profile Header */}
           <div className="relative bg-gradient-to-r from-blue-500/20 to-purple-600/20 p-8">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 animate-gradient-x"></div>
-            <div className="relative flex flex-col sm:flex-row items-center gap-6">
+            <div className="relative flex flex-col items-center gap-6">
               {/* Avatar */}
-              <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20">
+              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20">
                 <User className="h-12 w-12 text-white" />
               </div>
 
               {/* Profile Info */}
-              <div className="flex-1 text-center sm:text-left">
-                <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
+              <div className="flex-1 text-center">
+                <div className="flex items-center justify-center gap-3 mb-2">
                   {isEditing ? (
                     <div className="flex items-center gap-2">
                       <input
@@ -423,23 +423,32 @@ export function Profile() {
                 </div>
 
                 {/* Role Badge */}
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${roleInfo.bgColor} ${roleInfo.borderColor} border`}>
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${roleInfo.bgColor} ${roleInfo.borderColor} border mb-4`}>
                   <RoleIcon className={`h-4 w-4 ${roleInfo.color}`} />
                   <span className={`text-sm font-medium ${roleInfo.color}`}>
                     {roleInfo.label}
                   </span>
                 </div>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="flex gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold text-white">{joinedContests.length}</p>
-                  <p className="text-xs text-white/60">Contests</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-white">{submissions.length}</p>
-                  <p className="text-xs text-white/60">Submissions</p>
+                
+                {/* Activity Stats - Moved inside profile info */}
+                <div className="grid grid-cols-3 gap-3 mt-2 max-w-md mx-auto">
+                  <div className="p-3 bg-gradient-to-br from-yellow-500/20 to-yellow-500/5 rounded-xl border border-yellow-500/20 text-center">
+                    <Star className="h-5 w-5 text-yellow-400 mx-auto mb-1" />
+                    <p className="text-xl font-bold text-white">{joinedContests.length}</p>
+                    <p className="text-xs text-white/70">Contests</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-blue-500/20 to-blue-500/5 rounded-xl border border-blue-500/20 text-center">
+                    <Trophy className="h-5 w-5 text-blue-400 mx-auto mb-1" />
+                    <p className="text-xl font-bold text-white">0</p>
+                    <p className="text-xs text-white/70">Wins</p>
+                  </div>
+                  <div className="p-3 bg-gradient-to-br from-purple-500/20 to-purple-500/5 rounded-xl border border-purple-500/20 text-center">
+                    <Eye className="h-5 w-5 text-purple-400 mx-auto mb-1" />
+                    <p className="text-xl font-bold text-white">
+                      {formatNumber(submissions.reduce((total, sub) => total + (sub.views || 0), 0))}
+                    </p>
+                    <p className="text-xs text-white/70">Views</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -477,38 +486,6 @@ export function Profile() {
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 {/* Activity Stats */}
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-green-400" />
-                    <span>Activity Stats</span>
-                  </h3>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-5 relative">
-                    <div className="group p-3 sm:p-5 bg-gradient-to-br from-white/8 to-white/5 hover:from-white/10 hover:to-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg hover:shadow-yellow-500/5">
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <Star className="h-6 w-6 text-yellow-400" />
-                      </div>
-                      <p className="text-xl sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">{joinedContests.length}</p>
-                      <p className="text-xs sm:text-sm text-white/70">Contests</p>
-                    </div>
-                    <div className="group p-3 sm:p-5 bg-gradient-to-br from-white/8 to-white/5 hover:from-white/10 hover:to-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg hover:shadow-blue-500/5">
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <Trophy className="h-6 w-6 text-blue-400" />
-                      </div>
-                      <p className="text-xl sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">0</p>
-                      <p className="text-xs sm:text-sm text-white/70">Wins</p>
-                    </div>
-                    <div className="group p-3 sm:p-5 bg-gradient-to-br from-white/8 to-white/5 hover:from-white/10 hover:to-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-lg hover:shadow-purple-500/5">
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
-                      </div>
-                      <p className="text-xl sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">
-                        {submissions.reduce((total, sub) => total + (sub.views || 0), 0)}
-                      </p>
-                      <p className="text-xs sm:text-sm text-white/70">Views</p>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Account Information */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
