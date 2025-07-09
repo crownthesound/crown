@@ -532,7 +532,7 @@ export function Profile() {
                 {loading ? (
                   <div className="text-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
-                    <p className="text-white/60 mt-4">Loading contests...</p>
+                    <p className="text-white/60 mt-4">Loading submissions...</p>
                   </div>
                 ) : joinedContests.length === 0 ? (
                   <div className="text-center py-12">
@@ -543,11 +543,10 @@ export function Profile() {
                       onClick={() => navigate('/')}
                       className="px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
                     >
-                      Browse Contests
-                    </button>
-                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+                    <Settings className="h-5 w-5 text-blue-400" />
+                    <span>Account Information</span>
                 ) : (
-                  <div className="grid gap-4">
                     {joinedContests.map((contest) => {
                       const status = getContestStatus(contest);
                       return (
@@ -743,32 +742,45 @@ export function Profile() {
                               
                               <div className="flex items-center gap-2">
                                 <Link
-                                  to={`/contest-management/${submission.contest_id}`}
-                                  className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-                                  title="Manage submission"
+                  <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-green-400" />
+                    <span>Activity Stats</span>
                                 >
-                                  <Settings className="h-4 w-4 text-white/80" />
-                                </Link>
-                                <button
-                                  onClick={() => window.open(submission.url, '_blank')}
-                                  className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <Star className="h-6 w-6 text-yellow-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-white mb-1">{joinedContests.length}</p>
+                      <p className="text-sm text-white/70">Contests Joined</p>
                                   title="View video"
-                                >
-                                  <ExternalLink className="h-4 w-4 text-white/80" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteSubmission(submission.id)}
-                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <Trophy className="h-6 w-6 text-blue-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-white mb-1">0</p>
+                      <p className="text-sm text-white/70">Wins</p>
+                      </div>
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <Crown className="h-6 w-6 text-purple-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-white mb-1">
                                   title="Delete submission"
                                 >
-                                  <Trash2 className="h-4 w-4 text-red-400" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      <p className="text-sm text-white/70">Total Views</p>
+                  <div className="grid gap-5">
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                      <div className={`w-12 h-12 ${roleInfo.bgColor} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                        <RoleIcon className={`h-5 w-5 ${roleInfo.color}`} />
+                <div className="pt-8 mt-4 border-t border-white/10">
+                      <div className="flex-1">
+                        <p className="text-sm text-white/70 mb-1">Account Type</p>
+                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-red-300 group shadow-sm hover:shadow-md"
+                        <p className="text-xs text-white/50 mt-1.5">{roleInfo.description}</p>
+                    <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    <span className="font-medium tracking-wide">Sign Out</span>
                   </div>
                 )}
               </div>
