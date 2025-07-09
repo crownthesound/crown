@@ -435,7 +435,7 @@ export function Profile() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
                     <Settings className="h-5 w-5 text-blue-400" />
-                    Account Information
+                    <span>Account Information</span>
                   </h3>
                   <div className="grid gap-5">
                     <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
@@ -477,7 +477,7 @@ export function Profile() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
                     <BarChart3 className="h-5 w-5 text-green-400" />
-                    Activity Stats
+                    <span>Activity Stats</span>
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
@@ -507,10 +507,10 @@ export function Profile() {
                 </div>
 
                 {/* Sign Out Button */}
-                <div className="pt-8 mt-2 border-t border-white/10">
+                <div className="pt-8 mt-4 border-t border-white/10">
                   <button
                     onClick={handleSignOut}
-                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-red-300 group"
+                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-red-300 group shadow-sm hover:shadow-md"
                   >
                     <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                     <span className="font-medium tracking-wide">Sign Out</span>
