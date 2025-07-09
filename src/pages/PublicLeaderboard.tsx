@@ -932,30 +932,35 @@ export function PublicLeaderboard() {
         {/* Join Competition Button */}
         {contest.status === "active" && (
           <div className="fixed bottom-0 left-0 right-0 py-2 px-4 bg-black/95 backdrop-blur-lg border-t border-white/10">
-            <div className="max-w-6xl mx-auto flex justify-center">
+            <div className="max-w-6xl mx-auto">
               {session ? (
-                <div className="flex gap-4 w-full max-w-md">
-                  {userSubmission && (
-                    <>
-                      <button
-                        onClick={() => navigate(`/contest-management/${id}`)}
-                        className="flex-1 px-3 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="hidden xs:inline">Manage</span>
-                        <span className="xs:hidden">Manage</span>
-                      </button>
-                      <button
-                        onClick={() => navigate(`/share/${id}`)}
-                        className="flex-1 px-3 py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
-                      >
-                        <Share2 className="h-4 w-4" />
-                        <span className="hidden xs:inline">Share</span>
-                        <span className="xs:hidden">Share</span>
-                      </button>
-                    </>
-                  )}
+                <div className="flex justify-center">
+                  <div className="flex gap-4 w-full max-w-md">
+                    {userSubmission && (
+                      <div className="flex gap-3 w-full">
+                        <div className="flex-1">
+                          <button
+                            onClick={() => navigate(`/contest-management/${id}`)}
+                            className="w-full px-3 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <Settings className="h-4 w-4" />
+                            <span>Manage</span>
+                          </button>
+                        </div>
+                        <div className="flex-1">
+                          <button
+                            onClick={() => navigate(`/share/${id}`)}
+                            className="w-full px-3 py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
+                          >
+                            <Share2 className="h-4 w-4" />
+                            <span>Share</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
                   </div>
+                </div>
               ) : (
                 <div className="w-full">
                   <button
