@@ -527,29 +527,29 @@ export function Profile() {
                     <BarChart3 className="h-5 w-5 text-green-400" />
                     <span>Activity Stats</span>
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
-                      <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-5">
+                    <div className="group p-3 sm:p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                         <Star className="h-6 w-6 text-yellow-400" />
                       </div>
-                      <p className="text-2xl font-bold text-white mb-1">{joinedContests.length}</p>
-                      <p className="text-sm text-white/70">Contests Joined</p>
+                      <p className="text-xl sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">{joinedContests.length}</p>
+                      <p className="text-xs sm:text-sm text-white/70">Contests</p>
                     </div>
-                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
-                      <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <div className="group p-3 sm:p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
                         <Trophy className="h-6 w-6 text-blue-400" />
                       </div>
-                      <p className="text-2xl font-bold text-white mb-1">0</p>
-                      <p className="text-sm text-white/70">Wins</p>
+                      <p className="text-xl sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">0</p>
+                      <p className="text-xs sm:text-sm text-white/70">Wins</p>
                     </div>
-                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
-                      <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <Crown className="h-6 w-6 text-purple-400" />
+                    <div className="group p-3 sm:p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
                       </div>
-                      <p className="text-2xl font-bold text-white mb-1">
+                      <p className="text-xl sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">
                         {submissions.reduce((total, sub) => total + (sub.views || 0), 0)}
                       </p>
-                      <p className="text-sm text-white/70">Total Views</p>
+                      <p className="text-xs sm:text-sm text-white/70">Views</p>
                     </div>
                   </div>
                 </div>
