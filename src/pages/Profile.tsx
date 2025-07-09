@@ -621,6 +621,13 @@ export function Profile() {
                                 <p className="text-sm text-white/60">Contest: {submission.contest_name}</p>
                               </div>
                               <div className="flex items-center gap-2">
+                                <Link
+                                  to={`/contest-management/${submission.contest_id}`}
+                                  className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                                  title="Manage submission"
+                                >
+                                  <Settings className="h-4 w-4 text-white/60" />
+                                </Link>
                                 <button
                                   onClick={() => window.open(submission.url, '_blank')}
                                   className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
