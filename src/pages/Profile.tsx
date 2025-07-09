@@ -585,7 +585,7 @@ export function Profile() {
                             <div className="flex-1 p-4 sm:p-5 flex flex-col">
                               <div className="mb-2">
                                 <h4 className="text-lg font-semibold text-white line-clamp-1">{contest.name}</h4>
-                                <div className="flex items-center gap-2 mt-1">
+                                <div className="flex items-center gap-2 mt-1.5">
                                   {new Date(contest.end_date) > new Date() && (
                                     <>
                                       <Clock className="h-3.5 w-3.5 text-white/60" />
@@ -612,17 +612,19 @@ export function Profile() {
                               </div>
                               
                               <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/10">
-                                <div className="text-xs text-white/40">
-                                  <div className="flex flex-col gap-1">
-                                    <div>
-                                      <Calendar className="h-3 w-3 inline mr-1" />
-                                      {new Date(contest.end_date) > new Date() 
-                                        ? `Ends ${formatDate(contest.end_date)}` 
-                                        : `Ended ${formatDate(contest.end_date)}`}
+                                <div className="text-xs text-white/50">
+                                  <div className="flex flex-col gap-1.5">
+                                    <div className="flex items-center gap-1.5">
+                                      <Calendar className="h-3.5 w-3.5 text-white/40" />
+                                      <span>
+                                        {new Date(contest.end_date) > new Date() 
+                                          ? `Ends ${formatDate(contest.end_date)}` 
+                                          : `Ended ${formatDate(contest.end_date)}`}
+                                      </span>
                                     </div>
-                                    <div>
-                                      <Calendar className="h-3 w-3 inline mr-1" />
-                                      Joined: {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}
+                                    <div className="flex items-center gap-1.5">
+                                      <Calendar className="h-3.5 w-3.5 text-white/40" />
+                                      <span>Joined {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -630,14 +632,16 @@ export function Profile() {
                                 <div className="flex items-center gap-2">
                                   <Link
                                     to={`/l/${contest.id}`}
-                                    className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors"
+                                    className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
                                   >
+                                    <Eye className="h-3.5 w-3.5" />
                                     View Leaderboard
                                   </Link>
                                   <Link
                                     to={`/contest-management/${contest.id}`}
-                                    className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium rounded-lg transition-colors"
+                                    className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
                                   >
+                                    <Settings className="h-3.5 w-3.5" />
                                     Manage
                                   </Link>
                                 </div>
