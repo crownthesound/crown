@@ -22,8 +22,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { ContestJoinModal } from '../components/ContestJoinModal';
 import { TikTokConnectModal } from '../components/TikTokConnectModal';
 import { ViewSubmissionModal } from '../components/ViewSubmissionModal';
-import { useTikTokConnection } from '../hooks/useTikTokConnection';
 import toast from 'react-hot-toast';
+import { useTikTokConnection } from '../hooks/useTikTokConnection';
 
 interface LeaderboardContest {
   id: string;
@@ -82,8 +82,6 @@ export function ContestsPage() {
   const navigate = useNavigate();
   const [contests, setContests] = useState<LeaderboardContest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showTikTokModal, setShowTikTokModal] = useState(false);
   const [selectedContest, setSelectedContest] = useState<LeaderboardContest | null>(null);
@@ -243,13 +241,6 @@ export function ContestsPage() {
     toast.success('Successfully joined contest!');
   };
 
-  const filteredContests = contests.filter(contest => {
-    const matchesSearch = contest.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         contest.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || contest.music_category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
   const formatTimeLeft = (endDate: string) => {
     const end = new Date(endDate).getTime();
     const now = new Date().getTime();
@@ -320,7 +311,6 @@ export function ContestsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Trophy className="h-8 w-8 text-yellow-400" />
@@ -333,66 +323,18 @@ export function ContestsPage() {
           </p>
         </div>
 
-        {/* Search and Filter */}
-        <div className="mb-6 space-y-3">
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/40" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white/5 border border-white/10 rounded-md text-white placeholder-white/40 focus:outline-none focus:ring-1 focus:ring-white/20"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 text-white/40" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-8 pr-6 py-1 text-xs bg-white/5 border border-white/10 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-white/20 appearance-none cursor-pointer w-full sm:min-w-[120px] sm:w-auto"
-                style={{ WebkitAppearance: "none", MozAppearance: "none" }}
-              >
-                {MUSIC_CATEGORIES.map(category => (
-                  <option key={category} value={category} className="bg-[#1A1A1A] text-white text-[10px] py-0.5">
-                    {category}
-                  </option>
-                ))}
-              </select>
-              {/* Custom dropdown arrow */}
-              <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-2 h-2 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Results count */}
-          <div className="text-white/40 text-[10px]">
-            {filteredContests.length} contest{filteredContests.length !== 1 ? 's' : ''} found
-          </div>
-        </div>
-
         {/* Contests Grid */}
-        {filteredContests.length === 0 ? (
+        {contests.length === 0 ? (
           <div className="text-center py-16">
             <Music className="h-16 w-16 text-white/20 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No contests found</h3>
             <p className="text-white/60">
-              {searchTerm || selectedCategory !== 'All' 
-                ? 'Try adjusting your search or filter criteria'
-                : 'Check back later for new contests!'
-              }
+              Check back later for new contests!
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredContests.map((contest) => (
+            {contests.map((contest) => (
               <div
                 key={contest.id}
                 className="group bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden hover:border-white/20 transition-all duration-300 hover:scale-[1.02]"
@@ -528,7 +470,7 @@ export function ContestsPage() {
         )}
 
         {/* Call to Action */}
-        {!session && filteredContests.length > 0 && (
+        {!session && contests.length > 0 && (
           <div className="mt-16 text-center bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
             <Award className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">Ready to Compete?</h3>
