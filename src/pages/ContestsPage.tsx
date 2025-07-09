@@ -462,7 +462,17 @@ export function ContestsPage() {
                         className="flex-1 px-2 py-1.5 sm:px-4 sm:py-2 bg-white hover:bg-white/90 text-black rounded-lg transition-all text-[10px] sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2"
                       >
                         <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
-                        {session ? <span className="hidden sm:inline">Join Contest</span><span className="sm:hidden">Join</span> : <span className="hidden sm:inline">Sign Up to Join</span><span className="sm:hidden">Sign Up</span>}
+                        {session ? (
+                          <>
+                            <span className="hidden sm:inline">Join Contest</span>
+                            <span className="sm:hidden">Join</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="hidden sm:inline">Sign Up to Join</span>
+                            <span className="sm:hidden">Sign Up</span>
+                          </>
+                        )}
                       </button>
                     )}
                   </div>
