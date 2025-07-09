@@ -49,6 +49,15 @@ export const useTikTokConnection = () => {
     
     try {
       console.log("🔍 Checking TikTok connection for user:", session.user.id);
+      
+      // Check if we have a valid session and user
+      if (!session.user?.id) {
+        console.log("❌ No valid user session found");
+        setIsConnected(false);
+        setTikTokProfile(null);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("tiktok_profiles")
         .select("*")
@@ -59,7 +68,10 @@ export const useTikTokConnection = () => {
 
       if (error) {
         console.error("❌ TikTok profile query error:", error);
-        throw error;
+        // Don't throw on database errors, just set disconnected state
+        setIsConnected(false);
+        setTikTokProfile(null);
+        return;
       }
 
       const connected = !!data;
@@ -67,9 +79,16 @@ export const useTikTokConnection = () => {
       setIsConnected(connected);
       setTikTokProfile(data);
     } catch (error) {
-      console.error("Error checking TikTok connection:", error);
-      setIsConnected(false);
-      setTikTokProfile(null);
+      console.error("❌ Network error checking TikTok connection:", error);
+      // On network errors, don't change the current state to avoid flickering
+      // Just log the error and keep the current state
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.log("🌐 Network connectivity issue detected, keeping current state");
+      } else {
+        // For other errors, reset to disconnected state
+        setIsConnected(false);
+        setTikTokProfile(null);
+      }
     } finally {
       setIsLoading(false);
     }
