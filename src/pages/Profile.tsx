@@ -211,7 +211,7 @@ export function Profile() {
         return {
           label: 'Organizer',
           color: 'text-yellow-400',
-          bgColor: 'bg-yellow-400/10',
+          bgColor: 'bg-yellow-400/20',
           borderColor: 'border-yellow-400/20',
           icon: Crown,
           description: 'Can create and manage contests'
@@ -220,7 +220,7 @@ export function Profile() {
         return {
           label: 'Administrator',
           color: 'text-red-400',
-          bgColor: 'bg-red-400/10',
+          bgColor: 'bg-red-400/20',
           borderColor: 'border-red-400/20',
           icon: Shield,
           description: 'Full system access'
@@ -229,7 +229,7 @@ export function Profile() {
         return {
           label: 'User',
           color: 'text-blue-400',
-          bgColor: 'bg-blue-400/10',
+          bgColor: 'bg-blue-400/20',
           borderColor: 'border-blue-400/20',
           icon: User,
           description: 'Can participate in contests'
@@ -433,35 +433,41 @@ export function Profile() {
               <div className="space-y-6">
                 {/* Account Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
+                  <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+                    <Settings className="h-5 w-5 text-blue-400" />
                     Account Information
                   </h3>
-                  <div className="grid gap-4">
-                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                      <Mail className="h-5 w-5 text-white/60" />
-                      <div>
-                        <p className="text-sm text-white/60">Email Address</p>
-                        <p className="text-white font-medium">{profile.email || 'Not provided'}</p>
+                  <div className="grid gap-5">
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                      <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Mail className="h-5 w-5 text-blue-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white/70 mb-1">Email Address</p>
+                        <p className="text-white font-medium tracking-wide">{profile.email || 'Not provided'}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                      <Calendar className="h-5 w-5 text-white/60" />
-                      <div>
-                        <p className="text-sm text-white/60">Member Since</p>
-                        <p className="text-white font-medium">
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                      <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Calendar className="h-5 w-5 text-purple-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white/70 mb-1">Member Since</p>
+                        <p className="text-white font-medium tracking-wide">
                           {profile.created_at ? formatDate(profile.created_at) : 'Unknown'}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                      <RoleIcon className={`h-5 w-5 ${roleInfo.color}`} />
-                      <div>
-                        <p className="text-sm text-white/60">Account Type</p>
-                        <p className={`font-medium ${roleInfo.color}`}>{roleInfo.label}</p>
-                        <p className="text-xs text-white/40 mt-1">{roleInfo.description}</p>
+                    <div className="group flex items-center gap-4 p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300">
+                      <div className={`w-12 h-12 ${roleInfo.bgColor} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                        <RoleIcon className={`h-5 w-5 ${roleInfo.color}`} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-white/70 mb-1">Account Type</p>
+                        <p className={`font-medium ${roleInfo.color} tracking-wide`}>{roleInfo.label}</p>
+                        <p className="text-xs text-white/50 mt-1.5">{roleInfo.description}</p>
                       </div>
                     </div>
                   </div>
@@ -469,39 +475,45 @@ export function Profile() {
 
                 {/* Activity Stats */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
+                  <h3 className="text-lg font-semibold text-white mb-5 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-green-400" />
                     Activity Stats
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
-                      <Star className="h-6 w-6 text-yellow-400 mx-auto mb-2" />
-                      <p className="text-2xl font-bold text-white">{joinedContests.length}</p>
-                      <p className="text-sm text-white/60">Contests Joined</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <Star className="h-6 w-6 text-yellow-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-white mb-1">{joinedContests.length}</p>
+                      <p className="text-sm text-white/70">Contests Joined</p>
                     </div>
-                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
-                      <Trophy className="h-6 w-6 text-blue-400 mx-auto mb-2" />
-                      <p className="text-2xl font-bold text-white">0</p>
-                      <p className="text-sm text-white/60">Wins</p>
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <Trophy className="h-6 w-6 text-blue-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-white mb-1">0</p>
+                      <p className="text-sm text-white/70">Wins</p>
                     </div>
-                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 text-center">
-                      <Crown className="h-6 w-6 text-purple-400 mx-auto mb-2" />
-                      <p className="text-2xl font-bold text-white">
+                    <div className="group p-5 bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 text-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                      <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                        <Crown className="h-6 w-6 text-purple-400" />
+                      </div>
+                      <p className="text-2xl font-bold text-white mb-1">
                         {submissions.reduce((total, sub) => total + (sub.views || 0), 0)}
                       </p>
-                      <p className="text-sm text-white/60">Total Views</p>
+                      <p className="text-sm text-white/70">Total Views</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Sign Out Button */}
-                <div className="pt-6 border-t border-white/10">
+                <div className="pt-8 mt-2 border-t border-white/10">
                   <button
                     onClick={handleSignOut}
-                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg transition-all duration-200 text-red-400 hover:text-red-300 group"
+                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-3.5 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-xl transition-all duration-300 text-red-400 hover:text-red-300 group"
                   >
-                    <LogOut className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    <span className="font-medium">Sign Out</span>
+                    <LogOut className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    <span className="font-medium tracking-wide">Sign Out</span>
                   </button>
                 </div>
               </div>
