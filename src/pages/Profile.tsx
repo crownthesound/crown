@@ -524,7 +524,8 @@ export function Profile() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                     <Trophy className="h-5 w-5" />
-                    Joined Contests ({joinedContests.length})
+                    <span>Joined Contests</span>
+                    <span className="ml-2 px-2 py-0.5 bg-white/10 rounded-full text-xs font-medium text-white/80">{joinedContests.length}</span>
                   </h3>
                 </div>
 
@@ -550,38 +551,73 @@ export function Profile() {
                     {joinedContests.map((contest) => {
                       const status = getContestStatus(contest);
                       return (
-                        <div key={contest.id} className="bg-white/5 rounded-lg border border-white/10 p-6">
-                          <div className="flex items-start gap-4">
+                        <div key={contest.id} className="group bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 overflow-hidden transition-all duration-300 transform hover:translate-y-[-2px]">
+                          <div className="flex flex-col sm:flex-row">
                             {contest.cover_image && (
-                              <img
-                                src={contest.cover_image}
-                                alt={contest.name}
-                                className="w-16 h-16 rounded-lg object-cover"
-                              />
-                            )}
-                            <div className="flex-1">
-                              <div className="flex items-start justify-between mb-2">
-                                <h4 className="text-lg font-semibold text-white">{contest.name}</h4>
-                                <div className={`px-2 py-1 rounded-full text-xs font-medium ${status.bgColor} ${status.color}`}>
+                              <div className="relative sm:w-48 h-40 flex-shrink-0">
+                                <img
+                                  src={contest.cover_image}
+                                  alt={contest.name}
+                                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-70"></div>
+                                
+                                {/* Status badge */}
+                                <div className={`absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium ${status.bgColor} ${status.color}`}>
                                   {status.label}
                                 </div>
                               </div>
-                              <p className="text-white/60 text-sm mb-3 line-clamp-2">{contest.description}</p>
-                              <div className="flex items-center gap-4 text-xs text-white/40">
-                                <span>Joined: {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}</span>
-                                <span>•</span>
-                                <span>Category: {contest.music_category}</span>
-                                <span>•</span>
-                                <span>Prize: ${contest.prize_per_winner}</span>
+                            )}
+                            
+                            <div className="flex-1 p-4 sm:p-5 flex flex-col">
+                              <div className="mb-2">
+                                <h4 className="text-lg font-semibold text-white line-clamp-1">{contest.name}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Clock className="h-3.5 w-3.5 text-white/60" />
+                                  <p className="text-sm text-white/70">
+                                    {new Date(contest.end_date) > new Date() 
+                                      ? `Ends ${formatDate(contest.end_date)}` 
+                                      : `Ended ${formatDate(contest.end_date)}`}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <p className="text-white/60 text-sm mb-4 line-clamp-2">{contest.description}</p>
+                              
+                              {/* Contest details */}
+                              <div className="grid grid-cols-2 gap-3 mb-4">
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <p className="text-xs text-white/50 mb-1">Category</p>
+                                  <p className="text-sm font-medium text-white">{contest.music_category}</p>
+                                </div>
+                                <div className="bg-white/5 rounded-lg p-2">
+                                  <p className="text-xs text-white/50 mb-1">Prize</p>
+                                  <p className="text-sm font-medium text-white">${contest.prize_per_winner}</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/10">
+                                <div className="text-xs text-white/40">
+                                  <Calendar className="h-3 w-3 inline mr-1" />
+                                  Joined: {contest.joined_at ? formatDate(contest.joined_at) : 'Unknown'}
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  <Link
+                                    to={`/l/${contest.id}`}
+                                    className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors"
+                                  >
+                                    View Leaderboard
+                                  </Link>
+                                  <Link
+                                    to={`/contest-management/${contest.id}`}
+                                    className="px-3 py-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium rounded-lg transition-colors"
+                                  >
+                                    Manage
+                                  </Link>
+                                </div>
                               </div>
                             </div>
-                            <button
-                              onClick={() => navigate(`/l/${contest.id}`)}
-                              className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
-                              title="View contest"
-                            >
-                              <ExternalLink className="h-4 w-4 text-white/60" />
-                            </button>
                           </div>
                         </div>
                       );
