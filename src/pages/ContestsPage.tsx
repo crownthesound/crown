@@ -333,7 +333,7 @@ export function ContestsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {contests.map((contest) => (
               <div
                 key={contest.id}
@@ -342,11 +342,13 @@ export function ContestsPage() {
                 {/* Contest Image */}
                 <div className="relative aspect-video overflow-hidden">
                   {contest.cover_image ? (
-                    <img
-                      src={contest.cover_image}
-                      alt={contest.name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
+                    <div className="w-full h-full">
+                      <img
+                        src={contest.cover_image}
+                        alt={contest.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
                       <Music className="h-12 w-12 text-white/40" />
@@ -355,48 +357,48 @@ export function ContestsPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                   
                   {/* Time left badge */}
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-sm flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {formatTimeLeft(contest.end_date)}
+                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 px-2 py-0.5 sm:px-3 sm:py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm flex items-center gap-1">
+                    <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    <span className="truncate">{formatTimeLeft(contest.end_date)}</span>
                   </div>
 
                   {/* Category badge */}
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">
+                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 px-2 py-0.5 sm:px-3 sm:py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-[10px] sm:text-xs font-medium">
                     {contest.music_category || 'Music'}
                   </div>
                 </div>
 
                 {/* Contest Info */}
-                <div className="p-6 space-y-4">
+                <div className="p-3 sm:p-6 space-y-2 sm:space-y-4">
                   <div>
-                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-1">
+                    <h3 className="text-sm sm:text-xl font-bold text-white mb-1 sm:mb-2 line-clamp-1">
                       {contest.name}
                     </h3>
-                    <p className="text-white/70 text-sm line-clamp-2">
+                    <p className="text-white/70 text-xs sm:text-sm line-clamp-2">
                       {contest.description}
                     </p>
                   </div>
 
                   {/* Prize Info */}
-                  <div className="bg-black/30 backdrop-blur-sm rounded-lg p-2">
-                    <div className="flex items-center justify-between mb-2">
+                  <div className="bg-black/30 backdrop-blur-sm rounded-lg p-1.5 sm:p-2">
+                    <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div className="flex items-center gap-2">
-                        <Trophy className="h-4 w-4 text-yellow-400" />
-                        <h4 className="text-xs font-medium text-white">Prizes</h4>
+                        <Trophy className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
+                        <h4 className="text-[10px] sm:text-xs font-medium text-white">Prizes</h4>
                       </div>
-                      <div className="text-xs text-white/60">
+                      <div className="text-[10px] sm:text-xs text-white/60">
                         {contest.num_winners} Winners
                       </div>
                     </div>
-                    <div className="flex gap-1 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide">
+                    <div className="flex gap-1 overflow-x-auto pb-1 sm:pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide">
                       {contest.prize_titles
                         .slice(0, contest.num_winners || contest.prize_titles.length)
                         .map((prize: any, index: number) => (
                           <div
                             key={index}
-                            className="p-1.5 rounded-lg border snap-start flex-shrink-0 min-w-[70px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
+                            className="p-1 sm:p-1.5 rounded-lg border snap-start flex-shrink-0 min-w-[60px] sm:min-w-[70px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
                           >
-                            <div className="flex items-center gap-1 mb-0.5">
+                            <div className="flex items-center gap-0.5 sm:gap-1 mb-0.5">
                               {getRankIcon(index + 1)}
                               <span className={`text-[10px] font-medium ${
                                 index === 0 ? "text-yellow-400" :
@@ -406,7 +408,7 @@ export function ContestsPage() {
                                 {index + 1}{index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"}
                               </span>
                             </div>
-                            <div className="text-[10px] font-medium leading-tight line-clamp-2 text-white">
+                            <div className="text-[8px] sm:text-[10px] font-medium leading-tight line-clamp-1 sm:line-clamp-2 text-white">
                               {contest.prize_tier === "monetary"
                                 ? `$${formatNumber((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
                                 : prize.title}
@@ -417,13 +419,14 @@ export function ContestsPage() {
                   </div>
 
                   {/* Top Participants */}
+                  {/* Hide top participants on mobile to save space */}
                   {contest.top_participants && contest.top_participants.length > 0 && (
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-white/60" />
-                        <span className="text-sm font-medium text-white/60">Current Leaders</span>
+                      <div className="hidden sm:flex items-center gap-2">
+                        <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white/60" />
+                        <span className="text-xs sm:text-sm font-medium text-white/60">Current Leaders</span>
                       </div>
-                      <div className="space-y-1">
+                      <div className="hidden sm:block space-y-1">
                         {contest.top_participants.slice(0, 3).map((participant) => (
                           <div key={participant.rank} className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
@@ -438,27 +441,27 @@ export function ContestsPage() {
                   )}
 
                   {/* Action Buttons */}
-                  <div className="flex gap-3 pt-2">
+                  <div className="flex gap-2 sm:gap-3 pt-2">
                     <Link
                       to={`/l/${contest.id}`}
-                      className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-center text-sm font-medium"
+                      className="flex-1 px-2 py-1.5 sm:px-4 sm:py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors text-center text-[10px] sm:text-sm font-medium"
                     >
                       Leaderboard
                     </Link>
                     {session && userSubmissions[contest.id] ? (
                       <button
                         onClick={() => navigate(`/contest-management/${contest.id}`)}
-                        className="flex-1 px-4 py-2 bg-white hover:bg-white/90 text-black rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                        className="flex-1 px-2 py-1.5 sm:px-4 sm:py-2 bg-white hover:bg-white/90 text-black rounded-lg transition-all text-[10px] sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2"
                       >
-                        <Settings className="h-4 w-4" />
+                        <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
                         Manage
                       </button>
                     ) : (
                       <button
                         onClick={() => handleJoinContest(contest)}
-                        className="flex-1 px-4 py-2 bg-white hover:bg-white/90 text-black rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2"
+                        className="flex-1 px-2 py-1.5 sm:px-4 sm:py-2 bg-white hover:bg-white/90 text-black rounded-lg transition-all text-[10px] sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2"
                       >
-                        <Trophy className="h-4 w-4" />
+                        <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
                         {session ? 'Join Contest' : 'Sign Up to Join'}
                       </button>
                     )}
