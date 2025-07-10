@@ -168,7 +168,9 @@ export function OTPVerification() {
 
       if (user) {
         if (state.isSignIn) {
-          // For sign in, just show success and redirect
+          // For sign in, set login timestamp and show success
+          localStorage.setItem('user_login_time', Date.now().toString());
+          
           toast.success("Signed in successfully!", {
             duration: 2000,
             icon: "✅",
@@ -195,6 +197,9 @@ export function OTPVerification() {
             // Don't throw error here as user is already created
           }
 
+          // For sign up, set login timestamp and show success
+          localStorage.setItem('user_login_time', Date.now().toString());
+          
           // Show success message and redirect
           toast.success("Account verified successfully! Welcome to Crown!", {
             duration: 3000,

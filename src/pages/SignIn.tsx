@@ -165,6 +165,15 @@ export function SignIn() {
               >
                 Create an Account
               </Link>
+              
+              <div className="mt-4 text-center">
+                <Link
+                  to="/admin-login"
+                  className="text-sm text-white/40 hover:text-white/60 transition-colors"
+                >
+                  Admin/Organizer Login
+                </Link>
+              </div>
             </div>
           </div>
         </div>

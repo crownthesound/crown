@@ -20,6 +20,7 @@ import { Start } from "./pages/Start";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
 import { OTPVerification } from "./pages/OTPVerification";
+import { AdminLogin } from "./pages/AdminLogin";
 import { AdminPage } from "./pages/AdminPage";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
@@ -50,6 +51,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "./contexts/AuthContext";
 import { useScrollToTop } from "./hooks/useScrollToTop";
+import { useSessionExpiry } from "./hooks/useSessionExpiry";
 import { TikTokSettingsModal } from "./components/TikTokSettingsModal";
 import toast from "react-hot-toast";
 
@@ -206,12 +208,14 @@ function App() {
   const [showTikTokModal, setShowTikTokModal] = useState(false);
 
   useScrollToTop();
+  useSessionExpiry(); // Handle session expiry checking
 
   const isPublicPage = location.pathname.startsWith("/l/");
   const isAuthPage = [
     "/signin",
     "/signup",
     "/verify-otp",
+    "/admin-login",
     "/terms",
     "/privacy",
   ].includes(location.pathname);
@@ -330,6 +334,7 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/verify-otp" element={<OTPVerification />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/start" element={<Start />} />
