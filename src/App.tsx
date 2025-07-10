@@ -19,6 +19,7 @@ import { ContestManagement } from "./pages/ContestManagement";
 import { Start } from "./pages/Start";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
+import { OTPVerification } from "./pages/OTPVerification";
 import { AdminPage } from "./pages/AdminPage";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
@@ -49,6 +50,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "./contexts/AuthContext";
 import { useScrollToTop } from "./hooks/useScrollToTop";
+import { TikTokSettingsModal } from "./components/TikTokSettingsModal";
 import toast from "react-hot-toast";
 
 interface Contest {
@@ -201,17 +203,32 @@ function App() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [activeContests, setActiveContests] = useState<Contest[]>([]);
+  const [showTikTokModal, setShowTikTokModal] = useState(false);
 
   useScrollToTop();
 
   const isPublicPage = location.pathname.startsWith("/l/");
-  const isAuthPage = ["/signin", "/signup", "/terms", "/privacy"].includes(
-    location.pathname
-  );
+  const isAuthPage = [
+    "/signin",
+    "/signup",
+    "/verify-otp",
+    "/terms",
+    "/privacy",
+  ].includes(location.pathname);
   const currentPage =
     location.pathname === "/" ? "home" : location.pathname.slice(1);
   const isOrganizer = profile?.role === "organizer";
   const showFooter = session && !isPublicPage && !isAuthPage;
+
+  // Check for TikTok modal URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('showTikTokModal') === 'true' && session) {
+      setShowTikTokModal(true);
+      // Clean up URL
+      navigate('/', { replace: true });
+    }
+  }, [location.search, session, navigate]);
 
   useEffect(() => {
     const fetchActiveContests = async () => {
@@ -243,6 +260,32 @@ function App() {
 
     fetchActiveContests();
   }, []);
+
+  // Check TikTok connection status after authentication
+  useEffect(() => {
+    const checkTikTokConnection = async () => {
+      if (session && profile && !isAuthPage) {
+        try {
+          const { data: tikTokProfile } = await supabase
+            .from('tiktok_profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+
+          if (!tikTokProfile && location.pathname === '/') {
+            // User is not connected to TikTok, show modal after a short delay
+            setTimeout(() => {
+              setShowTikTokModal(true);
+            }, 2000);
+          }
+        } catch (error) {
+          console.error('Error checking TikTok connection:', error);
+        }
+      }
+    };
+
+    checkTikTokConnection();
+  }, [session, profile, isAuthPage, location.pathname]);
 
   const handleSignOut = async () => {
     try {
@@ -286,22 +329,25 @@ function App() {
           />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/verify-otp" element={<OTPVerification />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/start" element={<Start />} />
           <Route path="/contests-page" element={<ContestsPage />} />
           <Route path="/share/:id" element={<SharePage />} />
-          <Route 
-            path="/contest-management/:id" 
+          <Route
+            path="/contest-management/:id"
             element={
-              session ? <ContestManagement /> : <Navigate to="/signin" replace />
-            } 
+              session ? (
+                <ContestManagement />
+              ) : (
+                <Navigate to="/signin" replace />
+              )
+            }
           />
           <Route
             path="/profile"
-            element={
-              session ? <Profile /> : <Navigate to="/signin" replace />
-            }
+            element={session ? <Profile /> : <Navigate to="/signin" replace />}
           />
           <Route
             path="/past"
@@ -374,7 +420,7 @@ function App() {
                 {/* Join Contest Button - Middle */}
                 <button
                   onClick={() => {
-                    navigate('/contests-page');
+                    navigate("/contests-page");
                   }}
                   className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
                 >
@@ -385,7 +431,7 @@ function App() {
                 {/* Profile Button - Far Right */}
                 <button
                   onClick={() => {
-                    navigate('/profile');
+                    navigate("/profile");
                   }}
                   className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
                     currentPage === "profile"
@@ -403,6 +449,12 @@ function App() {
       )}
 
       <Toaster position="bottom-center" />
+      
+      {/* TikTok Settings Modal */}
+      <TikTokSettingsModal 
+        isOpen={showTikTokModal} 
+        onClose={() => setShowTikTokModal(false)} 
+      />
     </div>
   );
 }
