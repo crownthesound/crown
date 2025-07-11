@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Loader2 } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from "react";
+import { supabase } from "../lib/supabase";
+import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface AuthProps {
   isSignUp: boolean;
@@ -11,9 +11,9 @@ interface AuthProps {
 
 export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [isResetPassword, setIsResetPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,10 +33,10 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
 
       if (error) throw error;
 
-      toast.success('Password reset instructions sent to your email');
+      toast.success("Password reset instructions sent to your email");
       setIsResetPassword(false);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to send password reset email');
+      toast.error(error.message || "Failed to send password reset email");
     } finally {
       setLoading(false);
     }
@@ -49,42 +49,47 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
     try {
       if (isSignUp) {
         if (!validatePassword(password)) {
-          throw new Error('Password must be at least 6 characters long');
+          throw new Error("Password must be at least 6 characters long");
         }
 
-        const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+        const {
+          data: { user },
+          error: signUpError,
+        } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`
-          }
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
         });
 
         if (signUpError) {
-          if (signUpError.message.includes('already registered')) {
-            throw new Error('This email is already registered. Please sign in instead.');
+          if (signUpError.message.includes("already registered")) {
+            throw new Error(
+              "This email is already registered. Please sign in instead."
+            );
           }
           throw signUpError;
         }
 
         if (user) {
           const { error: profileError } = await supabase
-            .from('profiles')
+            .from("profiles")
             .insert([
               {
                 id: user.id,
                 email: user.email,
                 full_name: fullName,
-                role: 'user',
+                role: "user",
               },
             ]);
 
           if (profileError) {
-            throw new Error('Failed to create user profile. Please try again.');
+            throw new Error("Failed to create user profile. Please try again.");
           }
         }
 
-        toast.success('Sign up successful! You can now sign in.');
+        toast.success("Sign up successful! You can now sign in.");
         setIsSignUp(false);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -93,25 +98,36 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
         });
 
         if (error) {
-          if (error.message.includes('Email not confirmed')) {
-            throw new Error('Please check your email to confirm your account before signing in.');
-          } else if (error.message.includes('Invalid login credentials')) {
-            throw new Error('Invalid email or password. Please try again or reset your password.');
+          if (error.message.includes("Email not confirmed")) {
+            throw new Error(
+              "Please check your email to confirm your account before signing in."
+            );
+          } else if (error.message.includes("Invalid login credentials")) {
+            throw new Error(
+              "Invalid email or password. Please try again or reset your password."
+            );
           }
           throw error;
         }
 
-        toast.success('Signed in successfully!');
-        
-        const currentPath = location.pathname;
-        if (currentPath.startsWith('/l/')) {
-          window.location.reload();
+        toast.success("Signed in successfully!");
+
+        // Check if user came from a contest page
+        const returnUrl = localStorage.getItem("auth_return_url");
+        if (returnUrl) {
+          localStorage.removeItem("auth_return_url");
+          navigate(returnUrl);
         } else {
-          navigate('/');
+          const currentPath = location.pathname;
+          if (currentPath.startsWith("/l/")) {
+            window.location.reload();
+          } else {
+            navigate("/");
+          }
         }
       }
     } catch (error: any) {
-      toast.error(error.message || 'An error occurred during authentication');
+      toast.error(error.message || "An error occurred during authentication");
     } finally {
       setLoading(false);
     }
@@ -121,9 +137,12 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-semibold text-center mb-2">Reset Password</h2>
+          <h2 className="text-2xl font-semibold text-center mb-2">
+            Reset Password
+          </h2>
           <p className="text-gray-600 text-center mb-8">
-            Enter your email address and we'll send you instructions to reset your password.
+            Enter your email address and we'll send you instructions to reset
+            your password.
           </p>
 
           <form onSubmit={handlePasswordReset} className="space-y-6">
@@ -146,7 +165,7 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
               {loading ? (
                 <Loader2 className="animate-spin h-5 w-5 mx-auto" />
               ) : (
-                'Send Reset Instructions'
+                "Send Reset Instructions"
               )}
             </button>
           </form>
@@ -166,12 +185,12 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
     <div className="min-h-[80vh] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <h2 className="text-2xl font-semibold text-center mb-2">
-          {isSignUp ? 'Create Account' : 'Login'}
+          {isSignUp ? "Create Account" : "Login"}
         </h2>
         <p className="text-gray-600 text-center mb-8">
-          {isSignUp 
-            ? 'Enter your details to create your account' 
-            : 'Enter your email and password to access your account'}
+          {isSignUp
+            ? "Enter your details to create your account"
+            : "Enter your email and password to access your account"}
         </p>
 
         <form onSubmit={handleAuth} className="space-y-6">
@@ -223,8 +242,10 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
           >
             {loading ? (
               <Loader2 className="animate-spin h-5 w-5 mx-auto" />
+            ) : isSignUp ? (
+              "Create Account"
             ) : (
-              isSignUp ? 'Create Account' : 'Sign In'
+              "Sign In"
             )}
           </button>
         </form>
@@ -252,7 +273,7 @@ export function Auth({ isSignUp, setIsSignUp }: AuthProps) {
             onClick={() => setIsSignUp(!isSignUp)}
             className="w-full py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            {isSignUp ? 'Back to Sign In' : 'Create an Account'}
+            {isSignUp ? "Back to Sign In" : "Create an Account"}
           </button>
         </div>
       </div>

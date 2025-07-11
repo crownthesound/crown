@@ -85,27 +85,41 @@ export function OTPVerification() {
 
   const checkTikTokConnectionAndRedirect = async () => {
     try {
+      // Check if user came from a contest page
+      const returnUrl = localStorage.getItem("auth_return_url");
+
       // Check if user has TikTok profile in our database
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         const { data: tikTokProfile } = await supabase
-          .from('tiktok_profiles')
-          .select('*')
-          .eq('user_id', user.id)
+          .from("tiktok_profiles")
+          .select("*")
+          .eq("user_id", user.id)
           .single();
 
-        if (!tikTokProfile) {
+        if (returnUrl) {
+          // Clear the return URL and redirect back to contest page
+          localStorage.removeItem("auth_return_url");
+          navigate(returnUrl);
+        } else if (!tikTokProfile) {
           // User not connected to TikTok, show modal
-          // We'll handle this in App.tsx or with a context
-          navigate('/?showTikTokModal=true');
+          navigate("/?showTikTokModal=true");
         } else {
           // User connected, redirect to home
-          navigate('/');
+          navigate("/");
         }
       }
     } catch (error) {
-      console.error('Error checking TikTok connection:', error);
-      navigate('/');
+      console.error("Error checking TikTok connection:", error);
+      const returnUrl = localStorage.getItem("auth_return_url");
+      if (returnUrl) {
+        localStorage.removeItem("auth_return_url");
+        navigate(returnUrl);
+      } else {
+        navigate("/");
+      }
     }
   };
 
@@ -169,8 +183,8 @@ export function OTPVerification() {
       if (user) {
         if (state.isSignIn) {
           // For sign in, set login timestamp and show success
-          localStorage.setItem('user_login_time', Date.now().toString());
-          
+          localStorage.setItem("user_login_time", Date.now().toString());
+
           toast.success("Signed in successfully!", {
             duration: 2000,
             icon: "✅",
@@ -181,25 +195,36 @@ export function OTPVerification() {
             checkTikTokConnectionAndRedirect();
           }, 1000);
         } else {
-          // For sign up, create user profile
-          const { error: profileError } = await supabase.from("profiles").insert([
-            {
-              id: user.id,
-              email: state.email,
-              full_name: state.fullName,
-              phone_number: state.phoneNumber,
-              role: "user",
-            },
-          ]);
+          // For sign up, check if profile already exists
+          const { data: existingProfile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("id", user.id)
+            .maybeSingle();
 
-          if (profileError) {
-            console.error("Profile creation error:", profileError);
-            // Don't throw error here as user is already created
+          if (!existingProfile) {
+            // Create user profile only if it doesn't exist
+            const { error: profileError } = await supabase
+              .from("profiles")
+              .insert([
+                {
+                  id: user.id,
+                  email: state.email,
+                  full_name: state.fullName,
+                  phone_number: state.phoneNumber,
+                  role: "user",
+                },
+              ]);
+
+            if (profileError) {
+              console.error("Profile creation error:", profileError);
+              // Don't throw error here as user is already created
+            }
           }
 
           // For sign up, set login timestamp and show success
-          localStorage.setItem('user_login_time', Date.now().toString());
-          
+          localStorage.setItem("user_login_time", Date.now().toString());
+
           // Show success message and redirect
           toast.success("Account verified successfully! Welcome to Crown!", {
             duration: 3000,
@@ -253,8 +278,8 @@ export function OTPVerification() {
                 Verify Your Phone
               </h2>
               <p className="text-white/60 mb-4">
-                {state?.isSignIn 
-                  ? "We've sent a verification code to" 
+                {state?.isSignIn
+                  ? "We've sent a verification code to"
                   : "We've sent a 6-digit code to"}
               </p>
               <p className="text-white font-medium text-lg">

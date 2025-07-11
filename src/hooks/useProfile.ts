@@ -18,6 +18,9 @@ export function useProfile(userId: string | undefined) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let retryCount = 0;
+    const maxRetries = 3;
+
     async function fetchProfile() {
       if (!userId) {
         setProfile(null);
@@ -30,17 +33,33 @@ export function useProfile(userId: string | undefined) {
           .from("profiles")
           .select("*")
           .eq("id", userId)
-          .single();
+          .maybeSingle();
         console.log({ data, error });
 
         if (error) {
           console.error("Error fetching profile:", error);
-          throw error;
+          // Don't throw error or show toast for profile not found
+          setProfile(null);
+          return;
         }
 
         if (!data) {
-          console.error("No profile found for user");
-          throw new Error("Profile not found");
+          console.log(
+            "No profile found for user, this might be expected for new users"
+          );
+
+          // Retry a few times for new users whose profiles might still be creating
+          if (retryCount < maxRetries) {
+            retryCount++;
+            console.log(
+              `Retrying profile fetch (${retryCount}/${maxRetries})...`
+            );
+            setTimeout(fetchProfile, 1000 * retryCount); // Exponential backoff
+            return;
+          }
+
+          setProfile(null);
+          return;
         }
 
         // Validate and ensure proper role typing
@@ -58,16 +77,22 @@ export function useProfile(userId: string | undefined) {
         };
 
         setProfile(typedProfile);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching profile:", error);
-        toast.error("Failed to load user profile");
+        // Only show toast for unexpected errors, not for missing profiles
+        if (error?.code !== "PGRST116") {
+          toast.error("Failed to load user profile");
+        }
         setProfile(null);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchProfile();
+    // Add a small delay for the initial fetch to give profile creation time
+    const timer = setTimeout(fetchProfile, 100);
+
+    return () => clearTimeout(timer);
   }, [userId]);
 
   return { profile, setProfile, loading };

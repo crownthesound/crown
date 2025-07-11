@@ -332,7 +332,7 @@ export function PublicLeaderboard() {
   useEffect(() => {
     const fetchSubmission = async () => {
       if (!session || !id) return;
-      
+
       const { data, error } = await supa
         .from("contest_links")
         .select("*")
@@ -340,7 +340,7 @@ export function PublicLeaderboard() {
         .eq("created_by", session.user.id)
         .eq("is_contest_submission", true)
         .single();
-      
+
       if (!error) {
         setUserSubmission(data);
       } else {
@@ -369,7 +369,9 @@ export function PublicLeaderboard() {
 
   const handleJoinCompetition = () => {
     if (!session) {
-      navigate('/signin');
+      // Store current contest page URL for redirect after auth
+      localStorage.setItem("auth_return_url", window.location.pathname);
+      navigate("/signin");
       return;
     }
 
@@ -940,7 +942,9 @@ export function PublicLeaderboard() {
                       <div className="flex gap-3 w-full">
                         <div className="flex-1">
                           <button
-                            onClick={() => navigate(`/contest-management/${id}`)}
+                            onClick={() =>
+                              navigate(`/contest-management/${id}`)
+                            }
                             className="w-full px-3 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5"
                           >
                             <Settings className="h-4 w-4" />
@@ -958,7 +962,6 @@ export function PublicLeaderboard() {
                         </div>
                       </div>
                     )}
-                    
                   </div>
                 </div>
               ) : (
