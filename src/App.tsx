@@ -200,7 +200,7 @@ const mockParticipants = [
 ];
 
 function App() {
-  const { session, signOut, profile } = useAuth();
+  const { session, signOut, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
@@ -221,16 +221,18 @@ function App() {
   ].includes(location.pathname);
   const currentPage =
     location.pathname === "/" ? "home" : location.pathname.slice(1);
-  const isOrganizer = profile?.role === "organizer";
+  const isOrganizer =
+    profile?.role === "organizer" || profile?.role === "admin";
   const showFooter = session && !isPublicPage && !isAuthPage;
 
+  console.log({ isOrganizer, session, profile, authLoading });
   // Check for TikTok modal URL parameter
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    if (urlParams.get('showTikTokModal') === 'true' && session) {
+    if (urlParams.get("showTikTokModal") === "true" && session) {
       setShowTikTokModal(true);
       // Clean up URL
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
     }
   }, [location.search, session, navigate]);
 
@@ -268,28 +270,28 @@ function App() {
   // Check TikTok connection status after authentication
   useEffect(() => {
     const checkTikTokConnection = async () => {
-      if (session && profile && !isAuthPage) {
+      if (session && profile && !isAuthPage && !isOrganizer) {
         try {
           const { data: tikTokProfile } = await supabase
-            .from('tiktok_profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
+            .from("tiktok_profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
             .single();
 
-          if (!tikTokProfile && location.pathname === '/') {
+          if (!tikTokProfile && location.pathname === "/") {
             // User is not connected to TikTok, show modal after a short delay
             setTimeout(() => {
               setShowTikTokModal(true);
             }, 2000);
           }
         } catch (error) {
-          console.error('Error checking TikTok connection:', error);
+          console.error("Error checking TikTok connection:", error);
         }
       }
     };
 
     checkTikTokConnection();
-  }, [session, profile, isAuthPage, location.pathname]);
+  }, [session, profile, isAuthPage, location.pathname, isOrganizer]);
 
   const handleSignOut = async () => {
     try {
@@ -312,6 +314,42 @@ function App() {
       default:
         return "text-blue-400";
     }
+  };
+
+  // Loading component for protected routes
+  const ProtectedRoute = ({
+    children,
+    requireOrganizer = false,
+  }: {
+    children: React.ReactNode;
+    requireOrganizer?: boolean;
+  }) => {
+    // Show loading while auth is loading OR while we have a session but no profile yet
+    if (authLoading || (session && !profile)) {
+      return (
+        <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 relative">
+              <div className="absolute inset-0 rounded-full border-2 border-white/20 animate-ping"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-t-white animate-spin"></div>
+            </div>
+            <p className="mt-6 text-white/60 font-light tracking-wider">
+              LOADING
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (!session) {
+      return <Navigate to="/signin" replace />;
+    }
+
+    if (requireOrganizer && !isOrganizer) {
+      return <Navigate to="/" replace />;
+    }
+
+    return <>{children}</>;
   };
 
   return (
@@ -343,31 +381,33 @@ function App() {
           <Route
             path="/contest-management/:id"
             element={
-              session ? (
+              <ProtectedRoute>
                 <ContestManagement />
-              ) : (
-                <Navigate to="/signin" replace />
-              )
+              </ProtectedRoute>
             }
           />
           <Route
             path="/profile"
-            element={session ? <Profile /> : <Navigate to="/signin" replace />}
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/past"
             element={
-              session ? <PastContests /> : <Navigate to="/signin" replace />
+              <ProtectedRoute>
+                <PastContests />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/contests"
             element={
-              session && isOrganizer ? (
+              <ProtectedRoute requireOrganizer>
                 <Contests />
-              ) : (
-                <Navigate to="/" replace />
-              )
+              </ProtectedRoute>
             }
           />
           <Route path="/contests/:id" element={<ContestDetails />} />
@@ -375,31 +415,25 @@ function App() {
           <Route
             path="/build"
             element={
-              session && isOrganizer ? (
+              <ProtectedRoute requireOrganizer>
                 <BuildLeaderboard />
-              ) : (
-                <Navigate to="/" replace />
-              )
+              </ProtectedRoute>
             }
           />
           <Route
             path="/build/:id"
             element={
-              session && isOrganizer ? (
+              <ProtectedRoute requireOrganizer>
                 <BuildLeaderboard />
-              ) : (
-                <Navigate to="/" replace />
-              )
+              </ProtectedRoute>
             }
           />
           <Route
             path="/admin"
             element={
-              session && isOrganizer ? (
+              <ProtectedRoute requireOrganizer>
                 <AdminPage />
-              ) : (
-                <Navigate to="/" replace />
-              )
+              </ProtectedRoute>
             }
           />
         </Routes>
@@ -409,56 +443,144 @@ function App() {
         <footer className="fixed bottom-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-lg border-t border-white/10 safe-area-bottom pb-[env(safe-area-inset-bottom)]">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex justify-center">
-              <nav className="grid grid-cols-3 w-[400px] gap-1">
-                {/* Rewards Button - Far Left */}
-                <button
-                  onClick={() => {
-                    // TODO: Navigate to rewards page or show rewards modal
-                    toast.success("Rewards coming soon!");
-                  }}
-                  className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
-                >
-                  <Gift className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="text-xs font-medium">Rewards</span>
-                </button>
+              {isOrganizer ? (
+                // Organizer/Admin Footer
+                <nav className="grid grid-cols-5 w-[600px] gap-1">
+                  {/* Manage Contests */}
+                  <button
+                    onClick={() => {
+                      navigate("/contests");
+                    }}
+                    className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
+                      currentPage === "contests"
+                        ? "text-white"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <ListTodo className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-xs font-medium">Contests</span>
+                  </button>
 
-                {/* Join Contest Button - Middle */}
-                <button
-                  onClick={() => {
-                    navigate("/contests-page");
-                  }}
-                  className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
-                >
-                  <UserPlus className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="text-xs font-medium">Join Contest</span>
-                </button>
+                  {/* Create Contest */}
+                  <button
+                    onClick={() => {
+                      navigate("/build");
+                    }}
+                    className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
+                      currentPage === "build"
+                        ? "text-white"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <Plus className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-xs font-medium">Create</span>
+                  </button>
 
-                {/* Profile Button - Far Right */}
-                <button
-                  onClick={() => {
-                    navigate("/profile");
-                  }}
-                  className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
-                    currentPage === "profile"
-                      ? "text-white"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  <User className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
-                  <span className="text-xs font-medium">Profile</span>
-                </button>
-              </nav>
+                  {/* Admin Panel */}
+                  <button
+                    onClick={() => {
+                      navigate("/admin");
+                    }}
+                    className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
+                      currentPage === "admin"
+                        ? "text-white"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <Settings2 className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-xs font-medium">Admin</span>
+                  </button>
+
+                  {/* Profile with Role */}
+                  <button
+                    onClick={() => {
+                      navigate("/profile");
+                    }}
+                    className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
+                      currentPage === "profile"
+                        ? "text-white"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <div className="relative">
+                      <User className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110 text-yellow-400" />
+                      {/* {profile?.role && (
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      )} */}
+                    </div>
+                    {profile?.role && (
+                      <span
+                        className={`text-xs font-bold ${getRoleColor(
+                          profile.role
+                        )}`}
+                      >
+                        {profile.role.toUpperCase()}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Sign Out */}
+                  <button
+                    onClick={handleSignOut}
+                    className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                  >
+                    <LogOut className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-xs font-medium">Sign Out</span>
+                  </button>
+                </nav>
+              ) : (
+                // Regular User Footer
+                <nav className="grid grid-cols-3 w-[400px] gap-1">
+                  {/* Rewards Button - Far Left */}
+                  <button
+                    onClick={() => {
+                      // TODO: Navigate to rewards page or show rewards modal
+                      toast.success("Rewards coming soon!");
+                    }}
+                    className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                  >
+                    <Gift className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-xs font-medium">Rewards</span>
+                  </button>
+
+                  {/* Join Contest Button - Middle */}
+                  <button
+                    onClick={() => {
+                      navigate("/contests-page");
+                    }}
+                    className="flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group text-white/60 hover:text-white"
+                  >
+                    <UserPlus className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-xs font-medium">Join Contest</span>
+                  </button>
+
+                  {/* Profile Button - Far Right */}
+                  <button
+                    onClick={() => {
+                      navigate("/profile");
+                    }}
+                    className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all duration-300 group ${
+                      currentPage === "profile"
+                        ? "text-white"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    <User className="h-6 w-6 mb-1 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="text-xs font-medium">Profile</span>
+                  </button>
+                </nav>
+              )}
             </div>
           </div>
         </footer>
       )}
 
       <Toaster position="bottom-center" />
-      
+
       {/* TikTok Settings Modal */}
-      <TikTokSettingsModal 
-        isOpen={showTikTokModal} 
-        onClose={() => setShowTikTokModal(false)} 
+      <TikTokSettingsModal
+        isOpen={showTikTokModal}
+        onClose={() => setShowTikTokModal(false)}
       />
     </div>
   );

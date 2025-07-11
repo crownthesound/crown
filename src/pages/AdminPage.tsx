@@ -1,8 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { PlusCircle, Trash2, Edit2, EyeOff, Eye, Loader2, Clock, Globe, Menu, X, Link as LinkIcon, Image, Calendar, Video, AlertTriangle } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
+import {
+  PlusCircle,
+  Trash2,
+  Edit2,
+  EyeOff,
+  Eye,
+  Loader2,
+  Clock,
+  Globe,
+  Menu,
+  X,
+  Link as LinkIcon,
+  Image,
+  Calendar,
+  Video,
+  AlertTriangle,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface VideoLink {
   id: string;
@@ -19,7 +35,7 @@ interface VideoLink {
   video_url?: string;
   duration?: number;
   size?: number;
-  video_type: 'tiktok' | 'upload';
+  video_type: "tiktok" | "upload";
 }
 
 interface Contest {
@@ -37,34 +53,52 @@ export function AdminPage() {
   const [updating, setUpdating] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({ video: 0, thumbnail: 0 });
+  const [uploadProgress, setUploadProgress] = useState({
+    video: 0,
+    thumbnail: 0,
+  });
   const [showExtendTime, setShowExtendTime] = useState<string | null>(null);
   const [extensionDays, setExtensionDays] = useState(7);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [newVideo, setNewVideo] = useState({
-    title: '',
-    username: '',
+    title: "",
+    username: "",
     videoFile: null as File | null,
     thumbnailFile: null as File | null,
-    thumbnailPreview: ''
+    thumbnailPreview: "",
   });
 
   useEffect(() => {
     fetchVideos();
     fetchContests();
+    getCurrentUser();
   }, []);
+
+  const getCurrentUser = async () => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        setCurrentUser(session.user.id);
+      }
+    } catch (error) {
+      console.error("Error getting current user:", error);
+    }
+  };
 
   const fetchVideos = async () => {
     try {
       const { data, error } = await supabase
-        .from('video_links')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("video_links")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setVideos(data || []);
     } catch (error) {
-      console.error('Error fetching videos:', error);
-      toast.error('Failed to load videos');
+      console.error("Error fetching videos:", error);
+      toast.error("Failed to load videos");
     } finally {
       setLoading(false);
     }
@@ -73,104 +107,69 @@ export function AdminPage() {
   const fetchContests = async () => {
     try {
       const { data, error } = await supabase
-        .from('leaderboard_config')
-        .select('id, name, end_date, status')
-        .order('created_at', { ascending: false });
+        .from("contests")
+        .select("id, name, end_date, status")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setContests(data || []);
     } catch (error) {
-      console.error('Error fetching contests:', error);
-      toast.error('Failed to load contests');
+      console.error("Error fetching contests:", error);
+      toast.error("Failed to load contests");
     }
   };
 
   const handleExtendTime = async (contestId: string) => {
     if (!extensionDays || extensionDays < 1) {
-      toast.error('Please enter a valid number of days');
+      toast.error("Please enter a valid number of days");
       return;
     }
 
     try {
-      const contest = contests.find(c => c.id === contestId);
+      const contest = contests.find((c) => c.id === contestId);
       if (!contest) return;
 
       const currentEndDate = new Date(contest.end_date);
-      const newEndDate = new Date(currentEndDate.getTime() + (extensionDays * 24 * 60 * 60 * 1000));
+      const newEndDate = new Date(
+        currentEndDate.getTime() + extensionDays * 24 * 60 * 60 * 1000
+      );
 
       const { error } = await supabase
-        .from('leaderboard_config')
-        .update({ 
+        .from("contests")
+        .update({
           end_date: newEndDate.toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', contestId);
+        .eq("id", contestId);
 
       if (error) throw error;
 
-      setContests(contests.map(c => 
-        c.id === contestId 
-          ? { ...c, end_date: newEndDate.toISOString() }
-          : c
-      ));
+      setContests(
+        contests.map((c) =>
+          c.id === contestId ? { ...c, end_date: newEndDate.toISOString() } : c
+        )
+      );
 
       toast.success(`Contest extended by ${extensionDays} days`);
       setShowExtendTime(null);
       setExtensionDays(7);
     } catch (error) {
-      console.error('Error extending contest time:', error);
-      toast.error('Failed to extend contest time');
-    }
-  };
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
-      return;
-    }
-
-    if (!file.type.startsWith('image/')) {
-      toast.error('Only image files are allowed');
-      return;
-    }
-
-    setUploadingImage(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `cover-images/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('leaderboard-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('leaderboard-images')
-        .getPublicUrl(filePath);
-
-      setConfig(prev => ({
-        ...prev,
-        cover_image: publicUrl
-      }));
-
-      toast.success('Cover image uploaded successfully');
-    } catch (error: any) {
-      console.error('Error uploading image:', error);
-      toast.error('Failed to upload image');
-    } finally {
-      setUploadingImage(false);
+      console.error("Error extending contest time:", error);
+      toast.error("Failed to extend contest time");
     }
   };
 
   const handleAddVideo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newVideo.videoFile || !newVideo.thumbnailFile || !newVideo.title || !newVideo.username) {
-      toast.error('Please fill in all fields and select both video and thumbnail files');
+    if (
+      !newVideo.videoFile ||
+      !newVideo.thumbnailFile ||
+      !newVideo.title ||
+      !newVideo.username
+    ) {
+      toast.error(
+        "Please fill in all fields and select both video and thumbnail files"
+      );
       return;
     }
 
@@ -179,47 +178,42 @@ export function AdminPage() {
       // Upload thumbnail
       const thumbnailFileName = `${Date.now()}-${newVideo.thumbnailFile.name}`;
       const { error: thumbnailError } = await supabase.storage
-        .from('thumbnails')
+        .from("thumbnails")
         .upload(thumbnailFileName, newVideo.thumbnailFile, {
-          cacheControl: '3600',
+          cacheControl: "3600",
           upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100;
-            setUploadProgress(prev => ({ ...prev, thumbnail: Math.round(percent) }));
-          }
         });
 
       if (thumbnailError) throw thumbnailError;
 
       // Get thumbnail URL
-      const { data: { publicUrl: thumbnailUrl } } = supabase.storage
-        .from('thumbnails')
-        .getPublicUrl(thumbnailFileName);
+      const {
+        data: { publicUrl: thumbnailUrl },
+      } = supabase.storage.from("thumbnails").getPublicUrl(thumbnailFileName);
 
       // Upload video file
       const videoFileName = `${Date.now()}-${newVideo.videoFile.name}`;
       const { error: videoError } = await supabase.storage
-        .from('videos')
+        .from("videos")
         .upload(videoFileName, newVideo.videoFile, {
-          cacheControl: '3600',
+          cacheControl: "3600",
           upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100;
-            setUploadProgress(prev => ({ ...prev, video: Math.round(percent) }));
-          }
         });
 
       if (videoError) throw videoError;
 
       // Get video URL
-      const { data: { publicUrl: videoUrl } } = supabase.storage
-        .from('videos')
-        .getPublicUrl(videoFileName);
+      const {
+        data: { publicUrl: videoUrl },
+      } = supabase.storage.from("videos").getPublicUrl(videoFileName);
 
       // Create video entry
-      const { error: dbError } = await supabase
-        .from('video_links')
-        .insert([{
+      if (!currentUser) {
+        throw new Error("User not authenticated");
+      }
+
+      const { error: dbError } = await supabase.from("video_links").insert([
+        {
           title: newVideo.title,
           username: newVideo.username,
           url: videoUrl,
@@ -230,25 +224,28 @@ export function AdminPage() {
           shares: 0,
           active: true,
           video_url: videoUrl,
-          video_type: 'upload',
-          size: newVideo.videoFile.size
-        }]);
+          video_type: "upload",
+          size: newVideo.videoFile.size,
+          created_by: currentUser,
+          is_public: true,
+        },
+      ]);
 
       if (dbError) throw dbError;
 
-      toast.success('Video added successfully');
+      toast.success("Video added successfully");
       setShowAddForm(false);
       setNewVideo({
-        title: '',
-        username: '',
+        title: "",
+        username: "",
         videoFile: null,
         thumbnailFile: null,
-        thumbnailPreview: ''
+        thumbnailPreview: "",
       });
       fetchVideos();
     } catch (error: any) {
-      console.error('Error adding video:', error);
-      toast.error(error.message || 'Failed to add video');
+      console.error("Error adding video:", error);
+      toast.error(error.message || "Failed to add video");
     } finally {
       setProcessing(false);
       setUploadProgress({ video: 0, thumbnail: 0 });
@@ -260,21 +257,21 @@ export function AdminPage() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Thumbnail must be less than 5MB');
+      toast.error("Thumbnail must be less than 5MB");
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setNewVideo(prev => ({
+      setNewVideo((prev) => ({
         ...prev,
         thumbnailFile: file,
-        thumbnailPreview: reader.result as string
+        thumbnailPreview: reader.result as string,
       }));
     };
     reader.readAsDataURL(file);
@@ -283,75 +280,75 @@ export function AdminPage() {
   const handleToggleVisibility = async (id: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
-        .from('video_links')
+        .from("video_links")
         .update({ active: !currentStatus })
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
 
-      setVideos(videos.map(video => 
-        video.id === id ? { ...video, active: !currentStatus } : video
-      ));
-      
-      toast.success(`Video ${currentStatus ? 'hidden' : 'shown'} successfully`);
+      setVideos(
+        videos.map((video) =>
+          video.id === id ? { ...video, active: !currentStatus } : video
+        )
+      );
+
+      toast.success(`Video ${currentStatus ? "hidden" : "shown"} successfully`);
     } catch (error) {
-      console.error('Error updating video visibility:', error);
-      toast.error('Failed to update video visibility');
+      console.error("Error updating video visibility:", error);
+      toast.error("Failed to update video visibility");
     }
   };
 
   const handleDelete = async (id: string) => {
     if (videos.length <= 3) {
-      toast.error('Cannot delete: Minimum of 3 videos must be maintained');
+      toast.error("Cannot delete: Minimum of 3 videos must be maintained");
       return;
     }
 
-    if (!confirm('Are you sure you want to delete this video?')) {
+    if (!confirm("Are you sure you want to delete this video?")) {
       return;
     }
 
     try {
-      const video = videos.find(v => v.id === id);
+      const video = videos.find((v) => v.id === id);
       if (video?.video_url) {
-        const fileName = video.video_url.split('/').pop();
+        const fileName = video.video_url.split("/").pop();
         if (fileName) {
-          await supabase.storage
-            .from('videos')
-            .remove([fileName]);
+          await supabase.storage.from("videos").remove([fileName]);
         }
       }
 
       const { error } = await supabase
-        .from('video_links')
+        .from("video_links")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
 
-      setVideos(videos.filter(video => video.id !== id));
-      toast.success('Video deleted successfully');
+      setVideos(videos.filter((video) => video.id !== id));
+      toast.success("Video deleted successfully");
     } catch (error) {
-      console.error('Error deleting video:', error);
-      toast.error('Failed to delete video');
+      console.error("Error deleting video:", error);
+      toast.error("Failed to delete video");
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
     });
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const getTimeLeft = (endDate: string) => {
@@ -359,10 +356,12 @@ export function AdminPage() {
     const now = new Date().getTime();
     const distance = end - now;
 
-    if (distance < 0) return 'Ended';
+    if (distance < 0) return "Ended";
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
 
     return `${days}d ${hours}h left`;
   };
@@ -382,39 +381,48 @@ export function AdminPage() {
     <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Active Contests Section */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Active Contests</h2>
+        {/* <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">
+            Active Contests
+          </h2>
           <div className="grid gap-4">
-            {contests.filter(contest => contest.status === 'active').map(contest => (
-              <div key={contest.id} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-lg font-medium text-white mb-1">{contest.name}</h3>
-                    <div className="flex items-center gap-2 text-white/60 text-sm">
-                      <Clock className="h-4 w-4" />
-                      <span>{getTimeLeft(contest.end_date)}</span>
+            {contests
+              .filter((contest) => contest.status === "active")
+              .map((contest) => (
+                <div
+                  key={contest.id}
+                  className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-medium text-white mb-1">
+                        {contest.name}
+                      </h3>
+                      <div className="flex items-center gap-2 text-white/60 text-sm">
+                        <Clock className="h-4 w-4" />
+                        <span>{getTimeLeft(contest.end_date)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        to={`/l/${contest.id}`}
+                        target="_blank"
+                        className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                      >
+                        <Globe className="h-5 w-5" />
+                      </Link>
+                      <button
+                        onClick={() => setShowExtendTime(contest.id)}
+                        className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                      >
+                        <Calendar className="h-5 w-5" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Link
-                      to={`/l/${contest.id}`}
-                      target="_blank"
-                      className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                    >
-                      <Globe className="h-5 w-5" />
-                    </Link>
-                    <button
-                      onClick={() => setShowExtendTime(contest.id)}
-                      className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                    >
-                      <Calendar className="h-5 w-5" />
-                    </button>
-                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Videos Section */}
         <div className="flex items-center justify-between mb-8">
@@ -433,7 +441,8 @@ export function AdminPage() {
             <div className="flex items-center gap-2 text-yellow-500">
               <AlertTriangle className="h-5 w-5" />
               <p className="text-sm">
-                A minimum of 3 videos must be maintained. You cannot delete videos when only 3 remain.
+                A minimum of 3 videos must be maintained. You cannot delete
+                videos when only 3 remain.
               </p>
             </div>
           </div>
@@ -445,10 +454,18 @@ export function AdminPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/40 uppercase tracking-wider">Video</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/40 uppercase tracking-wider">Stats</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/40 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-white/40 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/40 uppercase tracking-wider">
+                    Video
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/40 uppercase tracking-wider">
+                    Stats
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/40 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-white/40 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
@@ -470,9 +487,15 @@ export function AdminPage() {
                           )}
                         </div>
                         <div>
-                          <div className="font-medium text-white">{video.title}</div>
-                          <div className="text-sm text-white/60">@{video.username}</div>
-                          <div className="text-xs text-white/40 mt-1">{formatDate(video.created_at)}</div>
+                          <div className="font-medium text-white">
+                            {video.title}
+                          </div>
+                          <div className="text-sm text-white/60">
+                            @{video.username}
+                          </div>
+                          <div className="text-xs text-white/40 mt-1">
+                            {formatDate(video.created_at)}
+                          </div>
                           {video.size && (
                             <div className="text-xs text-white/40">
                               Size: {formatFileSize(video.size)}
@@ -484,22 +507,28 @@ export function AdminPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div>
-                          <div className="text-sm font-medium text-white">{video.views.toLocaleString()}</div>
+                          <div className="text-sm font-medium text-white">
+                            {video.views.toLocaleString()}
+                          </div>
                           <div className="text-sm text-white/60">Views</div>
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-white">{video.likes.toLocaleString()}</div>
+                          <div className="text-sm font-medium text-white">
+                            {video.likes.toLocaleString()}
+                          </div>
                           <div className="text-sm text-white/60">Likes</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        video.active 
-                          ? 'bg-green-500/20 text-green-500' 
-                          : 'bg-white/10 text-white/60'
-                      }`}>
-                        {video.active ? 'Active' : 'Hidden'}
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          video.active
+                            ? "bg-green-500/20 text-green-500"
+                            : "bg-white/10 text-white/60"
+                        }`}
+                      >
+                        {video.active ? "Active" : "Hidden"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -516,9 +545,11 @@ export function AdminPage() {
                           </a>
                         )}
                         <button
-                          onClick={() => handleToggleVisibility(video.id, video.active)}
+                          onClick={() =>
+                            handleToggleVisibility(video.id, video.active)
+                          }
                           className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                          title={video.active ? 'Hide video' : 'Show video'}
+                          title={video.active ? "Hide video" : "Show video"}
                         >
                           {video.active ? (
                             <EyeOff className="h-5 w-5" />
@@ -529,11 +560,15 @@ export function AdminPage() {
                         <button
                           onClick={() => handleDelete(video.id)}
                           className={`p-2 rounded-lg transition-colors ${
-                            videos.length > 3 
-                              ? 'text-white/60 hover:text-red-500 hover:bg-white/10' 
-                              : 'cursor-not-allowed opacity-50'
+                            videos.length > 3
+                              ? "text-white/60 hover:text-red-500 hover:bg-white/10"
+                              : "cursor-not-allowed opacity-50"
                           }`}
-                          title={videos.length > 3 ? 'Delete video' : 'Cannot delete: Minimum 3 videos required'}
+                          title={
+                            videos.length > 3
+                              ? "Delete video"
+                              : "Cannot delete: Minimum 3 videos required"
+                          }
                           disabled={videos.length <= 3}
                         >
                           <Trash2 className="h-5 w-5" />
@@ -553,7 +588,9 @@ export function AdminPage() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-[#1A1A1A] rounded-xl border border-white/10 shadow-xl max-w-md w-full">
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">Extend Contest Duration</h3>
+              <h3 className="text-lg font-semibold text-white">
+                Extend Contest Duration
+              </h3>
               <button
                 onClick={() => setShowExtendTime(null)}
                 className="p-1.5 hover:bg-white/10 rounded-full transition-colors"
@@ -571,7 +608,9 @@ export function AdminPage() {
                     type="number"
                     min="1"
                     value={extensionDays}
-                    onChange={(e) => setExtensionDays(parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      setExtensionDays(parseInt(e.target.value) || 0)
+                    }
                     className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/20"
                   />
                 </div>
@@ -600,9 +639,9 @@ export function AdminPage() {
       {/* Add Video Modal */}
       {showAddForm && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div 
+          <div
             className="bg-[#0A0A0A] rounded-2xl border border-white/10 shadow-xl w-full max-h-[calc(100vh-2rem)] overflow-y-auto"
-            style={{ maxWidth: 'min(90vw, 640px)' }}
+            style={{ maxWidth: "min(90vw, 640px)" }}
           >
             <div className="p-4 sm:p-6 border-b border-white/10">
               <div className="flex items-center justify-between">
@@ -615,7 +654,7 @@ export function AdminPage() {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-4 sm:p-6">
               <form onSubmit={handleAddVideo} className="space-y-4">
                 <div>
@@ -625,7 +664,9 @@ export function AdminPage() {
                   <input
                     type="text"
                     value={newVideo.title}
-                    onChange={(e) => setNewVideo({ ...newVideo, title: e.target.value })}
+                    onChange={(e) =>
+                      setNewVideo({ ...newVideo, title: e.target.value })
+                    }
                     className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
                     placeholder="Enter video title"
                     required
@@ -639,7 +680,9 @@ export function AdminPage() {
                   <input
                     type="text"
                     value={newVideo.username}
-                    onChange={(e) => setNewVideo({ ...newVideo, username: e.target.value })}
+                    onChange={(e) =>
+                      setNewVideo({ ...newVideo, username: e.target.value })
+                    }
                     className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
                     placeholder="Enter creator username"
                     required
@@ -653,7 +696,12 @@ export function AdminPage() {
                   <input
                     type="file"
                     accept="video/mp4"
-                    onChange={(e) => setNewVideo({ ...newVideo, videoFile: e.target.files?.[0] || null })}
+                    onChange={(e) =>
+                      setNewVideo({
+                        ...newVideo,
+                        videoFile: e.target.files?.[0] || null,
+                      })
+                    }
                     className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
                     required
                   />
@@ -705,20 +753,21 @@ export function AdminPage() {
                         </div>
                       </div>
                     )}
-                    {uploadProgress.thumbnail > 0 && uploadProgress.thumbnail < 100 && (
-                      <div>
-                        <div className="flex justify-between text-sm text-white/60 mb-1">
-                          <span>Uploading thumbnail...</span>
-                          <span>{uploadProgress.thumbnail}%</span>
+                    {uploadProgress.thumbnail > 0 &&
+                      uploadProgress.thumbnail < 100 && (
+                        <div>
+                          <div className="flex justify-between text-sm text-white/60 mb-1">
+                            <span>Uploading thumbnail...</span>
+                            <span>{uploadProgress.thumbnail}%</span>
+                          </div>
+                          <div className="w-full bg-white/10 rounded-full h-2">
+                            <div
+                              className="bg-white h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${uploadProgress.thumbnail}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="w-full bg-white/10 rounded-full h-2">
-                          <div
-                            className="bg-white h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${uploadProgress.thumbnail}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
+                      )}
                   </div>
                 )}
               </form>
@@ -740,7 +789,7 @@ export function AdminPage() {
                   {processing ? (
                     <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                   ) : (
-                    'Add Video'
+                    "Add Video"
                   )}
                 </button>
               </div>
