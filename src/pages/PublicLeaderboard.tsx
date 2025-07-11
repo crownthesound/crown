@@ -232,8 +232,7 @@ export function PublicLeaderboard() {
   const [viewVideo, setViewVideo] = useState<any>(null);
   const [userSubmission, setUserSubmission] = useState<any>(null);
 
-  const { isConnected: isTikTokConnected, refreshConnection } =
-    useTikTokConnection();
+  const { refreshConnection } = useTikTokConnection();
   const queryClient = useQueryClient();
 
   // Fetch contest details
@@ -374,10 +373,7 @@ export function PublicLeaderboard() {
       return;
     }
 
-    if (!isTikTokConnected) {
-      setShowTikTokModal(true);
-      return;
-    }
+    // Always show the ContestJoinModal - it handles TikTok connection internally
 
     setShowJoinModal(true);
   };

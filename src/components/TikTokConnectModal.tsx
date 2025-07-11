@@ -64,9 +64,38 @@ export const TikTokConnectModal: React.FC<TikTokConnectModalProps> = ({
               clearInterval(checkClosed);
               toast.success("TikTok session cleared! Proceeding with OAuth...");
 
-              // Proceed with OAuth after logout
+              // Proceed with OAuth after logout in a popup
               const authUrl = `${backendUrl}/api/v1/tiktok/auth?token=${session.access_token}`;
-              window.location.href = authUrl;
+              const authPopup = window.open(
+                authUrl,
+                "tiktok_auth",
+                "width=600,height=700,scrollbars=yes,resizable=yes"
+              );
+
+              if (authPopup) {
+                // Monitor the auth popup
+                const checkAuthClosed = setInterval(() => {
+                  if (authPopup.closed) {
+                    clearInterval(checkAuthClosed);
+                    toast.success("TikTok connection completed!");
+                    setIsConnecting(false);
+                    onSuccess();
+                  }
+                }, 1000);
+
+                // Auto-close auth popup after 5 minutes
+                setTimeout(() => {
+                  if (!authPopup.closed) {
+                    authPopup.close();
+                    clearInterval(checkAuthClosed);
+                    toast.error("TikTok connection timed out. Please try again.");
+                    setIsConnecting(false);
+                  }
+                }, 300000);
+              } else {
+                toast.error("Popup blocked. Please allow popups and try again.");
+                setIsConnecting(false);
+              }
             }
           }, 1000);
 
@@ -77,8 +106,38 @@ export const TikTokConnectModal: React.FC<TikTokConnectModalProps> = ({
               clearInterval(checkClosed);
               toast.success("Proceeding with OAuth...");
 
+              // Proceed with OAuth after logout in a popup
               const authUrl = `${backendUrl}/api/v1/tiktok/auth?token=${session.access_token}`;
-              window.location.href = authUrl;
+              const authPopup = window.open(
+                authUrl,
+                "tiktok_auth",
+                "width=600,height=700,scrollbars=yes,resizable=yes"
+              );
+
+              if (authPopup) {
+                // Monitor the auth popup
+                const checkAuthClosed = setInterval(() => {
+                  if (authPopup.closed) {
+                    clearInterval(checkAuthClosed);
+                    toast.success("TikTok connection completed!");
+                    setIsConnecting(false);
+                    onSuccess();
+                  }
+                }, 1000);
+
+                // Auto-close auth popup after 5 minutes
+                setTimeout(() => {
+                  if (!authPopup.closed) {
+                    authPopup.close();
+                    clearInterval(checkAuthClosed);
+                    toast.error("TikTok connection timed out. Please try again.");
+                    setIsConnecting(false);
+                  }
+                }, 300000);
+              } else {
+                toast.error("Popup blocked. Please allow popups and try again.");
+                setIsConnecting(false);
+              }
             }
           }, 10000);
         } else {
@@ -87,9 +146,38 @@ export const TikTokConnectModal: React.FC<TikTokConnectModalProps> = ({
           setIsConnecting(false);
         }
       } else {
-        // Normal OAuth flow
+        // Normal OAuth flow in popup
         const authUrl = `${backendUrl}/api/v1/tiktok/auth?token=${session.access_token}`;
-        window.location.href = authUrl;
+        const authPopup = window.open(
+          authUrl,
+          "tiktok_auth",
+          "width=600,height=700,scrollbars=yes,resizable=yes"
+        );
+
+        if (authPopup) {
+          // Monitor the auth popup
+          const checkAuthClosed = setInterval(() => {
+            if (authPopup.closed) {
+              clearInterval(checkAuthClosed);
+              toast.success("TikTok connection completed!");
+              setIsConnecting(false);
+              onSuccess();
+            }
+          }, 1000);
+
+          // Auto-close auth popup after 5 minutes
+          setTimeout(() => {
+            if (!authPopup.closed) {
+              authPopup.close();
+              clearInterval(checkAuthClosed);
+              toast.error("TikTok connection timed out. Please try again.");
+              setIsConnecting(false);
+            }
+          }, 300000);
+        } else {
+          toast.error("Popup blocked. Please allow popups and try again.");
+          setIsConnecting(false);
+        }
       }
     } catch (error) {
       console.error("Error connecting to TikTok:", error);

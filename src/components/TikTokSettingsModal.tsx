@@ -21,6 +21,7 @@ export function TikTokSettingsModal({
     isReconnecting,
   } = useTikTokConnection();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [forceAccountSelection, setForceAccountSelection] = useState(false);
 
   console.log("🔍 TikTokSettingsModal render - isOpen:", isOpen);
 
@@ -41,8 +42,56 @@ export function TikTokSettingsModal({
 
   const handleReconnect = async () => {
     try {
-      await connectWithVideoPermissions();
-      toast.success("Reconnecting to TikTok...");
+      if (forceAccountSelection) {
+        // Clear local storage first
+        try {
+          Object.keys(localStorage).forEach((key) => {
+            if (key.toLowerCase().includes("tiktok")) {
+              localStorage.removeItem(key);
+            }
+          });
+          localStorage.removeItem("tiktok_access_token");
+        } catch (e) {
+          console.log("Could not clear local storage:", e);
+        }
+
+        toast.success("Opening TikTok logout...");
+
+        // Open TikTok logout in a popup window
+        const logoutPopup = window.open(
+          "https://www.tiktok.com/logout",
+          "tiktok_logout",
+          "width=600,height=600,scrollbars=yes,resizable=yes"
+        );
+
+        if (logoutPopup) {
+          // Wait for popup to close or timeout
+          const checkClosed = setInterval(() => {
+            if (logoutPopup.closed) {
+              clearInterval(checkClosed);
+              toast.success("TikTok session cleared! Proceeding with OAuth...");
+              // Proceed with normal reconnection after logout
+              connectWithVideoPermissions();
+            }
+          }, 1000);
+
+          // Auto-close popup and proceed after 10 seconds
+          setTimeout(() => {
+            if (!logoutPopup.closed) {
+              logoutPopup.close();
+              clearInterval(checkClosed);
+              toast.success("Proceeding with OAuth...");
+              connectWithVideoPermissions();
+            }
+          }, 10000);
+        } else {
+          // Fallback if popup is blocked
+          toast.error("Popup blocked. Please allow popups and try again.");
+        }
+      } else {
+        await connectWithVideoPermissions();
+        toast.success("Reconnecting to TikTok...");
+      }
     } catch (error) {
       console.error("Error reconnecting TikTok:", error);
       toast.error("Failed to reconnect TikTok account");
@@ -124,6 +173,27 @@ export function TikTokSettingsModal({
               </div>
             </div>
           )}
+
+          {/* Force Account Selection Option */}
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+            <label className="flex items-center space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={forceAccountSelection}
+                onChange={(e) => setForceAccountSelection(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-transparent border-2 border-blue-500 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <div>
+                <span className="text-blue-200 text-sm font-medium">
+                  Choose a different TikTok account
+                </span>
+                <p className="text-blue-200/60 text-xs mt-1">
+                  Check this if you want to select a different TikTok account or
+                  create a new connection
+                </p>
+              </div>
+            </label>
+          </div>
 
           {/* Actions */}
           <div className="space-y-3">
