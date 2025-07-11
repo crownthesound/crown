@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { 
-  Crown, 
-  Trophy, 
-  Clock, 
-  Users, 
-  Star, 
-  ArrowRight, 
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Crown,
+  Trophy,
+  Clock,
+  Users,
+  Star,
+  ArrowRight,
   Filter,
   Search,
   Sparkles,
@@ -15,15 +15,15 @@ import {
   Loader2,
   Calendar,
   Award,
-  Settings
-} from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
-import { ContestJoinModal } from '../components/ContestJoinModal';
-import { TikTokConnectModal } from '../components/TikTokConnectModal';
-import { ViewSubmissionModal } from '../components/ViewSubmissionModal';
-import toast from 'react-hot-toast';
-import { useTikTokConnection } from '../hooks/useTikTokConnection';
+  Settings,
+} from "lucide-react";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../contexts/AuthContext";
+import { ContestJoinModal } from "../components/ContestJoinModal";
+import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
+import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
+import toast from "react-hot-toast";
+import { useTikTokConnection } from "../hooks/useTikTokConnection";
 
 interface LeaderboardContest {
   id: string;
@@ -55,26 +55,26 @@ interface LeaderboardContest {
 }
 
 const MUSIC_CATEGORIES = [
-  'All',
-  'Pop',
-  'Rock', 
-  'Hip Hop/Rap',
-  'R&B/Soul',
-  'Electronic/Dance',
-  'Jazz',
-  'Classical',
-  'Country',
-  'Folk',
-  'Blues',
-  'Metal',
-  'Reggae',
-  'World Music',
-  'Alternative',
-  'Indie',
-  'Latin',
-  'Gospel/Christian',
-  'Punk',
-  'Funk'
+  "All",
+  "Pop",
+  "Rock",
+  "Hip Hop/Rap",
+  "R&B/Soul",
+  "Electronic/Dance",
+  "Jazz",
+  "Classical",
+  "Country",
+  "Folk",
+  "Blues",
+  "Metal",
+  "Reggae",
+  "World Music",
+  "Alternative",
+  "Indie",
+  "Latin",
+  "Gospel/Christian",
+  "Punk",
+  "Funk",
 ];
 
 export function ContestsPage() {
@@ -84,14 +84,19 @@ export function ContestsPage() {
   const [loading, setLoading] = useState(true);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showTikTokModal, setShowTikTokModal] = useState(false);
-  const [selectedContest, setSelectedContest] = useState<LeaderboardContest | null>(null);
-  const [userSubmissions, setUserSubmissions] = useState<Record<string, any>>({});
+  const [selectedContest, setSelectedContest] =
+    useState<LeaderboardContest | null>(null);
+  const [userSubmissions, setUserSubmissions] = useState<Record<string, any>>(
+    {}
+  );
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewVideo, setViewVideo] = useState<any>(null);
-  
-  const { isConnected: isTikTokConnected, refreshConnection } = useTikTokConnection();
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+  const { isConnected: isTikTokConnected, refreshConnection } =
+    useTikTokConnection();
+
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
   useEffect(() => {
     fetchContests();
@@ -101,10 +106,10 @@ export function ContestsPage() {
   const fetchContests = async () => {
     try {
       const { data, error } = await supabase
-        .from('contests')
-        .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false });
+        .from("contests")
+        .select("*")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
@@ -112,28 +117,28 @@ export function ContestsPage() {
         (data || []).map(async (contest) => {
           // Fetch leaderboard data for each contest
           let top_participants: any[] = [];
-          
+
           // Only attempt to fetch leaderboard if backend URL is properly configured
           if (backendUrl && backendUrl !== "http://localhost:3000") {
             try {
               // Create AbortController for timeout
               const controller = new AbortController();
               const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-              
+
               const response = await fetch(
-                `${backendUrl}/api/v1/contests/${contest.id}/leaderboard?limit=${
-                  contest.num_winners || 15
-                }`,
-                { 
+                `${backendUrl}/api/v1/contests/${
+                  contest.id
+                }/leaderboard?limit=${contest.num_winners || 15}`,
+                {
                   signal: controller.signal,
                   headers: {
-                    'Content-Type': 'application/json',
-                  }
+                    "Content-Type": "application/json",
+                  },
                 }
               );
-              
+
               clearTimeout(timeoutId);
-              
+
               if (response.ok) {
                 const leaderboardData = await response.json();
                 if (leaderboardData.data?.leaderboard) {
@@ -152,17 +157,26 @@ export function ContestsPage() {
                   );
                 }
               } else {
-                console.warn(`Leaderboard API returned ${response.status} for contest ${contest.id}`);
+                console.warn(
+                  `Leaderboard API returned ${response.status} for contest ${contest.id}`
+                );
               }
             } catch (error) {
-              if (error instanceof Error && error.name === 'AbortError') {
-                console.warn(`Leaderboard request timeout for contest ${contest.id}`);
+              if (error instanceof Error && error.name === "AbortError") {
+                console.warn(
+                  `Leaderboard request timeout for contest ${contest.id}`
+                );
               } else {
-                console.warn(`Network error fetching leaderboard for contest ${contest.id}:`, error);
+                console.warn(
+                  `Network error fetching leaderboard for contest ${contest.id}:`,
+                  error
+                );
               }
             }
           } else {
-            console.warn('Backend URL not configured or using default localhost - skipping leaderboard fetch');
+            console.warn(
+              "Backend URL not configured or using default localhost - skipping leaderboard fetch"
+            );
           }
 
           return {
@@ -185,8 +199,8 @@ export function ContestsPage() {
       );
       setContests(contestsWithParticipants);
     } catch (error) {
-      console.error('Error fetching contests:', error);
-      toast.error('Failed to load contests');
+      console.error("Error fetching contests:", error);
+      toast.error("Failed to load contests");
     } finally {
       setLoading(false);
     }
@@ -196,10 +210,10 @@ export function ContestsPage() {
     if (!session) return;
     try {
       const { data, error } = await supabase
-        .from('contest_links')
-        .select('*')
-        .eq('created_by', session.user.id)
-        .eq('is_contest_submission', true);
+        .from("contest_links")
+        .select("*")
+        .eq("created_by", session.user.id)
+        .eq("is_contest_submission", true);
       if (error) throw error;
       const mapping: Record<string, any> = {};
       data.forEach((row) => {
@@ -209,13 +223,13 @@ export function ContestsPage() {
       });
       setUserSubmissions(mapping);
     } catch (err) {
-      console.error('Error fetching user submissions', err);
+      console.error("Error fetching user submissions", err);
     }
   };
 
   const handleJoinContest = (contest: LeaderboardContest) => {
     if (!session) {
-      navigate('/signin');
+      navigate("/signin");
       return;
     }
 
@@ -228,17 +242,14 @@ export function ContestsPage() {
     setShowJoinModal(true);
   };
 
-  const handleTikTokConnected = () => {
-    setShowTikTokModal(false);
-    refreshConnection();
-    toast.success('TikTok connected successfully!');
-  };
+  // TikTokSettingsModal handles its own success/failure states
+  // No need for handleTikTokConnected function
 
   const handleContestJoined = () => {
     setShowJoinModal(false);
     setSelectedContest(null);
     fetchUserSubmissions(); // Refresh user submissions after joining
-    toast.success('Successfully joined contest!');
+    toast.success("Successfully joined contest!");
   };
 
   const formatTimeLeft = (endDate: string) => {
@@ -246,10 +257,12 @@ export function ContestsPage() {
     const now = new Date().getTime();
     const distance = end - now;
 
-    if (distance < 0) return 'Ended';
+    if (distance < 0) return "Ended";
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
 
     return `${days}d ${hours}h left`;
   };
@@ -267,8 +280,8 @@ export function ContestsPage() {
   const getRankIcon = (rank: number) => {
     const colors = {
       1: "text-yellow-400",
-      2: "text-gray-400", 
-      3: "text-amber-600"
+      2: "text-gray-400",
+      3: "text-amber-600",
     };
     const color = colors[rank as keyof typeof colors] || "text-white/60";
 
@@ -306,7 +319,9 @@ export function ContestsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
         <Link to="/" className="flex items-center gap-3">
           <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-          <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
+          <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Crown
+          </span>
         </Link>
       </div>
 
@@ -319,7 +334,8 @@ export function ContestsPage() {
             </h1>
           </div>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Join live music competitions and showcase your talent to win amazing prizes
+            Join live music competitions and showcase your talent to win amazing
+            prizes
           </p>
         </div>
 
@@ -327,10 +343,10 @@ export function ContestsPage() {
         {contests.length === 0 ? (
           <div className="text-center py-16">
             <Music className="h-16 w-16 text-white/20 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No contests found</h3>
-            <p className="text-white/60">
-              Check back later for new contests!
-            </p>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              No contests found
+            </h3>
+            <p className="text-white/60">Check back later for new contests!</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
@@ -355,16 +371,18 @@ export function ContestsPage() {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                  
+
                   {/* Time left badge */}
                   <div className="absolute top-2 right-2 sm:top-4 sm:right-4 px-2 py-0.5 sm:px-3 sm:py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm flex items-center gap-1">
                     <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                    <span className="truncate">{formatTimeLeft(contest.end_date)}</span>
+                    <span className="truncate">
+                      {formatTimeLeft(contest.end_date)}
+                    </span>
                   </div>
 
                   {/* Category badge */}
                   <div className="absolute top-2 left-2 sm:top-4 sm:left-4 px-2 py-0.5 sm:px-3 sm:py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-[10px] sm:text-xs font-medium">
-                    {contest.music_category || 'Music'}
+                    {contest.music_category || "Music"}
                   </div>
                 </div>
 
@@ -384,7 +402,9 @@ export function ContestsPage() {
                     <div className="flex items-center justify-between mb-1 sm:mb-2">
                       <div className="flex items-center gap-2">
                         <Trophy className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
-                        <h4 className="text-[10px] sm:text-xs font-medium text-white">Prizes</h4>
+                        <h4 className="text-[10px] sm:text-xs font-medium text-white">
+                          Prizes
+                        </h4>
                       </div>
                       <div className="text-[10px] sm:text-xs text-white/60">
                         {contest.num_winners} Winners
@@ -392,7 +412,10 @@ export function ContestsPage() {
                     </div>
                     <div className="flex gap-1 overflow-x-auto pb-1 sm:pb-2 -mx-1 px-1 snap-x snap-mandatory scrollbar-hide">
                       {contest.prize_titles
-                        .slice(0, contest.num_winners || contest.prize_titles.length)
+                        .slice(
+                          0,
+                          contest.num_winners || contest.prize_titles.length
+                        )
                         .map((prize: any, index: number) => (
                           <div
                             key={index}
@@ -400,17 +423,33 @@ export function ContestsPage() {
                           >
                             <div className="flex items-center gap-0.5 sm:gap-1 mb-0.5">
                               {getRankIcon(index + 1)}
-                              <span className={`text-[10px] font-medium ${
-                                index === 0 ? "text-yellow-400" :
-                                index === 1 ? "text-gray-400" :
-                                index === 2 ? "text-amber-600" : "text-white/60"
-                              }`}>
-                                {index + 1}{index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"}
+                              <span
+                                className={`text-[10px] font-medium ${
+                                  index === 0
+                                    ? "text-yellow-400"
+                                    : index === 1
+                                    ? "text-gray-400"
+                                    : index === 2
+                                    ? "text-amber-600"
+                                    : "text-white/60"
+                                }`}
+                              >
+                                {index + 1}
+                                {index === 0
+                                  ? "st"
+                                  : index === 1
+                                  ? "nd"
+                                  : index === 2
+                                  ? "rd"
+                                  : "th"}
                               </span>
                             </div>
                             <div className="text-[8px] sm:text-[10px] font-medium leading-tight line-clamp-1 sm:line-clamp-2 text-white">
                               {contest.prize_tier === "monetary"
-                                ? `$${formatNumber((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                                ? `$${formatNumber(
+                                    (contest.prize_per_winner || 0) *
+                                      (1 - index * 0.2)
+                                  )}`
                                 : prize.title}
                             </div>
                           </div>
@@ -420,25 +459,37 @@ export function ContestsPage() {
 
                   {/* Top Participants */}
                   {/* Hide top participants on mobile to save space */}
-                  {contest.top_participants && contest.top_participants.length > 0 && (
-                    <div className="space-y-2">
-                      <div className="hidden sm:flex items-center gap-2">
-                        <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white/60" />
-                        <span className="text-xs sm:text-sm font-medium text-white/60">Current Leaders</span>
+                  {contest.top_participants &&
+                    contest.top_participants.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="hidden sm:flex items-center gap-2">
+                          <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white/60" />
+                          <span className="text-xs sm:text-sm font-medium text-white/60">
+                            Current Leaders
+                          </span>
+                        </div>
+                        <div className="hidden sm:block space-y-1">
+                          {contest.top_participants
+                            .slice(0, 3)
+                            .map((participant) => (
+                              <div
+                                key={participant.rank}
+                                className="flex items-center justify-between text-sm"
+                              >
+                                <div className="flex items-center gap-2">
+                                  {getRankIcon(participant.rank)}
+                                  <span className="text-white">
+                                    @{participant.username}
+                                  </span>
+                                </div>
+                                <span className="text-white/60">
+                                  {formatNumber(participant.views)}
+                                </span>
+                              </div>
+                            ))}
+                        </div>
                       </div>
-                      <div className="hidden sm:block space-y-1">
-                        {contest.top_participants.slice(0, 3).map((participant) => (
-                          <div key={participant.rank} className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2">
-                              {getRankIcon(participant.rank)}
-                              <span className="text-white">@{participant.username}</span>
-                            </div>
-                            <span className="text-white/60">{formatNumber(participant.views)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Action Buttons */}
                   <div className="flex gap-2 sm:gap-3 pt-2">
@@ -450,7 +501,9 @@ export function ContestsPage() {
                     </Link>
                     {session && userSubmissions[contest.id] ? (
                       <button
-                        onClick={() => navigate(`/contest-management/${contest.id}`)}
+                        onClick={() =>
+                          navigate(`/contest-management/${contest.id}`)
+                        }
                         className="flex-1 px-2 py-1.5 sm:px-4 sm:py-2 bg-white hover:bg-white/90 text-black rounded-lg transition-all text-[10px] sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2"
                       >
                         <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -464,12 +517,16 @@ export function ContestsPage() {
                         <Trophy className="h-3 w-3 sm:h-4 sm:w-4" />
                         {session ? (
                           <>
-                            <span className="hidden sm:inline">Join Contest</span>
+                            <span className="hidden sm:inline">
+                              Join Contest
+                            </span>
                             <span className="sm:hidden">Join</span>
                           </>
                         ) : (
                           <>
-                            <span className="hidden sm:inline">Sign Up to Join</span>
+                            <span className="hidden sm:inline">
+                              Sign Up to Join
+                            </span>
                             <span className="sm:hidden">Sign Up</span>
                           </>
                         )}
@@ -486,9 +543,12 @@ export function ContestsPage() {
         {!session && contests.length > 0 && (
           <div className="mt-16 text-center bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
             <Award className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-white mb-2">Ready to Compete?</h3>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              Ready to Compete?
+            </h3>
             <p className="text-white/70 mb-6 max-w-md mx-auto">
-              Sign up now to join contests and showcase your musical talent to the world
+              Sign up now to join contests and showcase your musical talent to
+              the world
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
@@ -509,10 +569,9 @@ export function ContestsPage() {
       </div>
 
       {/* Modals */}
-      <TikTokConnectModal
+      <TikTokSettingsModal
         isOpen={showTikTokModal}
         onClose={() => setShowTikTokModal(false)}
-        onSuccess={handleTikTokConnected}
       />
 
       {selectedContest && (

@@ -28,7 +28,6 @@ import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import { Helmet } from "react-helmet";
 import { Footer } from "../components/Footer";
-import { TikTokConnectModal } from "../components/TikTokConnectModal";
 import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ContestJoinModal } from "../components/ContestJoinModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
@@ -403,10 +402,8 @@ export function PublicLeaderboard() {
     }, 500);
   };
 
-  const handleTikTokConnected = () => {
-    setShowTikTokModal(false);
-    refreshConnection();
-  };
+  // TikTokSettingsModal handles its own success/failure states
+  // No need for handleTikTokConnected function
 
   const getRankIcon = (rank: number, isWinner: boolean) => {
     if (!isWinner) {
@@ -1049,10 +1046,9 @@ export function PublicLeaderboard() {
         )}
 
         {/* Modals */}
-        <TikTokConnectModal
+        <TikTokSettingsModal
           isOpen={showTikTokModal}
           onClose={() => setShowTikTokModal(false)}
-          onSuccess={handleTikTokConnected}
         />
 
         <TikTokSettingsModal

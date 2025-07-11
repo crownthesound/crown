@@ -20,7 +20,6 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { VideoCarousel } from "./VideoCarousel";
 import { HowToEnterCarousel } from "./HowToEnterCarousel";
-import { TikTokConnectModal } from "./TikTokConnectModal";
 import { TikTokSettingsModal } from "./TikTokSettingsModal";
 import { ContestJoinModal } from "./ContestJoinModal";
 import { supabase } from "../lib/supabase";
@@ -107,22 +106,22 @@ export function HomeContent({
             if (backendUrl && backendUrl !== "http://localhost:3000") {
               const controller = new AbortController();
               const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-              
+
               const response = await fetch(
-                `${backendUrl}/api/v1/contests/${contest.id}/leaderboard?limit=${
-                  contest.num_winners || 15
-                }`,
+                `${backendUrl}/api/v1/contests/${
+                  contest.id
+                }/leaderboard?limit=${contest.num_winners || 15}`,
                 {
                   signal: controller.signal,
                   headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
                   },
                 }
               );
-              
+
               clearTimeout(timeoutId);
-              
+
               if (response.ok) {
                 const leaderboardData = await response.json();
                 if (leaderboardData.data?.leaderboard) {
@@ -141,16 +140,20 @@ export function HomeContent({
                   );
                 }
               } else {
-                console.warn(`Leaderboard API returned ${response.status} for contest ${contest.id}`);
+                console.warn(
+                  `Leaderboard API returned ${response.status} for contest ${contest.id}`
+                );
               }
             } else {
-              console.warn("Backend URL not configured or using default localhost");
+              console.warn(
+                "Backend URL not configured or using default localhost"
+              );
             }
           } catch (error) {
             // Only log as warning instead of error to avoid console spam
             console.warn(
               `Unable to fetch leaderboard for contest ${contest.id}:`,
-              error instanceof Error ? error.message : 'Network error'
+              error instanceof Error ? error.message : "Network error"
             );
             // Don't show toast error for network issues as this is expected when backend is down
           }
@@ -226,11 +229,8 @@ export function HomeContent({
     setShowJoinModal(true);
   };
 
-  const handleTikTokConnected = () => {
-    setShowTikTokModal(false);
-    refreshConnection();
-    toast.success("TikTok connected successfully!");
-  };
+  // TikTokSettingsModal handles its own success/failure states
+  // No need for handleTikTokConnected function
 
   const handleContestJoined = () => {
     setShowJoinModal(false);
@@ -312,22 +312,24 @@ export function HomeContent({
         console.log(
           "⚠️ TikTok connected but no session, attempting to restore..."
         );
-        
+
         // Try to restore session using the userToken from OAuth callback
         if (userToken) {
           console.log("🔄 Attempting session restoration with userToken...");
-          supabase.auth.setSession({
-            access_token: userToken,
-            refresh_token: userToken, // TikTok callback includes both
-          }).then(({ data, error }) => {
-            if (error) {
-              console.error("❌ Session restoration failed:", error);
-            } else {
-              console.log("✅ Session restored successfully:", data);
-            }
-          });
+          supabase.auth
+            .setSession({
+              access_token: userToken,
+              refresh_token: userToken, // TikTok callback includes both
+            })
+            .then(({ data, error }) => {
+              if (error) {
+                console.error("❌ Session restoration failed:", error);
+              } else {
+                console.log("✅ Session restored successfully:", data);
+              }
+            });
         }
-        
+
         // Store the callback data temporarily and wait for session
         localStorage.setItem(
           "tiktok_callback_data",
@@ -434,169 +436,202 @@ export function HomeContent({
       const processCallbackTimeout = setTimeout(() => {
         const storedCallbackData = localStorage.getItem("tiktok_callback_data");
         if (storedCallbackData) {
-        console.log("🔍 Processing stored TikTok callback data...");
-        
-        // Immediately remove from localStorage to prevent re-processing
-        localStorage.removeItem("tiktok_callback_data");
-        
-        try {
-          const {
-            accessToken,
-            refreshToken,
-            userToken,
-            tiktokUser,
-            isPartial,
-            isMock,
-            timestamp,
-            processed, // Add flag to prevent duplicate processing
-            grantedScopes, // Add granted scopes
-          } = JSON.parse(storedCallbackData);
-          
-          // Skip if already processed
-          if (processed) {
-            console.log("🔄 Callback data already processed, skipping...");
-            return;
-          }
-          
-          // Check if data is stale (older than 5 minutes)
-          if (timestamp && Date.now() - timestamp > 5 * 60 * 1000) {
-            console.log("⚠️ Stored callback data is stale, skipping...");
-            return;
-          }
+          console.log("🔍 Processing stored TikTok callback data...");
 
-          const saveTikTokProfile = async () => {
-            try {
-              if (accessToken && tiktokUser) {
-                const userInfo = JSON.parse(decodeURIComponent(tiktokUser));
-                console.log("🔍 Saving TikTok profile:", userInfo);
+          // Immediately remove from localStorage to prevent re-processing
+          localStorage.removeItem("tiktok_callback_data");
 
-                // Prepare data payload for debugging
-                const profileData = {
-                  user_id: session.user.id,
-                  tiktok_user_id: userInfo.open_id || userInfo.union_id,
-                  username: userInfo.username || userInfo.display_name || `user_${userInfo.open_id?.slice(-8) || 'unknown'}`,
-                  display_name: userInfo.display_name || null,
-                  avatar_url: userInfo.avatar_url || null,
-                  follower_count: userInfo.follower_count || 0,
-                  following_count: userInfo.following_count || 0,
-                  access_token: accessToken,
-                  refresh_token: refreshToken,
-                  granted_scopes: grantedScopes || "", // Add granted scopes
-                  updated_at: new Date().toISOString()
-                };
-                
-                console.log("📊 Profile data to insert:", profileData);
+          try {
+            const {
+              accessToken,
+              refreshToken,
+              userToken,
+              tiktokUser,
+              isPartial,
+              isMock,
+              timestamp,
+              processed, // Add flag to prevent duplicate processing
+              grantedScopes, // Add granted scopes
+            } = JSON.parse(storedCallbackData);
 
-                // Save directly to Supabase instead of going through backend
-                const { data, error } = await supabase
-                  .from('tiktok_profiles')
-                  .upsert(profileData, { 
-                    onConflict: 'user_id',
-                    ignoreDuplicates: false
-                  })
-                  .select();
-
-                if (error) {
-                  console.error("❌ Supabase save error details:", {
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint,
-                    code: error.code
-                  });
-                  
-                  // Check if it's a duplicate TikTok account error
-                  if (error.code === '23505' || error.message.includes('duplicate') || error.message.includes('already exists')) {
-                    toast.error("This TikTok account is already connected to another Crown account. Please disconnect it first or use a different TikTok account.");
-                  } else {
-                    toast.error(`Failed to save TikTok profile: ${error.message}`);
-                  }
-                  return;
-                }
-
-                console.log("✅ TikTok profile saved to Supabase:", data);
-                toast.success("TikTok profile connected successfully!");
-                
-                // Clear ALL callback data after successful save
-                localStorage.removeItem('tiktok_callback_data');
-                localStorage.removeItem('tiktok_access_token');
-                localStorage.removeItem('tiktok_refresh_token');
-                localStorage.removeItem('tiktok_user');
-                
-                // Refresh connection status
-                await refreshConnection();
-                
-                // Automatically fetch TikTok videos after successful connection
-                console.log("🎬 Automatically fetching TikTok videos after connection...");
-                try {
-                  const videoResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/tiktok/videos`, {
-                    method: 'GET',
-                    headers: {
-                      'Authorization': `Bearer ${session.access_token}`,
-                      'Content-Type': 'application/json'
-                    }
-                  });
-                  
-                  if (videoResponse.ok) {
-                    const videos = await videoResponse.json();
-                    console.log("✅ Successfully fetched TikTok videos:", videos);
-                    toast.success(`Connected and loaded ${videos.length || 0} TikTok videos!`);
-                  } else {
-                    console.warn("⚠️  Video fetch failed but connection succeeded:", videoResponse.status);
-                  }
-                } catch (videoError) {
-                  console.error("❌ Error fetching videos after connection:", videoError);
-                  // Don't show error toast here - connection was successful
-                }
-                
-                return true;
-              }
-              return false;
-            } catch (error) {
-              console.error("❌ Failed to save TikTok profile:", error);
-              toast.error(
-                "Failed to save TikTok profile, but connection was successful"
-              );
-              return false;
+            // Skip if already processed
+            if (processed) {
+              console.log("🔄 Callback data already processed, skipping...");
+              return;
             }
-          };
 
-          if (isMock === "true") {
-            toast.success("TikTok connected successfully! (Mock mode)");
-          } else if (isPartial === "true") {
-            toast.success(
-              "TikTok connected with limited permissions. Some features may be restricted."
-            );
-            saveTikTokProfile().then((success) => {
-              if (success) {
-                console.log("Successfully saved partial TikTok profile");
+            // Check if data is stale (older than 5 minutes)
+            if (timestamp && Date.now() - timestamp > 5 * 60 * 1000) {
+              console.log("⚠️ Stored callback data is stale, skipping...");
+              return;
+            }
+
+            const saveTikTokProfile = async () => {
+              try {
+                if (accessToken && tiktokUser) {
+                  const userInfo = JSON.parse(decodeURIComponent(tiktokUser));
+                  console.log("🔍 Saving TikTok profile:", userInfo);
+
+                  // Prepare data payload for debugging
+                  const profileData = {
+                    user_id: session.user.id,
+                    tiktok_user_id: userInfo.open_id || userInfo.union_id,
+                    username:
+                      userInfo.username ||
+                      userInfo.display_name ||
+                      `user_${userInfo.open_id?.slice(-8) || "unknown"}`,
+                    display_name: userInfo.display_name || null,
+                    avatar_url: userInfo.avatar_url || null,
+                    follower_count: userInfo.follower_count || 0,
+                    following_count: userInfo.following_count || 0,
+                    access_token: accessToken,
+                    refresh_token: refreshToken,
+                    granted_scopes: grantedScopes || "", // Add granted scopes
+                    updated_at: new Date().toISOString(),
+                  };
+
+                  console.log("📊 Profile data to insert:", profileData);
+
+                  // Save directly to Supabase instead of going through backend
+                  const { data, error } = await supabase
+                    .from("tiktok_profiles")
+                    .upsert(profileData, {
+                      onConflict: "user_id",
+                      ignoreDuplicates: false,
+                    })
+                    .select();
+
+                  if (error) {
+                    console.error("❌ Supabase save error details:", {
+                      message: error.message,
+                      details: error.details,
+                      hint: error.hint,
+                      code: error.code,
+                    });
+
+                    // Check if it's a duplicate TikTok account error
+                    if (
+                      error.code === "23505" ||
+                      error.message.includes("duplicate") ||
+                      error.message.includes("already exists")
+                    ) {
+                      toast.error(
+                        "This TikTok account is already connected to another Crown account. Please disconnect it first or use a different TikTok account."
+                      );
+                    } else {
+                      toast.error(
+                        `Failed to save TikTok profile: ${error.message}`
+                      );
+                    }
+                    return;
+                  }
+
+                  console.log("✅ TikTok profile saved to Supabase:", data);
+                  toast.success("TikTok profile connected successfully!");
+
+                  // Clear ALL callback data after successful save
+                  localStorage.removeItem("tiktok_callback_data");
+                  localStorage.removeItem("tiktok_access_token");
+                  localStorage.removeItem("tiktok_refresh_token");
+                  localStorage.removeItem("tiktok_user");
+
+                  // Refresh connection status
+                  await refreshConnection();
+
+                  // Automatically fetch TikTok videos after successful connection
+                  console.log(
+                    "🎬 Automatically fetching TikTok videos after connection..."
+                  );
+                  try {
+                    const videoResponse = await fetch(
+                      `${
+                        import.meta.env.VITE_BACKEND_URL
+                      }/api/v1/tiktok/videos`,
+                      {
+                        method: "GET",
+                        headers: {
+                          Authorization: `Bearer ${session.access_token}`,
+                          "Content-Type": "application/json",
+                        },
+                      }
+                    );
+
+                    if (videoResponse.ok) {
+                      const videos = await videoResponse.json();
+                      console.log(
+                        "✅ Successfully fetched TikTok videos:",
+                        videos
+                      );
+                      toast.success(
+                        `Connected and loaded ${
+                          videos.length || 0
+                        } TikTok videos!`
+                      );
+                    } else {
+                      console.warn(
+                        "⚠️  Video fetch failed but connection succeeded:",
+                        videoResponse.status
+                      );
+                    }
+                  } catch (videoError) {
+                    console.error(
+                      "❌ Error fetching videos after connection:",
+                      videoError
+                    );
+                    // Don't show error toast here - connection was successful
+                  }
+
+                  return true;
+                }
+                return false;
+              } catch (error) {
+                console.error("❌ Failed to save TikTok profile:", error);
+                toast.error(
+                  "Failed to save TikTok profile, but connection was successful"
+                );
+                return false;
               }
-            });
-          } else {
-            toast.success(
-              "TikTok connected successfully! Full access granted."
+            };
+
+            if (isMock === "true") {
+              toast.success("TikTok connected successfully! (Mock mode)");
+            } else if (isPartial === "true") {
+              toast.success(
+                "TikTok connected with limited permissions. Some features may be restricted."
+              );
+              saveTikTokProfile().then((success) => {
+                if (success) {
+                  console.log("Successfully saved partial TikTok profile");
+                }
+              });
+            } else {
+              toast.success(
+                "TikTok connected successfully! Full access granted."
+              );
+              saveTikTokProfile().then((success) => {
+                if (success) {
+                  console.log(
+                    "Successfully saved full TikTok profile and fetched videos"
+                  );
+                }
+              });
+            }
+
+            refreshConnection();
+            setShowTikTokModal(false);
+
+            // Mark as processed and clean up stored data
+            localStorage.removeItem("tiktok_callback_data");
+          } catch (error) {
+            console.error(
+              "❌ Error processing stored TikTok callback data:",
+              error
             );
-            saveTikTokProfile().then((success) => {
-              if (success) {
-                console.log("Successfully saved full TikTok profile and fetched videos");
-              }
-            });
+            localStorage.removeItem("tiktok_callback_data");
           }
-
-          refreshConnection();
-          setShowTikTokModal(false);
-
-          // Mark as processed and clean up stored data
-          localStorage.removeItem("tiktok_callback_data");
-        } catch (error) {
-          console.error(
-            "❌ Error processing stored TikTok callback data:",
-            error
-          );
-          localStorage.removeItem("tiktok_callback_data");
-        }
         }
       }, 1000); // 1 second debounce to prevent rapid consecutive calls
-      
+
       return () => clearTimeout(processCallbackTimeout);
     }
   }, [session]); // Remove refreshConnection to prevent infinite loops
@@ -728,10 +763,9 @@ export function HomeContent({
           </div>
         </div>
 
-        <TikTokConnectModal
+        <TikTokSettingsModal
           isOpen={showTikTokModal}
           onClose={() => setShowTikTokModal(false)}
-          onSuccess={handleTikTokConnected}
         />
 
         <TikTokSettingsModal
@@ -760,8 +794,7 @@ export function HomeContent({
             </span>
           </Link>
           {session ? (
-            <div className="flex items-center gap-2">
-            </div>
+            <div className="flex items-center gap-2"></div>
           ) : (
             <div className="flex items-center gap-2">
               <button
@@ -982,10 +1015,9 @@ export function HomeContent({
         </div>
       </footer>
 
-      <TikTokConnectModal
+      <TikTokSettingsModal
         isOpen={showTikTokModal}
         onClose={() => setShowTikTokModal(false)}
-        onSuccess={handleTikTokConnected}
       />
 
       <TikTokSettingsModal
