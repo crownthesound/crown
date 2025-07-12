@@ -49,6 +49,8 @@ export const useTikTokConnection = () => {
     
     try {
       console.log("🔍 Checking TikTok connection for user:", session.user.id);
+      console.log("🔍 Full session object:", session);
+      console.log("🔍 Session user object:", session.user);
       
       // Check if we have a valid session and user
       if (!session.user?.id) {
@@ -58,6 +60,9 @@ export const useTikTokConnection = () => {
         return;
       }
 
+      console.log("🔍 About to query tiktok_profiles table...");
+      console.log("🔍 Query: SELECT * FROM tiktok_profiles WHERE user_id =", session.user.id);
+
       const { data, error } = await supabase
         .from("tiktok_profiles")
         .select("*")
@@ -65,6 +70,8 @@ export const useTikTokConnection = () => {
         .maybeSingle(); // Use maybeSingle() instead of single() to avoid errors when no row exists
 
       console.log("🔍 TikTok profile query result:", { data, error });
+      console.log("🔍 Raw data received:", data);
+      console.log("🔍 Error details:", error);
 
       if (error) {
         console.error("❌ TikTok profile query error:", error);

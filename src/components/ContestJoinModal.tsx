@@ -76,9 +76,43 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
     string | null
   >(null);
   const [forceAccountSelection, setForceAccountSelection] = useState(false);
+  const [manualDbResult, setManualDbResult] = useState<any>(null);
+  const [isTestingDb, setIsTestingDb] = useState(false);
 
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+  // Manual database test function
+  const testDatabase = async () => {
+    if (!session?.user?.id) {
+      setManualDbResult({ error: "No user session" });
+      return;
+    }
+
+    setIsTestingDb(true);
+    try {
+      console.log("🔍 MANUAL DB TEST - Querying for user:", session.user.id);
+      
+      const { data, error } = await supabase
+        .from("tiktok_profiles")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      console.log("🔍 MANUAL DB TEST - Results:", { data, error });
+      
+      setManualDbResult({ 
+        data, 
+        error: error?.message || null,
+        query: `SELECT * FROM tiktok_profiles WHERE user_id = '${session.user.id}'`,
+        rowCount: data?.length || 0
+      });
+    } catch (err: any) {
+      console.error("🔍 MANUAL DB TEST - Error:", err);
+      setManualDbResult({ error: err.message });
+    } finally {
+      setIsTestingDb(false);
+    }
+  };
 
   // Fetch leaderboard data (only when join step is active)
   const { data: leaderboardResponse, isLoading: isLeaderboardLoading } =
@@ -656,6 +690,11 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                   {/* DEBUG: TikTok Connection Status */}
                   <div className="mt-4 p-3 bg-gray-500/10 border border-gray-500/20 rounded-lg text-xs">
                     <div className="text-gray-400 font-mono">
+                      DEBUG - User Session:<br/>
+                      Session: {session ? 'exists' : 'null'}<br/>
+                      User ID: {session?.user?.id || 'N/A'}<br/>
+                      User Email: {session?.user?.email || 'N/A'}<br/>
+                      <br/>
                       DEBUG - TikTok Status:<br/>
                       Connected: {isTikTokConnected ? 'true' : 'false'}<br/>
                       Loading: {isTikTokLoading ? 'true' : 'false'}<br/>
@@ -664,7 +703,34 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                         <>
                           Username: {tikTokProfile.username || 'N/A'}<br/>
                           Display: {tikTokProfile.display_name || 'N/A'}<br/>
-                          ID: {tikTokProfile.tiktok_user_id || 'N/A'}
+                          TikTok ID: {tikTokProfile.tiktok_user_id || 'N/A'}<br/>
+                          Profile User ID: {tikTokProfile.user_id || 'N/A'}
+                        </>
+                      )}
+                      <br/>
+                      <button
+                        onClick={testDatabase}
+                        disabled={isTestingDb}
+                        className="px-2 py-1 bg-blue-600 text-white rounded text-xs disabled:opacity-50"
+                      >
+                        {isTestingDb ? 'Testing...' : 'Test Database'}
+                      </button>
+                      {manualDbResult && (
+                        <>
+                          <br/><br/>
+                          DEBUG - Manual DB Test:<br/>
+                          Query: {manualDbResult.query}<br/>
+                          Row Count: {manualDbResult.rowCount}<br/>
+                          Error: {manualDbResult.error || 'none'}<br/>
+                          {manualDbResult.data && manualDbResult.data.length > 0 && (
+                            <>
+                              First Row Data:<br/>
+                              - user_id: {manualDbResult.data[0].user_id}<br/>
+                              - username: {manualDbResult.data[0].username || 'N/A'}<br/>
+                              - display_name: {manualDbResult.data[0].display_name || 'N/A'}<br/>
+                              - tiktok_user_id: {manualDbResult.data[0].tiktok_user_id || 'N/A'}
+                            </>
+                          )}
                         </>
                       )}
                     </div>
