@@ -2,11 +2,28 @@ import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../contexts/AuthContext";
 
+interface TikTokAccount {
+  id: string;
+  tiktok_user_id: string;
+  username: string;
+  display_name: string;
+  account_name: string;
+  avatar_url: string;
+  is_primary: boolean;
+  follower_count: number;
+  following_count: number;
+  likes_count: number;
+  video_count: number;
+  is_verified: boolean;
+  created_at: string;
+}
+
 export const useTikTokConnection = () => {
   const { session } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [tikTokProfile, setTikTokProfile] = useState<any>(null);
+  const [tikTokAccounts, setTikTokAccounts] = useState<TikTokAccount[]>([]);
+  const [primaryAccount, setPrimaryAccount] = useState<TikTokAccount | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [lastCheckTime, setLastCheckTime] = useState(0);
 
@@ -20,7 +37,8 @@ export const useTikTokConnection = () => {
     if (!session) {
       setIsConnected(false);
       setIsLoading(false);
-      setTikTokProfile(null);
+      setTikTokAccounts([]);
+      setPrimaryAccount(null);
       return;
     }
 
@@ -40,7 +58,6 @@ export const useTikTokConnection = () => {
     // Debounce: only check if forced or enough time has passed
     const now = Date.now();
     if (!force && now - lastCheckTime < DEBOUNCE_INTERVAL) {
-      console.log("🔄 Skipping TikTok connection check (debounced)");
       return;
     }
 
@@ -48,53 +65,45 @@ export const useTikTokConnection = () => {
     setLastCheckTime(now);
     
     try {
-      console.log("🔍 Checking TikTok connection for user:", session.user.id);
-      console.log("🔍 Full session object:", session);
-      console.log("🔍 Session user object:", session.user);
-      
       // Check if we have a valid session and user
       if (!session.user?.id) {
-        console.log("❌ No valid user session found");
         setIsConnected(false);
-        setTikTokProfile(null);
+        setTikTokAccounts([]);
+        setPrimaryAccount(null);
         return;
       }
 
-      console.log("🔍 About to query tiktok_profiles table...");
-      console.log("🔍 Query: SELECT * FROM tiktok_profiles WHERE user_id =", session.user.id);
+      // Use the new backend API to get all TikTok accounts
+      const response = await fetch(`${backendUrl}/api/v1/tiktok/accounts`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
-      const { data, error } = await supabase
-        .from("tiktok_profiles")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .maybeSingle(); // Use maybeSingle() instead of single() to avoid errors when no row exists
-
-      console.log("🔍 TikTok profile query result:", { data, error });
-      console.log("🔍 Raw data received:", data);
-      console.log("🔍 Error details:", error);
-
-      if (error) {
-        console.error("❌ TikTok profile query error:", error);
-        // Don't throw on database errors, just set disconnected state
-        setIsConnected(false);
-        setTikTokProfile(null);
-        return;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const connected = !!data;
-      console.log("🔍 TikTok connection status:", connected);
+      const result = await response.json();
+
+      const accounts = result.data?.accounts || [];
+      const connected = accounts.length > 0;
+      const primary = accounts.find((account: TikTokAccount) => account.is_primary) || accounts[0] || null;
+
       setIsConnected(connected);
-      setTikTokProfile(data);
+      setTikTokAccounts(accounts);
+      setPrimaryAccount(primary);
     } catch (error) {
-      console.error("❌ Network error checking TikTok connection:", error);
       // On network errors, don't change the current state to avoid flickering
-      // Just log the error and keep the current state
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        console.log("🌐 Network connectivity issue detected, keeping current state");
+        // Network connectivity issue, keep current state
       } else {
         // For other errors, reset to disconnected state
         setIsConnected(false);
-        setTikTokProfile(null);
+        setTikTokAccounts([]);
+        setPrimaryAccount(null);
       }
     } finally {
       setIsLoading(false);
@@ -153,12 +162,73 @@ export const useTikTokConnection = () => {
     }
   };
 
-  const disconnectTikTok = async () => {
-    if (!session) return;
+  const setPrimaryAccount = async (accountId: string) => {
+    if (!session) return false;
+
+    try {
+
+      const response = await fetch(
+        `${backendUrl}/api/v1/tiktok/accounts/set-primary`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ accountId }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to set primary TikTok account");
+      }
+
+
+      // Refresh the accounts list
+      await checkTikTokConnection(true);
+      return true;
+    } catch (error) {
+      console.error("Error setting primary TikTok account:", error);
+      throw error;
+    }
+  };
+
+  const deleteAccount = async (accountId: string) => {
+    if (!session) return false;
+
+    try {
+
+      const response = await fetch(
+        `${backendUrl}/api/v1/tiktok/accounts/${accountId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete TikTok account");
+      }
+
+
+      // Refresh the accounts list
+      await checkTikTokConnection(true);
+      return true;
+    } catch (error) {
+      console.error("Error deleting TikTok account:", error);
+      throw error;
+    }
+  };
+
+  const disconnectAllAccounts = async () => {
+    if (!session) return false;
 
     setIsLoading(true);
     try {
-      console.log("🔌 Disconnecting TikTok account...");
 
       const response = await fetch(
         `${backendUrl}/api/v1/tiktok/profile/disconnect`,
@@ -172,18 +242,18 @@ export const useTikTokConnection = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to disconnect TikTok account");
+        throw new Error("Failed to disconnect TikTok accounts");
       }
 
-      console.log("✅ TikTok account disconnected successfully");
 
       // Update local state
       setIsConnected(false);
-      setTikTokProfile(null);
+      setTikTokAccounts([]);
+      setPrimaryAccount(null);
 
       return true;
     } catch (error) {
-      console.error("Error disconnecting TikTok:", error);
+      console.error("Error disconnecting TikTok accounts:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -193,10 +263,15 @@ export const useTikTokConnection = () => {
   return {
     isConnected,
     isLoading,
-    tikTokProfile,
+    tikTokAccounts,
+    primaryAccount,
     refreshConnection,
     connectWithVideoPermissions,
-    disconnectTikTok,
+    setPrimaryAccount,
+    deleteAccount,
+    disconnectAllAccounts,
     isReconnecting,
+    // Legacy compatibility - return primary account as tikTokProfile
+    tikTokProfile: primaryAccount,
   };
 };

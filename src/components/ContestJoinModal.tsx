@@ -61,7 +61,9 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
     isLoading: isTikTokLoading,
     refreshConnection,
     connectWithVideoPermissions,
-    tikTokProfile,
+    tikTokAccounts,
+    primaryAccount,
+    tikTokProfile, // Legacy compatibility
   } = useTikTokConnection();
   type Step = "join" | "select-video" | "post-video";
   const [step, setStep] = useState<Step>("join");
@@ -76,43 +78,21 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
     string | null
   >(null);
   const [forceAccountSelection, setForceAccountSelection] = useState(false);
-  const [manualDbResult, setManualDbResult] = useState<any>(null);
-  const [isTestingDb, setIsTestingDb] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
 
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
-  // Manual database test function
-  const testDatabase = async () => {
-    if (!session?.user?.id) {
-      setManualDbResult({ error: "No user session" });
-      return;
+  // Auto-select primary account when accounts are loaded
+  React.useEffect(() => {
+    if (tikTokAccounts.length > 0 && !selectedAccount) {
+      const primaryAccountId = tikTokAccounts.find(acc => acc.is_primary)?.id || tikTokAccounts[0]?.id;
+      if (primaryAccountId) {
+        setSelectedAccount(primaryAccountId);
+      }
     }
+  }, [tikTokAccounts, selectedAccount]);
 
-    setIsTestingDb(true);
-    try {
-      console.log("🔍 MANUAL DB TEST - Querying for user:", session.user.id);
-      
-      const { data, error } = await supabase
-        .from("tiktok_profiles")
-        .select("*")
-        .eq("user_id", session.user.id);
-
-      console.log("🔍 MANUAL DB TEST - Results:", { data, error });
-      
-      setManualDbResult({ 
-        data, 
-        error: error?.message || null,
-        query: `SELECT * FROM tiktok_profiles WHERE user_id = '${session.user.id}'`,
-        rowCount: data?.length || 0
-      });
-    } catch (err: any) {
-      console.error("🔍 MANUAL DB TEST - Error:", err);
-      setManualDbResult({ error: err.message });
-    } finally {
-      setIsTestingDb(false);
-    }
-  };
 
   // Fetch leaderboard data (only when join step is active)
   const { data: leaderboardResponse, isLoading: isLeaderboardLoading } =
@@ -199,12 +179,16 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                   if (!authPopup.closed) {
                     authPopup.close();
                     clearInterval(checkAuthClosed);
-                    toast.error("TikTok connection timed out. Please try again.");
+                    toast.error(
+                      "TikTok connection timed out. Please try again."
+                    );
                     setIsConnectingTikTok(false);
                   }
                 }, 300000);
               } else {
-                toast.error("Popup blocked. Please allow popups and try again.");
+                toast.error(
+                  "Popup blocked. Please allow popups and try again."
+                );
                 setIsConnectingTikTok(false);
               }
             }
@@ -242,12 +226,16 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                   if (!authPopup.closed) {
                     authPopup.close();
                     clearInterval(checkAuthClosed);
-                    toast.error("TikTok connection timed out. Please try again.");
+                    toast.error(
+                      "TikTok connection timed out. Please try again."
+                    );
                     setIsConnectingTikTok(false);
                   }
                 }, 300000);
               } else {
-                toast.error("Popup blocked. Please allow popups and try again.");
+                toast.error(
+                  "Popup blocked. Please allow popups and try again."
+                );
                 setIsConnectingTikTok(false);
               }
             }
@@ -308,6 +296,11 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
 
     if (!isTikTokConnected) {
       toast.error("Please connect your TikTok account first to join contests");
+      return;
+    }
+
+    if (tikTokAccounts.length > 1 && !selectedAccount) {
+      toast.error("Please select which TikTok account to use for this contest");
       return;
     }
 
@@ -671,6 +664,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                 </div>
               </div>
 
+              {/* TikTok Account Section */}
               {!isTikTokConnected && !isTikTokLoading && (
                 <div className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                   <div className="flex items-start space-x-3 mb-3">
@@ -680,106 +674,11 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                         TikTok Account Required
                       </h4>
                       <p className="text-amber-300/80 text-sm mt-1">
-                        You need to connect your TikTok account before joining
-                        this contest. This allows you to select videos from your
-                        TikTok profile.
+                        You need to connect your TikTok account before joining this contest.
                       </p>
                     </div>
                   </div>
-                  
-                  {/* DEBUG: TikTok Connection Status */}
-                  <div className="mt-4 p-3 bg-gray-500/10 border border-gray-500/20 rounded-lg text-xs">
-                    <div className="text-gray-400 font-mono">
-                      DEBUG - User Session:<br/>
-                      Session: {session ? 'exists' : 'null'}<br/>
-                      User ID: {session?.user?.id || 'N/A'}<br/>
-                      User Email: {session?.user?.email || 'N/A'}<br/>
-                      <br/>
-                      DEBUG - TikTok Status:<br/>
-                      Connected: {isTikTokConnected ? 'true' : 'false'}<br/>
-                      Loading: {isTikTokLoading ? 'true' : 'false'}<br/>
-                      Profile: {tikTokProfile ? 'exists' : 'null'}<br/>
-                      {tikTokProfile && (
-                        <>
-                          Username: {tikTokProfile.username || 'N/A'}<br/>
-                          Display: {tikTokProfile.display_name || 'N/A'}<br/>
-                          TikTok ID: {tikTokProfile.tiktok_user_id || 'N/A'}<br/>
-                          Profile User ID: {tikTokProfile.user_id || 'N/A'}
-                        </>
-                      )}
-                      <br/>
-                      <button
-                        onClick={testDatabase}
-                        disabled={isTestingDb}
-                        className="px-2 py-1 bg-blue-600 text-white rounded text-xs disabled:opacity-50"
-                      >
-                        {isTestingDb ? 'Testing...' : 'Test Database'}
-                      </button>
-                      {manualDbResult && (
-                        <>
-                          <br/><br/>
-                          DEBUG - Manual DB Test:<br/>
-                          Query: {manualDbResult.query}<br/>
-                          Row Count: {manualDbResult.rowCount}<br/>
-                          Error: {manualDbResult.error || 'none'}<br/>
-                          {manualDbResult.data && manualDbResult.data.length > 0 && (
-                            <>
-                              First Row Data:<br/>
-                              - user_id: {manualDbResult.data[0].user_id}<br/>
-                              - username: {manualDbResult.data[0].username || 'N/A'}<br/>
-                              - display_name: {manualDbResult.data[0].display_name || 'N/A'}<br/>
-                              - tiktok_user_id: {manualDbResult.data[0].tiktok_user_id || 'N/A'}
-                            </>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Show connection info if we have any TikTok profile data */}
-                  {(isTikTokConnected || tikTokProfile) && (
-                    <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-green-400 text-sm font-medium">
-                          Currently connected to TikTok
-                        </span>
-                      </div>
-                      <p className="text-green-300/80 text-sm mt-1">
-                        {tikTokProfile ? (
-                          <>
-                            @{tikTokProfile.username || tikTokProfile.display_name || tikTokProfile.tiktok_user_id || "TikTok User"}
-                            {tikTokProfile.display_name && tikTokProfile.username !== tikTokProfile.display_name && tikTokProfile.username && (
-                              <span className="text-green-300/60"> ({tikTokProfile.display_name})</span>
-                            )}
-                          </>
-                        ) : (
-                          "TikTok Account Connected"
-                        )}
-                      </p>
-                    </div>
-                  )}
-                  
-                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-4">
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={forceAccountSelection}
-                        onChange={(e) => setForceAccountSelection(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 bg-transparent border-2 border-blue-500 rounded focus:ring-blue-500 focus:ring-2"
-                      />
-                      <div>
-                        <span className="text-blue-200 text-sm font-medium">
-                          Choose a different TikTok account
-                        </span>
-                        <p className="text-blue-200/60 text-xs mt-1">
-                          Check this if you want to select a different TikTok account or
-                          create a new connection
-                        </p>
-                      </div>
-                    </label>
-                  </div>
-                  
+
                   <div className="mt-3 flex justify-center">
                     <button
                       onClick={handleConnectTikTok}
@@ -792,12 +691,144 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                           <span>Connecting...</span>
                         </>
                       ) : (
-                        <>
-                          <span>Connect TikTok Account</span>
-                        </>
+                        <span>Connect TikTok Account</span>
                       )}
                     </button>
                   </div>
+                </div>
+              )}
+
+              {/* Account Selection - Show when user has multiple accounts */}
+              {isTikTokConnected && tikTokAccounts.length > 0 && (
+                <div className="mt-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="flex items-start space-x-3 mb-3">
+                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h4 className="text-green-400 font-medium">
+                        Choose TikTok Account
+                      </h4>
+                      <p className="text-green-300/80 text-sm mt-1">
+                        {tikTokAccounts.length === 1 
+                          ? "You have 1 TikTok account connected."
+                          : `You have ${tikTokAccounts.length} TikTok accounts connected. Choose which account to use for this contest.`
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  {tikTokAccounts.length === 1 ? (
+                    // Single account - just show it
+                    <div className="mt-3 p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm font-medium">
+                            {tikTokAccounts[0].display_name?.charAt(0) || tikTokAccounts[0].username?.charAt(0) || 'T'}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-green-200 font-medium">
+                            @{tikTokAccounts[0].username || 'TikTok User'}
+                          </div>
+                          {tikTokAccounts[0].display_name && (
+                            <div className="text-green-300/70 text-sm">
+                              {tikTokAccounts[0].display_name}
+                            </div>
+                          )}
+                        </div>
+                        {tikTokAccounts[0].is_primary && (
+                          <div className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">
+                            Primary
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    // Multiple accounts - show selection
+                    <div className="mt-3 space-y-2">
+                      {tikTokAccounts.map((account) => (
+                        <label
+                          key={account.id}
+                          className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                            selectedAccount === account.id
+                              ? 'bg-blue-500/20 border-blue-500/40'
+                              : 'bg-green-500/10 border-green-500/20 hover:bg-green-500/15'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="tiktok-account"
+                            value={account.id}
+                            checked={selectedAccount === account.id}
+                            onChange={(e) => setSelectedAccount(e.target.value)}
+                            className="w-4 h-4 text-blue-600 bg-transparent border-2 border-blue-500 rounded focus:ring-blue-500 focus:ring-2"
+                          />
+                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm font-medium">
+                              {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="text-green-200 font-medium">
+                              @{account.username || 'TikTok User'}
+                            </div>
+                            {account.display_name && (
+                              <div className="text-green-300/70 text-sm">
+                                {account.display_name}
+                              </div>
+                            )}
+                            {account.account_name && account.account_name !== account.display_name && (
+                              <div className="text-green-300/60 text-xs">
+                                {account.account_name}
+                              </div>
+                            )}
+                          </div>
+                          {account.is_primary && (
+                            <div className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">
+                              Primary
+                            </div>
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-4">
+                    <label className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={forceAccountSelection}
+                        onChange={(e) => setForceAccountSelection(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 bg-transparent border-2 border-blue-500 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                      <div>
+                        <span className="text-blue-200 text-sm font-medium">
+                          Connect a different TikTok account
+                        </span>
+                        <p className="text-blue-200/60 text-xs mt-1">
+                          Check this to connect another TikTok account or switch accounts
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {forceAccountSelection && (
+                    <div className="mt-3 flex justify-center">
+                      <button
+                        onClick={handleConnectTikTok}
+                        disabled={isConnectingTikTok}
+                        className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      >
+                        {isConnectingTikTok ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Connecting...</span>
+                          </>
+                        ) : (
+                          <span>Connect New Account</span>
+                        )}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1049,7 +1080,12 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
               </button>
               <button
                 onClick={handleJoinContest}
-                disabled={isJoining || !isTikTokConnected || isTikTokLoading}
+                disabled={
+                  isJoining || 
+                  !isTikTokConnected || 
+                  isTikTokLoading ||
+                  (tikTokAccounts.length > 1 && !selectedAccount)
+                }
                 className="px-3 py-2 sm:px-6 bg-gradient-to-r from-blue-500 to-purple-600 text-sm sm:text-base text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
               >
                 {isJoining ? (

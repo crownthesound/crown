@@ -174,23 +174,6 @@ export function TikTokSettingsModal({
             </div>
           )}
 
-          {/* DEBUG: TikTok Connection Status */}
-          <div className="mt-4 p-3 bg-gray-500/10 border border-gray-500/20 rounded-lg text-xs">
-            <div className="text-gray-400 font-mono">
-              DEBUG - TikTok Status:<br/>
-              Connected: {isConnected ? 'true' : 'false'}<br/>
-              Loading: {isLoading ? 'true' : 'false'}<br/>
-              Profile: {tikTokProfile ? 'exists' : 'null'}<br/>
-              {tikTokProfile && (
-                <>
-                  Username: {tikTokProfile.username || 'N/A'}<br/>
-                  Display: {tikTokProfile.display_name || 'N/A'}<br/>
-                  ID: {tikTokProfile.tiktok_user_id || 'N/A'}
-                </>
-              )}
-            </div>
-          </div>
-
           {/* Force Account Selection Option */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
             <label className="flex items-center space-x-3 cursor-pointer">
@@ -207,8 +190,12 @@ export function TikTokSettingsModal({
                 <p className="text-blue-200/60 text-xs mt-1">
                   {(isConnected || tikTokProfile) && tikTokProfile ? (
                     <>
-                      You're currently connected to @{tikTokProfile.username || tikTokProfile.display_name || tikTokProfile.tiktok_user_id || "TikTok User"}. 
-                      Check this to connect to a different account instead.
+                      You're currently connected to @
+                      {tikTokProfile.username ||
+                        tikTokProfile.display_name ||
+                        tikTokProfile.tiktok_user_id ||
+                        "TikTok User"}
+                      . Check this to connect to a different account instead.
                     </>
                   ) : isConnected ? (
                     "You have a TikTok account connected. Check this to connect to a different account."
