@@ -23,7 +23,7 @@ export const useTikTokConnection = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [tikTokAccounts, setTikTokAccounts] = useState<TikTokAccount[]>([]);
-  const [primaryAccount, setPrimaryAccount] = useState<TikTokAccount | null>(null);
+  const [primaryAccount, setPrimaryAccountState] = useState<TikTokAccount | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [lastCheckTime, setLastCheckTime] = useState(0);
 
@@ -94,7 +94,7 @@ export const useTikTokConnection = () => {
 
       setIsConnected(connected);
       setTikTokAccounts(accounts);
-      setPrimaryAccount(primary);
+      setPrimaryAccountState(primary);
     } catch (error) {
       // On network errors, don't change the current state to avoid flickering
       if (error instanceof TypeError && error.message.includes('fetch')) {
@@ -103,7 +103,7 @@ export const useTikTokConnection = () => {
         // For other errors, reset to disconnected state
         setIsConnected(false);
         setTikTokAccounts([]);
-        setPrimaryAccount(null);
+        setPrimaryAccountState(null);
       }
     } finally {
       setIsLoading(false);
@@ -249,7 +249,7 @@ export const useTikTokConnection = () => {
       // Update local state
       setIsConnected(false);
       setTikTokAccounts([]);
-      setPrimaryAccount(null);
+      setPrimaryAccountState(null);
 
       return true;
     } catch (error) {

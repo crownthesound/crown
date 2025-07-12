@@ -14,8 +14,10 @@ export function TikTokSettingsModal({
 }: TikTokSettingsModalProps) {
   const {
     isConnected,
-    tikTokProfile,
-    disconnectTikTok,
+    tikTokAccounts,
+    primaryAccount,
+    tikTokProfile, // Legacy compatibility
+    disconnectAllAccounts,
     connectWithVideoPermissions,
     isLoading,
     isReconnecting,
@@ -30,11 +32,11 @@ export function TikTokSettingsModal({
   const handleDisconnect = async () => {
     setIsDisconnecting(true);
     try {
-      await disconnectTikTok();
-      toast.success("TikTok account disconnected successfully!");
+      await disconnectAllAccounts();
+      toast.success("All TikTok accounts disconnected successfully!");
     } catch (error) {
       console.error("Error disconnecting TikTok:", error);
-      toast.error("Failed to disconnect TikTok account");
+      toast.error("Failed to disconnect TikTok accounts");
     } finally {
       setIsDisconnecting(false);
     }
@@ -146,30 +148,58 @@ export function TikTokSettingsModal({
           </div>
 
           {/* Profile Info */}
-          {isConnected && tikTokProfile && (
+          {isConnected && tikTokAccounts.length > 0 && (
             <div className="p-4 bg-black/20 rounded-lg border border-white/10">
-              <h3 className="font-medium text-white mb-2">Account Details</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-white/60">Username:</span>
-                  <span className="text-white">
-                    @{tikTokProfile.username || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/60">Display Name:</span>
-                  <span className="text-white">
-                    {tikTokProfile.display_name || "N/A"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/60">Connected:</span>
-                  <span className="text-white">
-                    {tikTokProfile.created_at
-                      ? new Date(tikTokProfile.created_at).toLocaleDateString()
-                      : "N/A"}
-                  </span>
-                </div>
+              <h3 className="font-medium text-white mb-2">
+                Connected Accounts ({tikTokAccounts.length})
+              </h3>
+              <div className="space-y-3">
+                {tikTokAccounts.map((account) => (
+                  <div key={account.id} className="p-3 bg-black/40 rounded-lg border border-white/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-medium">
+                            {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="text-white font-medium text-sm">
+                            @{account.username || "N/A"}
+                          </div>
+                          {account.display_name && (
+                            <div className="text-white/60 text-xs">
+                              {account.display_name}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {account.is_primary && (
+                        <div className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">
+                          Primary
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-white/60">Connected:</span>
+                        <span className="text-white">
+                          {account.created_at
+                            ? new Date(account.created_at).toLocaleDateString()
+                            : "N/A"}
+                        </span>
+                      </div>
+                      {account.follower_count !== null && (
+                        <div className="flex justify-between">
+                          <span className="text-white/60">Followers:</span>
+                          <span className="text-white">
+                            {account.follower_count.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -188,17 +218,19 @@ export function TikTokSettingsModal({
                   Choose a different TikTok account
                 </span>
                 <p className="text-blue-200/60 text-xs mt-1">
-                  {(isConnected || tikTokProfile) && tikTokProfile ? (
-                    <>
-                      You're currently connected to @
-                      {tikTokProfile.username ||
-                        tikTokProfile.display_name ||
-                        tikTokProfile.tiktok_user_id ||
-                        "TikTok User"}
-                      . Check this to connect to a different account instead.
-                    </>
-                  ) : isConnected ? (
-                    "You have a TikTok account connected. Check this to connect to a different account."
+                  {isConnected && tikTokAccounts.length > 0 ? (
+                    tikTokAccounts.length === 1 ? (
+                      <>
+                        You're currently connected to @
+                        {tikTokAccounts[0].username || tikTokAccounts[0].display_name || "TikTok User"}
+                        . Check this to connect to a different account instead.
+                      </>
+                    ) : (
+                      <>
+                        You have {tikTokAccounts.length} TikTok accounts connected.
+                        Check this to connect an additional account.
+                      </>
+                    )
                   ) : (
                     "Check this if you want to select a different TikTok account or create a new connection"
                   )}
@@ -224,7 +256,7 @@ export function TikTokSettingsModal({
                   disabled={isDisconnecting}
                   className="w-full px-4 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isDisconnecting ? "Disconnecting..." : "Disconnect Account"}
+                  {isDisconnecting ? "Disconnecting..." : `Disconnect All Accounts (${tikTokAccounts.length})`}
                 </button>
               </>
             ) : (
