@@ -24,6 +24,14 @@ import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import toast from "react-hot-toast";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
+import { 
+  calculateContestStatus, 
+  getStatusLabel, 
+  getStatusColor,
+  formatTimeRemaining,
+  getTimeRemaining 
+} from "../lib/contestUtils";
+import { ContestCountdownCompact } from "../components/ContestCountdown";
 
 interface LeaderboardContest {
   id: string;
@@ -33,6 +41,7 @@ interface LeaderboardContest {
   start_date: string;
   end_date: string;
   status: string | null;
+  calculatedStatus?: 'draft' | 'active' | 'ended' | 'archived';
   music_category?: string | null;
   prize_tier?: string | null;
   prize_per_winner?: number | null;
@@ -108,7 +117,7 @@ export function ContestsPage() {
       const { data, error } = await supabase
         .from("contests")
         .select("*")
-        .eq("status", "active")
+        .in("status", ["active", "draft"]) // Get both active and draft contests
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -179,7 +188,7 @@ export function ContestsPage() {
             );
           }
 
-          return {
+          const contestWithData = {
             ...contest,
             cover_image: contest.cover_image || "",
             music_category: contest.music_category || "",
@@ -195,9 +204,22 @@ export function ContestsPage() {
             ],
             top_participants,
           };
+
+          // Add calculated status
+          const calculatedStatus = calculateContestStatus(contestWithData);
+          return {
+            ...contestWithData,
+            calculatedStatus,
+          };
         })
       );
-      setContests(contestsWithParticipants);
+      
+      // Filter to only show contests that are currently active based on calculated status
+      const activeContests = contestsWithParticipants.filter(contest => 
+        contest.calculatedStatus === 'active'
+      );
+      
+      setContests(activeContests);
     } catch (error) {
       console.error("Error fetching contests:", error);
       toast.error("Failed to load contests");
@@ -228,6 +250,12 @@ export function ContestsPage() {
   };
 
   const handleJoinContest = (contest: LeaderboardContest) => {
+    // Check if contest has ended
+    if (contest.calculatedStatus === 'ended') {
+      toast.error('This contest has ended and is no longer accepting participants.');
+      return;
+    }
+
     if (!session) {
       navigate("/signin");
       return;
@@ -252,19 +280,12 @@ export function ContestsPage() {
     toast.success("Successfully joined contest!");
   };
 
-  const formatTimeLeft = (endDate: string) => {
-    const end = new Date(endDate).getTime();
-    const now = new Date().getTime();
-    const distance = end - now;
-
-    if (distance < 0) return "Ended";
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-
-    return `${days}d ${hours}h left`;
+  const formatTimeLeft = (contest: LeaderboardContest) => {
+    const timeRemaining = getTimeRemaining(contest);
+    if (!timeRemaining) {
+      return contest.calculatedStatus === 'ended' ? 'Ended' : 'Not started';
+    }
+    return formatTimeRemaining(timeRemaining) + ' left';
   };
 
   const formatNumber = (num: number) => {
@@ -372,17 +393,26 @@ export function ContestsPage() {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-                  {/* Time left badge */}
-                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 px-2 py-0.5 sm:px-3 sm:py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-xs sm:text-sm flex items-center gap-1">
-                    <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                    <span className="truncate">
-                      {formatTimeLeft(contest.end_date)}
-                    </span>
+                  {/* Time left badge with live countdown */}
+                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 px-2 py-0.5 sm:px-3 sm:py-1 bg-black/60 backdrop-blur-sm rounded-full">
+                    <ContestCountdownCompact 
+                      contest={contest} 
+                      className="text-white text-xs sm:text-sm"
+                    />
                   </div>
 
-                  {/* Category badge */}
-                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 px-2 py-0.5 sm:px-3 sm:py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-[10px] sm:text-xs font-medium">
-                    {contest.music_category || "Music"}
+                  {/* Category and Status badges */}
+                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 flex flex-col gap-1">
+                    <div className="px-2 py-0.5 sm:px-3 sm:py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-[10px] sm:text-xs font-medium">
+                      {contest.music_category || "Music"}
+                    </div>
+                    <div className={`px-2 py-0.5 sm:px-3 sm:py-1 backdrop-blur-sm rounded-full text-[10px] sm:text-xs font-medium ${
+                      contest.calculatedStatus === 'active' ? 'bg-green-500/80 text-white' :
+                      contest.calculatedStatus === 'ended' ? 'bg-red-500/80 text-white' :
+                      'bg-gray-500/80 text-white'
+                    }`}>
+                      {getStatusLabel(contest.calculatedStatus || 'active')}
+                    </div>
                   </div>
                 </div>
 

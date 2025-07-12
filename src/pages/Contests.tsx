@@ -11,13 +11,23 @@ import {
   Globe,
   Menu,
   X,
+  AlertTriangle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Database } from "../lib/database.types";
 import { useAuth } from "../contexts/AuthContext";
+import { 
+  calculateContestStatus, 
+  getStatusLabel, 
+  getStatusColor,
+  formatTimeRemaining,
+  getTimeRemaining 
+} from "../lib/contestUtils";
 
-type Contest = Database["public"]["Tables"]["contests"]["Row"];
+type Contest = Database["public"]["Tables"]["contests"]["Row"] & {
+  calculatedStatus?: 'draft' | 'active' | 'ended' | 'archived';
+};
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -50,7 +60,16 @@ export function Contests() {
       if (error) throw error;
 
       if (data) {
-        setContests(data);
+        // Add calculated status to each contest
+        const contestsWithStatus = data.map(contest => {
+          const calculatedStatus = calculateContestStatus(contest);
+          return {
+            ...contest,
+            calculatedStatus
+          };
+        });
+        
+        setContests(contestsWithStatus);
       }
     } catch (error) {
       console.error("Error fetching contests:", error);
@@ -156,9 +175,14 @@ export function Contests() {
   const getFilteredContests = () => {
     if (activeTab === "all") return contests;
     if (activeTab === "completed") {
-      // Map 'ended' status to 'completed' for filtering
-      return contests.filter((contest) => contest.status === "ended");
+      // Use calculated status for real-time filtering
+      return contests.filter((contest) => contest.calculatedStatus === "ended");
     }
+    if (activeTab === "active") {
+      // Use calculated status for active contests
+      return contests.filter((contest) => contest.calculatedStatus === "active");
+    }
+    // For other tabs (draft, hidden), use database status
     return contests.filter((contest) => contest.status === activeTab);
   };
 
@@ -178,28 +202,12 @@ export function Contests() {
     }
   };
 
-  const formatTimeLeft = (endDate: string) => {
-    const end = new Date(endDate).getTime();
-    const now = new Date().getTime();
-    const distance = end - now;
-
-    if (distance < 0) return "Ended";
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    );
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (days > 0) {
-      return `${days}d ${hours}h left`;
-    } else if (hours > 0) {
-      return `${hours}h ${minutes}m left`;
-    } else if (minutes > 0) {
-      return `${minutes}m left`;
-    } else {
-      return "Ending soon";
+  const formatTimeLeft = (contest: Contest) => {
+    const timeRemaining = getTimeRemaining(contest);
+    if (!timeRemaining) {
+      return contest.calculatedStatus === 'ended' ? 'Ended' : 'Not started yet';
     }
+    return formatTimeRemaining(timeRemaining) + ' left';
   };
 
   const renderActionButtons = (contest: Contest) => {
@@ -301,7 +309,10 @@ export function Contests() {
   const getTabCount = (tab: string) => {
     if (tab === "all") return contests.length;
     if (tab === "completed") {
-      return contests.filter((c) => c.status === "ended").length;
+      return contests.filter((c) => c.calculatedStatus === "ended").length;
+    }
+    if (tab === "active") {
+      return contests.filter((c) => c.calculatedStatus === "active").length;
     }
     return contests.filter((c) => c.status === tab).length;
   };
@@ -389,17 +400,14 @@ export function Contests() {
                           <h3 className="text-lg font-semibold truncate">
                             {contest.name || "Untitled Contest"}
                           </h3>
+                          
+                          {/* Real-time Status */}
                           <span
                             className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
-                              contest.status
+                              contest.calculatedStatus
                             )}`}
                           >
-                            {contest.status === "ended"
-                              ? "Completed"
-                              : contest.status
-                              ? contest.status.charAt(0).toUpperCase() +
-                                contest.status.slice(1)
-                              : "Draft"}
+                            {getStatusLabel(contest.calculatedStatus || 'draft')}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 line-clamp-2">
@@ -414,7 +422,7 @@ export function Contests() {
                     <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{formatTimeLeft(contest.end_date)}</span>
+                        <span>{formatTimeLeft(contest)}</span>
                       </div>
                       {contest.music_category && (
                         <div>

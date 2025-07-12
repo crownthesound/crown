@@ -2,6 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
+import { 
+  calculateContestStatus, 
+  getStatusLabel, 
+  getStatusColor 
+} from "../lib/contestUtils";
 import {
   Upload,
   CheckCircle,
@@ -153,6 +158,7 @@ export function BuildLeaderboard() {
       rank: index + 1,
       title,
     })),
+    prize_amounts: Array(5).fill(2000),
     created_by: null as string | null,
     status: "draft",
   });
@@ -209,6 +215,9 @@ export function BuildLeaderboard() {
         ? toDatetimeLocal(new Date(data.end_date))
         : toDatetimeLocal(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
 
+      const numWinners = data.num_winners || 5;
+      const prizePerWinner = data.prize_per_winner || 2000;
+      
       setConfig({
         id: data.id,
         name: data.name || "",
@@ -216,8 +225,8 @@ export function BuildLeaderboard() {
         cover_image: data.cover_image || "",
         start_date: startDate,
         end_date: endDate,
-        num_winners: data.num_winners || 5,
-        prize_per_winner: data.prize_per_winner || 2000,
+        num_winners: numWinners,
+        prize_per_winner: prizePerWinner,
         prize_tier: data.prize_per_winner ? "monetary" : "non-monetary",
         total_prize: data.total_prize || 5000,
         music_category: data.music_category || "",
@@ -227,6 +236,7 @@ export function BuildLeaderboard() {
             rank: index + 1,
             title,
           })),
+        prize_amounts: Array(numWinners).fill(prizePerWinner),
         created_by: data.created_by,
         status: (data.status as string) || "draft",
       });
@@ -347,6 +357,7 @@ export function BuildLeaderboard() {
 
   const handleUpdateNumWinners = (newNum: number) => {
     const currentTitles = [...config.prize_titles];
+    const currentAmounts = [...config.prize_amounts];
 
     if (newNum > currentTitles.length) {
       for (let i = currentTitles.length; i < newNum; i++) {
@@ -354,15 +365,27 @@ export function BuildLeaderboard() {
           rank: i + 1,
           title: `Winner ${i + 1}`,
         });
+        currentAmounts.push(config.prize_per_winner);
       }
     } else if (newNum < currentTitles.length) {
       currentTitles.splice(newNum);
+      currentAmounts.splice(newNum);
     }
 
     setConfig((prev) => ({
       ...prev,
       num_winners: newNum,
       prize_titles: currentTitles,
+      prize_amounts: currentAmounts,
+    }));
+  };
+
+  const handleUpdatePrizeAmount = (index: number, amount: number) => {
+    setConfig((prev) => ({
+      ...prev,
+      prize_amounts: prev.prize_amounts.map((amt, i) =>
+        i === index ? amount : amt
+      ),
     }));
   };
 
@@ -518,6 +541,39 @@ export function BuildLeaderboard() {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          {/* Contest Status Display */}
+          {contestId && (
+            <div className="p-4 border-b border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {config.name || 'Unnamed Contest'}
+                  </h3>
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(calculateContestStatus(config))}`}>
+                    {getStatusLabel(calculateContestStatus(config))}
+                  </div>
+                </div>
+                <div className="text-sm text-gray-600">
+                  {calculateContestStatus(config) === 'ended' && (
+                    <span className="text-red-600 font-medium">
+                      This contest has ended
+                    </span>
+                  )}
+                  {calculateContestStatus(config) === 'active' && (
+                    <span className="text-green-600 font-medium">
+                      Contest is currently active
+                    </span>
+                  )}
+                  {calculateContestStatus(config) === 'draft' && new Date(config.start_date) > new Date() && (
+                    <span className="text-blue-600 font-medium">
+                      Contest will start on {new Date(config.start_date).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="p-4">
             {step === "get-started" && (
               <div>
@@ -862,13 +918,12 @@ export function BuildLeaderboard() {
                                 <span className="text-gray-500">$</span>
                                 <input
                                   type="number"
-                                  value={config.prize_per_winner}
+                                  value={config.prize_amounts[index] || 0}
                                   onChange={(e) =>
-                                    setConfig((prev) => ({
-                                      ...prev,
-                                      prize_per_winner:
-                                        parseInt(e.target.value) || 0,
-                                    }))
+                                    handleUpdatePrizeAmount(
+                                      index,
+                                      parseInt(e.target.value) || 0
+                                    )
                                   }
                                   className="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
                                   placeholder="Enter prize amount"

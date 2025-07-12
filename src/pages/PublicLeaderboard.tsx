@@ -33,6 +33,13 @@ import { ContestJoinModal } from "../components/ContestJoinModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { supabase as supa } from "../lib/supabase";
+import { 
+  calculateContestStatus, 
+  getStatusLabel, 
+  getStatusColor,
+  formatTimeRemaining,
+  getTimeRemaining 
+} from "../lib/contestUtils";
 
 interface Participant {
   id: string;
@@ -59,6 +66,7 @@ interface ContestDetails {
   prize_per_winner: number;
   num_winners: number;
   status: "draft" | "active" | "completed" | "hidden";
+  calculatedStatus?: 'draft' | 'active' | 'ended' | 'archived';
   resources: Array<{
     title: string;
     description?: string;
@@ -272,7 +280,11 @@ export function PublicLeaderboard() {
 
   useEffect(() => {
     if (contestData) {
-      setContest(contestData as unknown as ContestDetails);
+      const contestWithStatus = {
+        ...contestData,
+        calculatedStatus: calculateContestStatus(contestData)
+      } as unknown as ContestDetails;
+      setContest(contestWithStatus);
     }
   }, [contestData]);
 
@@ -366,6 +378,12 @@ export function PublicLeaderboard() {
   };
 
   const handleJoinCompetition = () => {
+    // Check if contest has ended
+    if (contest?.calculatedStatus === 'ended') {
+      toast.error('This contest has ended and is no longer accepting participants.');
+      return;
+    }
+
     if (!session) {
       // Store current contest page URL for redirect after auth
       localStorage.setItem("auth_return_url", window.location.pathname);
@@ -374,7 +392,6 @@ export function PublicLeaderboard() {
     }
 
     // Always show the ContestJoinModal - it handles TikTok connection internally
-
     setShowJoinModal(true);
   };
 
@@ -465,27 +482,28 @@ export function PublicLeaderboard() {
   const getStatusBadge = () => {
     if (!contest) return null;
 
+    const calculatedStatus = contest.calculatedStatus || 'draft';
     const statusColors = {
       active: "bg-green-100 text-green-800 border-green-200",
-      completed: "bg-blue-100 text-blue-800 border-blue-200",
+      ended: "bg-red-100 text-red-800 border-red-200",
       draft: "bg-gray-100 text-gray-800 border-gray-200",
-      hidden: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      archived: "bg-yellow-100 text-yellow-800 border-yellow-200",
     };
 
     const statusText = {
       active: "Active",
-      completed: "Completed",
+      ended: "Ended",
       draft: "Draft",
-      hidden: "Hidden",
+      archived: "Archived",
     };
 
     return (
       <div
         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-          statusColors[contest.status as keyof typeof statusColors]
+          statusColors[calculatedStatus as keyof typeof statusColors]
         }`}
       >
-        {statusText[contest.status as keyof typeof statusText]}
+        {statusText[calculatedStatus as keyof typeof statusText]}
       </div>
     );
   };
@@ -961,9 +979,14 @@ export function PublicLeaderboard() {
                 <div className="w-full">
                   <button
                     onClick={handleJoinCompetition}
-                    className="w-full bg-white text-black font-medium py-3 rounded-lg hover:bg-white/90 transition-colors"
+                    disabled={contest?.calculatedStatus === 'ended'}
+                    className={`w-full font-medium py-3 rounded-lg transition-colors ${
+                      contest?.calculatedStatus === 'ended'
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                        : 'bg-white text-black hover:bg-white/90'
+                    }`}
                   >
-                    Sign up to Join Contest
+                    {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : 'Sign up to Join Contest'}
                   </button>
                 </div>
               )}
@@ -972,10 +995,15 @@ export function PublicLeaderboard() {
               <div className="max-w-6xl mx-auto mt-2 flex justify-center">
                 <button
                   onClick={handleJoinCompetition}
-                  className="w-full max-w-md bg-white text-black font-medium py-2.5 rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
+                  disabled={contest?.calculatedStatus === 'ended'}
+                  className={`w-full max-w-md font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
+                    contest?.calculatedStatus === 'ended'
+                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                      : 'bg-white text-black hover:bg-white/90'
+                  }`}
                 >
                   <UserPlus className="h-4 w-4" />
-                  Join Contest
+                  {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : 'Join Contest'}
                 </button>
               </div>
             )}
