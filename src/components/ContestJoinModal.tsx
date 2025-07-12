@@ -653,7 +653,25 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                     </div>
                   </div>
                   
-                  {isTikTokConnected && tikTokProfile && (
+                  {/* DEBUG: TikTok Connection Status */}
+                  <div className="mt-4 p-3 bg-gray-500/10 border border-gray-500/20 rounded-lg text-xs">
+                    <div className="text-gray-400 font-mono">
+                      DEBUG - TikTok Status:<br/>
+                      Connected: {isTikTokConnected ? 'true' : 'false'}<br/>
+                      Loading: {isTikTokLoading ? 'true' : 'false'}<br/>
+                      Profile: {tikTokProfile ? 'exists' : 'null'}<br/>
+                      {tikTokProfile && (
+                        <>
+                          Username: {tikTokProfile.username || 'N/A'}<br/>
+                          Display: {tikTokProfile.display_name || 'N/A'}<br/>
+                          ID: {tikTokProfile.tiktok_user_id || 'N/A'}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Show connection info if we have any TikTok profile data */}
+                  {(isTikTokConnected || tikTokProfile) && (
                     <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -662,9 +680,15 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                         </span>
                       </div>
                       <p className="text-green-300/80 text-sm mt-1">
-                        @{tikTokProfile.username || tikTokProfile.display_name || "TikTok User"}
-                        {tikTokProfile.display_name && tikTokProfile.username !== tikTokProfile.display_name && (
-                          <span className="text-green-300/60"> ({tikTokProfile.display_name})</span>
+                        {tikTokProfile ? (
+                          <>
+                            @{tikTokProfile.username || tikTokProfile.display_name || tikTokProfile.tiktok_user_id || "TikTok User"}
+                            {tikTokProfile.display_name && tikTokProfile.username !== tikTokProfile.display_name && tikTokProfile.username && (
+                              <span className="text-green-300/60"> ({tikTokProfile.display_name})</span>
+                            )}
+                          </>
+                        ) : (
+                          "TikTok Account Connected"
                         )}
                       </p>
                     </div>
