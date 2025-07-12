@@ -188,8 +188,14 @@ export function TikTokSettingsModal({
                   Choose a different TikTok account
                 </span>
                 <p className="text-blue-200/60 text-xs mt-1">
-                  Check this if you want to select a different TikTok account or
-                  create a new connection
+                  {isConnected && tikTokProfile ? (
+                    <>
+                      You're currently connected to @{tikTokProfile.username || tikTokProfile.display_name || "TikTok User"}. 
+                      Check this to connect to a different account instead.
+                    </>
+                  ) : (
+                    "Check this if you want to select a different TikTok account or create a new connection"
+                  )}
                 </p>
               </div>
             </label>

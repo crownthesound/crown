@@ -61,6 +61,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
     isLoading: isTikTokLoading,
     refreshConnection,
     connectWithVideoPermissions,
+    tikTokProfile,
   } = useTikTokConnection();
   type Step = "join" | "select-video" | "post-video";
   const [step, setStep] = useState<Step>("join");
@@ -651,6 +652,23 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                       </p>
                     </div>
                   </div>
+                  
+                  {isTikTokConnected && tikTokProfile && (
+                    <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-green-400 text-sm font-medium">
+                          Currently connected to TikTok
+                        </span>
+                      </div>
+                      <p className="text-green-300/80 text-sm mt-1">
+                        @{tikTokProfile.username || tikTokProfile.display_name || "TikTok User"}
+                        {tikTokProfile.display_name && tikTokProfile.username !== tikTokProfile.display_name && (
+                          <span className="text-green-300/60"> ({tikTokProfile.display_name})</span>
+                        )}
+                      </p>
+                    </div>
+                  )}
                   
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mt-4">
                     <label className="flex items-center space-x-3 cursor-pointer">
