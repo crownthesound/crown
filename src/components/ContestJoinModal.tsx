@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   X,
-  Play,
   Loader2,
   Check,
   ExternalLink,
@@ -63,8 +62,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
     connectWithVideoPermissions,
     tikTokAccounts,
     primaryAccount,
-    setPrimaryAccount,
-    tikTokProfile, // Legacy compatibility
+    setPrimaryAccount
   } = useTikTokConnection();
   type Step = "join" | "select-video" | "post-video";
   const [step, setStep] = useState<Step>("join");
@@ -85,15 +83,16 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
-  // Auto-select primary account when accounts are loaded
+  // Auto-select primary account when accounts are loaded or primary changes
   React.useEffect(() => {
-    if (tikTokAccounts.length > 0 && !selectedAccount) {
+    if (tikTokAccounts.length > 0) {
       const primaryAccountId = tikTokAccounts.find(acc => acc.is_primary)?.id || tikTokAccounts[0]?.id;
-      if (primaryAccountId) {
+      if (primaryAccountId && primaryAccountId !== selectedAccount) {
+        console.log('🔄 ContestJoinModal - Updating selectedAccount to primary:', primaryAccountId);
         setSelectedAccount(primaryAccountId);
       }
     }
-  }, [tikTokAccounts, selectedAccount]);
+  }, [tikTokAccounts, primaryAccount]);
 
 
   // Fetch leaderboard data (only when join step is active)
@@ -763,22 +762,29 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                             checked={selectedAccount === account.id}
                             onChange={async (e) => {
                               const newAccountId = e.target.value;
+                              console.log('🔄 ContestJoinModal - Radio button clicked:', newAccountId, 'Current primary:', primaryAccount?.id);
                               setSelectedAccount(newAccountId);
                               
                               // If the selected account is not already primary, switch to it
                               if (newAccountId !== primaryAccount?.id) {
+                                console.log('🔄 ContestJoinModal - Switching to account:', newAccountId);
                                 setSwitchingAccount(newAccountId);
                                 try {
                                   await setPrimaryAccount(newAccountId);
+                                  console.log('✅ ContestJoinModal - Switch successful');
+                                  // Force refresh to ensure UI updates
+                                  refreshConnection();
                                   toast.success(`Switched to @${account.username} successfully!`);
                                 } catch (error: any) {
-                                  console.error("Failed to switch primary account:", error);
+                                  console.error("❌ ContestJoinModal - Failed to switch primary account:", error);
                                   toast.error(error.message || 'Failed to switch account. Please try again.');
                                   // Revert selection on error
                                   setSelectedAccount(primaryAccount?.id || null);
                                 } finally {
                                   setSwitchingAccount(null);
                                 }
+                              } else {
+                                console.log('ℹ️ ContestJoinModal - Account already primary, no switch needed');
                               }
                             }}
                             disabled={switchingAccount !== null}

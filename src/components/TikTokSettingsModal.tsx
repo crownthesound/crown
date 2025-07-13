@@ -17,6 +17,7 @@ export function TikTokSettingsModal({
     tikTokAccounts,
     primaryAccount,
     setPrimaryAccount,
+    refreshConnection,
     tikTokProfile, // Legacy compatibility
     disconnectAllAccounts,
     connectWithVideoPermissions,
@@ -216,12 +217,16 @@ export function TikTokSettingsModal({
                           onClick={async () => {
                             if (switchingAccount) return; // Prevent multiple clicks
                             
+                            console.log('🔄 TikTokSettingsModal - Set as Active clicked:', account.id);
                             setSwitchingAccount(account.id);
                             try {
                               await setPrimaryAccount(account.id);
+                              console.log('✅ TikTokSettingsModal - Switch successful');
+                              // Force refresh to ensure UI updates
+                              refreshConnection();
                               toast.success(`Switched to @${account.username} successfully!`);
                             } catch (error: any) {
-                              console.error("Failed to switch primary account:", error);
+                              console.error("❌ TikTokSettingsModal - Failed to switch primary account:", error);
                               toast.error(error.message || 'Failed to switch account. Please try again.');
                             } finally {
                               setSwitchingAccount(null);
