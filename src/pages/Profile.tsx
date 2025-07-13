@@ -70,7 +70,8 @@ export function Profile() {
     setPrimaryAccount,
     deleteAccount,
     connectWithVideoPermissions,
-    isLoading: tikTokLoading
+    isLoading: tikTokLoading,
+    isReconnecting
   } = useTikTokConnection();
   const [activeTab, setActiveTab] = useState<'overview' | 'contests' | 'submissions' | 'tiktok-accounts'>('overview');
   const [isEditing, setIsEditing] = useState(false);
