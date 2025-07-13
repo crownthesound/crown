@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { X, Zap, AlertCircle, CheckCircle, Settings } from "lucide-react";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import toast from "react-hot-toast";
@@ -15,10 +15,8 @@ export function TikTokSettingsModal({
   const {
     isConnected,
     tikTokAccounts,
-    primaryAccount,
     setPrimaryAccount,
     refreshConnection,
-    tikTokProfile, // Legacy compatibility
     disconnectAllAccounts,
     connectWithVideoPermissions,
     isLoading,
@@ -31,6 +29,10 @@ export function TikTokSettingsModal({
   console.log("🔍 TikTokSettingsModal render - isOpen:", isOpen);
 
   if (!isOpen) return null;
+
+  // Don't show the modal if user is not connected to TikTok
+  // This modal is primarily for managing existing TikTok connections
+  if (!isConnected) return null;
 
   const handleDisconnect = async () => {
     setIsDisconnecting(true);
@@ -105,7 +107,7 @@ export function TikTokSettingsModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1A1A1A] rounded-2xl border border-white/10 w-full max-w-md overflow-hidden">
+      <div className="bg-[#1A1A1A] rounded-2xl border border-white/10 w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg">
@@ -123,7 +125,7 @@ export function TikTokSettingsModal({
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 overflow-y-auto flex-1">
           {/* Connection Status */}
           <div className="flex items-center justify-between p-4 bg-black/20 rounded-lg border border-white/10">
             <div className="flex items-center gap-3">
@@ -158,12 +160,17 @@ export function TikTokSettingsModal({
               </h3>
               <div className="space-y-3">
                 {tikTokAccounts.map((account) => (
-                  <div key={account.id} className="p-3 bg-black/40 rounded-lg border border-white/5">
+                  <div
+                    key={account.id}
+                    className="p-3 bg-black/40 rounded-lg border border-white/5"
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
                           <span className="text-white text-xs font-medium">
-                            {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
+                            {account.display_name?.charAt(0) ||
+                              account.username?.charAt(0) ||
+                              "T"}
                           </span>
                         </div>
                         <div>
@@ -191,54 +198,55 @@ export function TikTokSettingsModal({
                         )}
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-white/60">Connected:</span>
-                        <span className="text-white">
-                          {account.created_at
-                            ? new Date(account.created_at).toLocaleDateString()
-                            : "N/A"}
-                        </span>
-                      </div>
-                      {account.follower_count !== null && (
-                        <div className="flex justify-between">
-                          <span className="text-white/60">Followers:</span>
-                          <span className="text-white">
-                            {account.follower_count.toLocaleString()}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    
+
                     {/* Set as Active Button */}
                     {!account.is_primary && (
                       <div className="mt-3 pt-3 border-t border-white/10">
                         <button
                           onClick={async () => {
                             if (switchingAccount) return; // Prevent multiple clicks
-                            
-                            console.log('🔄 TikTokSettingsModal - Set as Active clicked:', account.id);
+
+                            console.log(
+                              "🔄 TikTokSettingsModal - Set as Active clicked:",
+                              account.id
+                            );
                             setSwitchingAccount(account.id);
                             try {
                               await setPrimaryAccount(account.id);
-                              console.log('✅ TikTokSettingsModal - Switch successful');
+                              console.log(
+                                "✅ TikTokSettingsModal - Switch successful"
+                              );
                               // Force refresh to ensure UI updates
                               refreshConnection();
-                              toast.success(`Switched to @${account.username} successfully!`);
+                              toast.success(
+                                `Switched to @${account.username} successfully!`
+                              );
                             } catch (error: any) {
-                              console.error("❌ TikTokSettingsModal - Failed to switch primary account:", error);
-                              toast.error(error.message || 'Failed to switch account. Please try again.');
+                              console.error(
+                                "❌ TikTokSettingsModal - Failed to switch primary account:",
+                                error
+                              );
+                              toast.error(
+                                error.message ||
+                                  "Failed to switch account. Please try again."
+                              );
                             } finally {
                               setSwitchingAccount(null);
                             }
                           }}
-                          disabled={switchingAccount === account.id || isLoading}
+                          disabled={
+                            switchingAccount === account.id || isLoading
+                          }
                           className={`w-full px-3 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:from-blue-500/30 hover:to-purple-500/30 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2 ${
-                            switchingAccount === account.id ? 'opacity-50 cursor-not-allowed' : ''
+                            switchingAccount === account.id
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
                           }`}
                         >
                           <Settings className="h-4 w-4" />
-                          {switchingAccount === account.id ? 'Switching...' : 'Set as Active'}
+                          {switchingAccount === account.id
+                            ? "Switching..."
+                            : "Set as Active"}
                         </button>
                       </div>
                     )}
@@ -266,13 +274,15 @@ export function TikTokSettingsModal({
                     tikTokAccounts.length === 1 ? (
                       <>
                         You're currently connected to @
-                        {tikTokAccounts[0].username || tikTokAccounts[0].display_name || "TikTok User"}
+                        {tikTokAccounts[0].username ||
+                          tikTokAccounts[0].display_name ||
+                          "TikTok User"}
                         . Check this to connect to a different account instead.
                       </>
                     ) : (
                       <>
-                        You have {tikTokAccounts.length} TikTok accounts connected.
-                        Check this to connect an additional account.
+                        You have {tikTokAccounts.length} TikTok accounts
+                        connected. Check this to connect an additional account.
                       </>
                     )
                   ) : (
@@ -300,7 +310,9 @@ export function TikTokSettingsModal({
                   disabled={isDisconnecting}
                   className="w-full px-4 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isDisconnecting ? "Disconnecting..." : `Disconnect All Accounts (${tikTokAccounts.length})`}
+                  {isDisconnecting
+                    ? "Disconnecting..."
+                    : `Disconnect All Accounts (${tikTokAccounts.length})`}
                 </button>
               </>
             ) : (
