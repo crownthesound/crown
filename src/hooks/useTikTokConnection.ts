@@ -261,20 +261,8 @@ export const useTikTokConnection = () => {
   const setPrimaryAccount = async (accountId: string) => {
     if (!session) return false;
 
-    // Store previous state for rollback
-    const previousAccounts = [...tikTokAccounts];
-    const previousPrimary = primaryAccount;
-
     try {
-      // Optimistic update: immediately update UI
-      const optimisticAccounts = tikTokAccounts.map(account => ({
-        ...account,
-        is_primary: account.id === accountId
-      }));
-      
-      setTikTokAccounts(optimisticAccounts);
-      setPrimaryAccountState(optimisticAccounts.find(acc => acc.id === accountId) || null);
-
+      // Step 1: Set the account as primary in the backend
       const response = await fetch(
         `${backendUrl}/api/v1/tiktok/accounts/set-primary`,
         {
@@ -292,16 +280,62 @@ export const useTikTokConnection = () => {
         throw new Error(errorData.message || "Failed to set primary TikTok account");
       }
 
-      // Refresh the accounts list to ensure consistency
+      // Step 2: Validate the TikTok session for the selected account
+      const validationResponse = await fetch(
+        `${backendUrl}/api/v1/tiktok/accounts/${accountId}/validate`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!validationResponse.ok) {
+        console.warn("Could not validate TikTok session for account:", accountId);
+      } else {
+        const validationData = await validationResponse.json();
+        if (!validationData.data?.isValid) {
+          console.warn("TikTok session is not valid for account:", accountId, validationData.data);
+          // Still proceed but warn the user
+        }
+      }
+
+      // Step 3: Refresh the accounts list to get the updated state
       await checkTikTokConnection(true);
       return true;
     } catch (error) {
-      // Rollback optimistic update on error
-      setTikTokAccounts(previousAccounts);
-      setPrimaryAccountState(previousPrimary);
-      
       console.error("Error setting primary TikTok account:", error);
       throw error;
+    }
+  };
+
+  const validateAccountSession = async (accountId: string) => {
+    if (!session) return null;
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/v1/tiktok/accounts/${accountId}/validate`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to validate TikTok session for account:", accountId);
+        return null;
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error("Error validating TikTok account session:", error);
+      return null;
     }
   };
 
@@ -380,6 +414,7 @@ export const useTikTokConnection = () => {
     refreshConnection,
     connectWithVideoPermissions,
     setPrimaryAccount,
+    validateAccountSession,
     deleteAccount,
     disconnectAllAccounts,
     isReconnecting,

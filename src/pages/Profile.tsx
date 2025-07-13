@@ -68,6 +68,7 @@ export function Profile() {
     tikTokAccounts,
     primaryAccount,
     setPrimaryAccount,
+    validateAccountSession,
     deleteAccount,
     connectWithVideoPermissions,
     isLoading: tikTokLoading,
@@ -82,6 +83,7 @@ export function Profile() {
   const [loading, setLoading] = useState(false);
   const [showTikTokSettings, setShowTikTokSettings] = useState(false);
   const [userRanks, setUserRanks] = useState<Record<string, number>>({});
+  const [switchingAccount, setSwitchingAccount] = useState<string | null>(null);
 
   useEffect(() => {
     if (session && (activeTab === 'contests' || activeTab === 'submissions')) {
@@ -973,9 +975,21 @@ export function Profile() {
                             {!account.is_primary ? (
                               <button
                                 onClick={async () => {
+                                  if (switchingAccount) return; // Prevent multiple clicks
+                                  
+                                  setSwitchingAccount(account.id);
                                   try {
+                                    // Switch the account
                                     await setPrimaryAccount(account.id);
-                                    toast.success(`Switched to @${account.username} successfully!`);
+                                    
+                                    // Validate the TikTok session for the new primary account
+                                    const validation = await validateAccountSession(account.id);
+                                    
+                                    if (validation?.isValid === false) {
+                                      toast.warning(`Switched to @${account.username}, but TikTok session may need refresh for video access.`);
+                                    } else {
+                                      toast.success(`Switched to @${account.username} successfully!`);
+                                    }
                                   } catch (error: any) {
                                     console.error("Failed to switch primary account:", error);
                                     
@@ -989,12 +1003,17 @@ export function Profile() {
                                     } else {
                                       toast.error(error.message || 'Failed to switch account. Please try again.');
                                     }
+                                  } finally {
+                                    setSwitchingAccount(null);
                                   }
                                 }}
-                                className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:from-blue-500/30 hover:to-purple-500/30 rounded-lg transition-all text-sm font-medium flex items-center gap-2"
+                                disabled={switchingAccount === account.id || tikTokLoading}
+                                className={`px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:from-blue-500/30 hover:to-purple-500/30 rounded-lg transition-all text-sm font-medium flex items-center gap-2 ${
+                                  switchingAccount === account.id ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                               >
                                 <Crown className="h-4 w-4" />
-                                Set as Active
+                                {switchingAccount === account.id ? 'Switching...' : 'Set as Active'}
                               </button>
                             ) : (
                               <span className="px-4 py-2 bg-green-500/20 text-green-300 rounded-lg text-sm font-medium flex items-center gap-2">
