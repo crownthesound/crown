@@ -117,8 +117,17 @@ export const useTikTokConnection = () => {
   const connectWithVideoPermissions = async () => {
     if (!session) return;
 
+    // Prevent multiple simultaneous connection attempts
+    if (isReconnecting) {
+      console.warn("TikTok connection already in progress");
+      return;
+    }
+
     setIsReconnecting(true);
     try {
+      // Clear any cached connection state to ensure fresh check
+      setLastCheckTime(0);
+      
       // First, initiate the TikTok auth flow with emphasis on video permissions
       const response = await fetch(
         `${backendUrl}/api/v1/tiktok/auth/initiate`,
@@ -136,7 +145,9 @@ export const useTikTokConnection = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to initiate TikTok connection");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || "Failed to initiate TikTok connection";
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -148,17 +159,50 @@ export const useTikTokConnection = () => {
         "width=600,height=700"
       );
 
+      if (!authWindow) {
+        throw new Error("Failed to open authentication window. Please check if popups are blocked.");
+      }
+
       // Poll for window closure
       const checkWindow = setInterval(() => {
         if (authWindow?.closed) {
           clearInterval(checkWindow);
+          // Force refresh connection state after window closes
           refreshConnection();
           setIsReconnecting(false);
         }
       }, 500);
-    } catch (error) {
+
+      // Add timeout for the auth window
+      const timeout = setTimeout(() => {
+        if (!authWindow.closed) {
+          clearInterval(checkWindow);
+          authWindow.close();
+          setIsReconnecting(false);
+          console.warn("TikTok authentication timed out");
+        }
+      }, 300000); // 5 minute timeout
+
+      // Clear timeout when window closes
+      const originalInterval = checkWindow;
+      const enhancedInterval = setInterval(() => {
+        if (authWindow?.closed) {
+          clearInterval(enhancedInterval);
+          clearTimeout(timeout);
+          refreshConnection();
+          setIsReconnecting(false);
+        }
+      }, 500);
+
+      // Clean up the original interval
+      clearInterval(originalInterval);
+      
+    } catch (error: any) {
       console.error("Error connecting to TikTok:", error);
       setIsReconnecting(false);
+      
+      // Re-throw with more specific error message for UI handling
+      throw new Error(error.message || "Failed to connect TikTok account");
     }
   };
 

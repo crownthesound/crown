@@ -848,11 +848,31 @@ export function Profile() {
                     TikTok Accounts Management
                   </h3>
                   <button
-                    onClick={connectWithVideoPermissions}
-                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all flex items-center gap-2"
+                    onClick={async () => {
+                      try {
+                        await connectWithVideoPermissions();
+                      } catch (error: any) {
+                        console.error("TikTok connection failed:", error);
+                        
+                        // Show user-friendly error messages
+                        if (error.message?.includes("already connected to your account")) {
+                          toast.error("This TikTok account is already connected to your account. Try connecting a different TikTok account.");
+                        } else if (error.message?.includes("already connected to another user")) {
+                          toast.error("This TikTok account is already connected to another user account. Please use a different TikTok account.");
+                        } else if (error.message?.includes("popups are blocked")) {
+                          toast.error("Please allow popups for this site to connect your TikTok account.");
+                        } else if (error.message?.includes("must be logged in")) {
+                          toast.error("Please log in first to connect your TikTok account.");
+                        } else {
+                          toast.error(error.message || "Failed to connect TikTok account. Please try again.");
+                        }
+                      }
+                    }}
+                    disabled={isReconnecting}
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Video className="h-4 w-4" />
-                    Connect New Account
+                    {isReconnecting ? "Connecting..." : "Connect New Account"}
                   </button>
                 </div>
 
@@ -867,11 +887,31 @@ export function Profile() {
                     <h4 className="text-lg font-medium text-white mb-2">No TikTok accounts connected</h4>
                     <p className="text-white/60 mb-6">Connect your first TikTok account to participate in contests</p>
                     <button
-                      onClick={connectWithVideoPermissions}
-                      className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all flex items-center gap-2 mx-auto"
+                      onClick={async () => {
+                        try {
+                          await connectWithVideoPermissions();
+                        } catch (error: any) {
+                          console.error("TikTok connection failed:", error);
+                          
+                          // Show user-friendly error messages
+                          if (error.message?.includes("already connected to your account")) {
+                            toast.error("This TikTok account is already connected to your account. Try connecting a different TikTok account.");
+                          } else if (error.message?.includes("already connected to another user")) {
+                            toast.error("This TikTok account is already connected to another user account. Please use a different TikTok account.");
+                          } else if (error.message?.includes("popups are blocked")) {
+                            toast.error("Please allow popups for this site to connect your TikTok account.");
+                          } else if (error.message?.includes("must be logged in")) {
+                            toast.error("Please log in first to connect your TikTok account.");
+                          } else {
+                            toast.error(error.message || "Failed to connect TikTok account. Please try again.");
+                          }
+                        }
+                      }}
+                      disabled={isReconnecting}
+                      className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all flex items-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Video className="h-4 w-4" />
-                      Connect TikTok Account
+                      {isReconnecting ? "Connecting..." : "Connect TikTok Account"}
                     </button>
                   </div>
                 ) : (
