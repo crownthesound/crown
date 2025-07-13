@@ -862,6 +862,10 @@ export function Profile() {
                       try {
                         await connectWithVideoPermissions();
                         toast.success("TikTok account connected successfully!");
+                        // Force refresh to show new account immediately
+                        setTimeout(() => {
+                          window.location.reload();
+                        }, 1500);
                       } catch (error: any) {
                         console.error("TikTok connection failed:", error);
                         

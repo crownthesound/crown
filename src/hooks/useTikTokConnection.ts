@@ -127,6 +127,8 @@ export const useTikTokConnection = () => {
   };
 
   const refreshConnection = () => {
+    // Clear cache and force a fresh check
+    setLastCheckTime(0);
     checkTikTokConnection(true); // Force check on manual refresh
   };
 
@@ -190,8 +192,11 @@ export const useTikTokConnection = () => {
               if (authPopup.closed) {
                 clearInterval(checkAuthClosed);
                 console.log("TikTok OAuth completed!");
-                refreshConnection();
-                setIsReconnecting(false);
+                // Add a small delay to ensure backend processing is complete
+                setTimeout(() => {
+                  refreshConnection();
+                  setIsReconnecting(false);
+                }, 1000);
               }
             }, 1000);
 
@@ -231,8 +236,11 @@ export const useTikTokConnection = () => {
               if (authPopup.closed) {
                 clearInterval(checkAuthClosed);
                 console.log("TikTok OAuth completed!");
-                refreshConnection();
-                setIsReconnecting(false);
+                // Add a small delay to ensure backend processing is complete
+                setTimeout(() => {
+                  refreshConnection();
+                  setIsReconnecting(false);
+                }, 1000);
               }
             }, 1000);
 
