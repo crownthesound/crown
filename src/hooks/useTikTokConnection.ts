@@ -90,7 +90,21 @@ export const useTikTokConnection = () => {
 
       const accounts = result.data?.accounts || [];
       const connected = accounts.length > 0;
-      const primary = accounts.find((account: TikTokAccount) => account.is_primary) || accounts[0] || null;
+      
+      // Find explicitly marked primary account, warn if multiple or none found
+      const primaryAccounts = accounts.filter((account: TikTokAccount) => account.is_primary);
+      
+      if (primaryAccounts.length > 1) {
+        console.warn("Multiple primary TikTok accounts found, using first one:", primaryAccounts);
+      }
+      
+      let primary = primaryAccounts[0] || null;
+      
+      // If no primary account is found but accounts exist, warn and use first account
+      if (!primary && accounts.length > 0) {
+        console.warn("No primary TikTok account found, defaulting to first account:", accounts[0]);
+        primary = accounts[0];
+      }
 
       setIsConnected(connected);
       setTikTokAccounts(accounts);
@@ -247,7 +261,19 @@ export const useTikTokConnection = () => {
   const setPrimaryAccount = async (accountId: string) => {
     if (!session) return false;
 
+    // Store previous state for rollback
+    const previousAccounts = [...tikTokAccounts];
+    const previousPrimary = primaryAccount;
+
     try {
+      // Optimistic update: immediately update UI
+      const optimisticAccounts = tikTokAccounts.map(account => ({
+        ...account,
+        is_primary: account.id === accountId
+      }));
+      
+      setTikTokAccounts(optimisticAccounts);
+      setPrimaryAccountState(optimisticAccounts.find(acc => acc.id === accountId) || null);
 
       const response = await fetch(
         `${backendUrl}/api/v1/tiktok/accounts/set-primary`,
@@ -262,14 +288,18 @@ export const useTikTokConnection = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to set primary TikTok account");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to set primary TikTok account");
       }
 
-
-      // Refresh the accounts list
+      // Refresh the accounts list to ensure consistency
       await checkTikTokConnection(true);
       return true;
     } catch (error) {
+      // Rollback optimistic update on error
+      setTikTokAccounts(previousAccounts);
+      setPrimaryAccountState(previousPrimary);
+      
       console.error("Error setting primary TikTok account:", error);
       throw error;
     }

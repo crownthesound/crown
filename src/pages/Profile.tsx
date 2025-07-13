@@ -976,8 +976,19 @@ export function Profile() {
                                   try {
                                     await setPrimaryAccount(account.id);
                                     toast.success(`Switched to @${account.username} successfully!`);
-                                  } catch (error) {
-                                    toast.error('Failed to switch account');
+                                  } catch (error: any) {
+                                    console.error("Failed to switch primary account:", error);
+                                    
+                                    // Provide specific error messages based on error type
+                                    if (error.message?.includes('Network')) {
+                                      toast.error('Network error. Please check your connection and try again.');
+                                    } else if (error.message?.includes('not found')) {
+                                      toast.error('Account not found. Please refresh the page and try again.');
+                                    } else if (error.message?.includes('unauthorized')) {
+                                      toast.error('Session expired. Please log in again.');
+                                    } else {
+                                      toast.error(error.message || 'Failed to switch account. Please try again.');
+                                    }
                                   }
                                 }}
                                 className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:from-blue-500/30 hover:to-purple-500/30 rounded-lg transition-all text-sm font-medium flex items-center gap-2"
@@ -1001,8 +1012,21 @@ export function Profile() {
                                   try {
                                     await deleteAccount(account.id);
                                     toast.success('Account disconnected successfully!');
-                                  } catch (error) {
-                                    toast.error('Failed to disconnect account');
+                                  } catch (error: any) {
+                                    console.error("Failed to delete account:", error);
+                                    
+                                    // Provide specific error messages based on error type
+                                    if (error.message?.includes('Network')) {
+                                      toast.error('Network error. Please check your connection and try again.');
+                                    } else if (error.message?.includes('not found')) {
+                                      toast.error('Account not found. It may have already been removed.');
+                                    } else if (error.message?.includes('only TikTok account')) {
+                                      toast.error('Cannot delete your only TikTok account.');
+                                    } else if (error.message?.includes('unauthorized')) {
+                                      toast.error('Session expired. Please log in again.');
+                                    } else {
+                                      toast.error(error.message || 'Failed to disconnect account. Please try again.');
+                                    }
                                   }
                                 }
                               }}
