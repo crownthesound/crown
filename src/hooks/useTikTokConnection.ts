@@ -272,6 +272,9 @@ export const useTikTokConnection = () => {
     if (!session) return false;
 
     try {
+      // Clear current state to avoid showing stale data
+      setActiveSessionAccount(null);
+
       // Step 1: Set the account as primary in the backend
       const response = await fetch(
         `${backendUrl}/api/v1/tiktok/accounts/set-primary`,
@@ -290,7 +293,11 @@ export const useTikTokConnection = () => {
         throw new Error(errorData.message || "Failed to set primary TikTok account");
       }
 
-      // Step 2: Establish TikTok session with the selected account
+      // Step 2: Force refresh the accounts list to get the updated state immediately
+      setLastCheckTime(0); // Clear cache
+      await checkTikTokConnection(true);
+
+      // Step 3: Establish TikTok session with the selected account
       try {
         await establishTikTokSession(accountId);
         console.log("✅ TikTok session established successfully");
@@ -299,8 +306,6 @@ export const useTikTokConnection = () => {
         // Still proceed but session might not work for video access
       }
 
-      // Step 3: Refresh the accounts list to get the updated state
-      await checkTikTokConnection(true);
       return true;
     } catch (error) {
       console.error("Error setting primary TikTok account:", error);
