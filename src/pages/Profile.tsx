@@ -843,15 +843,21 @@ export function Profile() {
 
             {activeTab === 'tiktok-accounts' && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                    <Video className="h-5 w-5 text-pink-400" />
-                    TikTok Accounts Management
-                  </h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                      <Video className="h-5 w-5 text-pink-400" />
+                      TikTok Accounts Management
+                    </h3>
+                    <p className="text-white/60 text-sm mt-1">
+                      Connect multiple TikTok accounts and switch between them easily
+                    </p>
+                  </div>
                   <button
                     onClick={async () => {
                       try {
                         await connectWithVideoPermissions();
+                        toast.success("TikTok account connected successfully!");
                       } catch (error: any) {
                         console.error("TikTok connection failed:", error);
                         
@@ -870,7 +876,7 @@ export function Profile() {
                       }
                     }}
                     disabled={isReconnecting}
-                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                   >
                     <Video className="h-4 w-4" />
                     {isReconnecting ? "Connecting..." : "Connect New Account"}
@@ -918,30 +924,44 @@ export function Profile() {
                 ) : (
                   <div className="grid gap-4">
                     {tikTokAccounts.map((account) => (
-                      <div key={account.id} className="group bg-white/5 hover:bg-white/8 rounded-xl border border-white/10 hover:border-white/20 p-6 transition-all duration-300">
-                        <div className="flex items-center justify-between">
+                      <div key={account.id} className={`group rounded-xl border p-6 transition-all duration-300 ${
+                        account.is_primary 
+                          ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30 hover:border-blue-500/50' 
+                          : 'bg-white/5 hover:bg-white/8 border-white/10 hover:border-white/20'
+                      }`}>
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <div className={`w-14 h-14 rounded-full flex items-center justify-center relative ${
+                              account.is_primary 
+                                ? 'bg-gradient-to-br from-blue-500 to-purple-600' 
+                                : 'bg-gradient-to-br from-pink-500 to-purple-600'
+                            }`}>
+                              {account.is_primary && (
+                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-400 rounded-full flex items-center justify-center">
+                                  <Crown className="h-3 w-3 text-white" />
+                                </div>
+                              )}
                               <span className="text-white text-lg font-medium">
                                 {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
                               </span>
                             </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h4 className="text-white font-semibold">@{account.username || 'N/A'}</h4>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="text-white font-semibold text-lg">@{account.username || 'N/A'}</h4>
                                 {account.is_primary && (
-                                  <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-medium">
-                                    Primary
+                                  <span className="px-2 py-1 bg-blue-500/30 text-blue-200 rounded-full text-xs font-medium flex items-center gap-1">
+                                    <Crown className="h-3 w-3" />
+                                    Active Account
                                   </span>
                                 )}
                                 {account.is_verified && (
                                   <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded-full text-xs font-medium">
-                                    Verified
+                                    ✓ Verified
                                   </span>
                                 )}
                               </div>
                               {account.display_name && (
-                                <p className="text-white/60 text-sm">{account.display_name}</p>
+                                <p className="text-white/70 text-sm mt-1">{account.display_name}</p>
                               )}
                               <p className="text-white/40 text-xs mt-1">
                                 Connected on {new Date(account.created_at).toLocaleDateString()}
@@ -949,21 +969,27 @@ export function Profile() {
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-2">
-                            {!account.is_primary && (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {!account.is_primary ? (
                               <button
                                 onClick={async () => {
                                   try {
                                     await setPrimaryAccount(account.id);
-                                    toast.success('Primary account updated successfully!');
+                                    toast.success(`Switched to @${account.username} successfully!`);
                                   } catch (error) {
-                                    toast.error('Failed to set primary account');
+                                    toast.error('Failed to switch account');
                                   }
                                 }}
-                                className="px-3 py-1.5 bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 rounded-lg transition-colors text-sm"
+                                className="px-4 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:from-blue-500/30 hover:to-purple-500/30 rounded-lg transition-all text-sm font-medium flex items-center gap-2"
                               >
-                                Set Primary
+                                <Crown className="h-4 w-4" />
+                                Set as Active
                               </button>
+                            ) : (
+                              <span className="px-4 py-2 bg-green-500/20 text-green-300 rounded-lg text-sm font-medium flex items-center gap-2">
+                                <Crown className="h-4 w-4" />
+                                Currently Active
+                              </span>
                             )}
                             <button
                               onClick={async () => {
@@ -980,15 +1006,16 @@ export function Profile() {
                                   }
                                 }
                               }}
-                              className="px-3 py-1.5 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg transition-colors text-sm"
+                              className="px-3 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg transition-colors text-sm flex items-center gap-2"
                             >
-                              Disconnect
+                              <Trash2 className="h-4 w-4" />
+                              Remove
                             </button>
                           </div>
                         </div>
                         
                         {(account.follower_count !== null || account.video_count !== null) && (
-                          <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-white/10">
+                          <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-white/10">
                             {account.follower_count !== null && (
                               <div className="text-center">
                                 <p className="text-lg font-semibold text-white">{account.follower_count.toLocaleString()}</p>

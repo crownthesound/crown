@@ -128,121 +128,112 @@ export const useTikTokConnection = () => {
       // Clear any cached connection state to ensure fresh check
       setLastCheckTime(0);
       
-      // First, initiate the TikTok auth flow with emphasis on video permissions
-      const response = await fetch(
-        `${backendUrl}/api/v1/tiktok/auth/initiate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            force_account_selection: true,
-            emphasize_video_permissions: true,
-          }),
-        }
+      // Use the working session clearing approach from TikTokConnectModal
+      // Step 1: Clear local storage
+      try {
+        Object.keys(localStorage).forEach((key) => {
+          if (key.toLowerCase().includes("tiktok")) {
+            localStorage.removeItem(key);
+          }
+        });
+        localStorage.removeItem("tiktok_access_token");
+      } catch (e) {
+        console.log("Could not clear local storage:", e);
+      }
+
+      console.log("Opening TikTok logout for session clearing...");
+
+      // Step 2: Open TikTok logout in a popup window
+      const logoutPopup = window.open(
+        "https://www.tiktok.com/logout",
+        "tiktok_logout",
+        "width=600,height=600,scrollbars=yes,resizable=yes"
       );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.message || "Failed to initiate TikTok connection";
-        throw new Error(errorMessage);
+      if (!logoutPopup) {
+        throw new Error("Failed to open logout window. Please check if popups are blocked.");
       }
 
-      const data = await response.json();
+      // Step 3: Wait for logout popup to close
+      const checkLogoutClosed = setInterval(() => {
+        if (logoutPopup.closed) {
+          clearInterval(checkLogoutClosed);
+          console.log("TikTok logout completed! Proceeding with OAuth...");
 
-      // Check if session clearing is required first
-      if (data.requires_session_clearing && data.clear_session_url) {
-        console.log("TikTok session clearing required, opening clearing page first...");
-        
-        // Open session clearing page first
-        const clearingWindow = window.open(
-          data.clear_session_url,
-          "tiktok-clear-session",
-          "width=600,height=700"
-        );
+          // Step 4: Open OAuth popup after logout
+          const authUrl = `${backendUrl}/api/v1/tiktok/auth?token=${session.access_token}`;
+          const authPopup = window.open(
+            authUrl,
+            "tiktok_auth",
+            "width=600,height=700,scrollbars=yes,resizable=yes"
+          );
 
-        if (!clearingWindow) {
-          throw new Error("Failed to open session clearing window. Please check if popups are blocked.");
-        }
+          if (authPopup) {
+            // Monitor the auth popup
+            const checkAuthClosed = setInterval(() => {
+              if (authPopup.closed) {
+                clearInterval(checkAuthClosed);
+                console.log("TikTok OAuth completed!");
+                refreshConnection();
+                setIsReconnecting(false);
+              }
+            }, 1000);
 
-        // Wait for clearing window to close, then continue with auth
-        const checkClearingWindow = setInterval(() => {
-          if (clearingWindow?.closed) {
-            clearInterval(checkClearingWindow);
-            console.log("Session clearing completed, proceeding with OAuth...");
-            
-            // Now proceed with the actual OAuth flow
-            // The clearing page should redirect to the OAuth URL automatically
-            // But if it doesn't, we'll handle it here
-            setIsReconnecting(false);
-            refreshConnection();
+            // Auto-close auth popup after 5 minutes
+            setTimeout(() => {
+              if (!authPopup.closed) {
+                authPopup.close();
+                clearInterval(checkAuthClosed);
+                console.warn("TikTok authentication timed out");
+                setIsReconnecting(false);
+              }
+            }, 300000);
+          } else {
+            throw new Error("Failed to open authentication window. Please check if popups are blocked.");
           }
-        }, 500);
+        }
+      }, 1000);
 
-        // Add timeout for clearing window
-        setTimeout(() => {
-          if (!clearingWindow.closed) {
-            clearInterval(checkClearingWindow);
-            clearingWindow.close();
-            setIsReconnecting(false);
-            console.warn("TikTok session clearing timed out");
+      // Auto-close logout popup and proceed after 10 seconds (like in working implementation)
+      setTimeout(() => {
+        if (!logoutPopup.closed) {
+          logoutPopup.close();
+          clearInterval(checkLogoutClosed);
+          console.log("Logout timeout reached, proceeding with OAuth...");
+
+          // Proceed with OAuth after logout timeout
+          const authUrl = `${backendUrl}/api/v1/tiktok/auth?token=${session.access_token}`;
+          const authPopup = window.open(
+            authUrl,
+            "tiktok_auth",
+            "width=600,height=700,scrollbars=yes,resizable=yes"
+          );
+
+          if (authPopup) {
+            // Monitor the auth popup
+            const checkAuthClosed = setInterval(() => {
+              if (authPopup.closed) {
+                clearInterval(checkAuthClosed);
+                console.log("TikTok OAuth completed!");
+                refreshConnection();
+                setIsReconnecting(false);
+              }
+            }, 1000);
+
+            // Auto-close auth popup after 5 minutes
+            setTimeout(() => {
+              if (!authPopup.closed) {
+                authPopup.close();
+                clearInterval(checkAuthClosed);
+                console.warn("TikTok authentication timed out");
+                setIsReconnecting(false);
+              }
+            }, 300000);
+          } else {
+            throw new Error("Failed to open authentication window. Please check if popups are blocked.");
           }
-        }, 300000); // 5 minute timeout
-
-        return; // Exit here, the clearing flow will handle the rest
-      }
-
-      // Regular flow when no session clearing is needed
-      if (!data.auth_url) {
-        throw new Error("No authentication URL provided by server");
-      }
-
-      // Open the TikTok auth URL in a new window
-      const authWindow = window.open(
-        data.auth_url,
-        "tiktok-auth",
-        "width=600,height=700"
-      );
-
-      if (!authWindow) {
-        throw new Error("Failed to open authentication window. Please check if popups are blocked.");
-      }
-
-      // Poll for window closure
-      const checkWindow = setInterval(() => {
-        if (authWindow?.closed) {
-          clearInterval(checkWindow);
-          // Force refresh connection state after window closes
-          refreshConnection();
-          setIsReconnecting(false);
         }
-      }, 500);
-
-      // Add timeout for the auth window
-      const timeout = setTimeout(() => {
-        if (!authWindow.closed) {
-          clearInterval(checkWindow);
-          authWindow.close();
-          setIsReconnecting(false);
-          console.warn("TikTok authentication timed out");
-        }
-      }, 300000); // 5 minute timeout
-
-      // Clear timeout when window closes
-      const originalInterval = checkWindow;
-      const enhancedInterval = setInterval(() => {
-        if (authWindow?.closed) {
-          clearInterval(enhancedInterval);
-          clearTimeout(timeout);
-          refreshConnection();
-          setIsReconnecting(false);
-        }
-      }, 500);
-
-      // Clean up the original interval
-      clearInterval(originalInterval);
+      }, 10000); // 10 second timeout like in working implementation
       
     } catch (error: any) {
       console.error("Error connecting to TikTok:", error);
