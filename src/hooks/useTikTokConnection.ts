@@ -152,6 +152,53 @@ export const useTikTokConnection = () => {
 
       const data = await response.json();
 
+      // Check if session clearing is required first
+      if (data.requires_session_clearing && data.clear_session_url) {
+        console.log("TikTok session clearing required, opening clearing page first...");
+        
+        // Open session clearing page first
+        const clearingWindow = window.open(
+          data.clear_session_url,
+          "tiktok-clear-session",
+          "width=600,height=700"
+        );
+
+        if (!clearingWindow) {
+          throw new Error("Failed to open session clearing window. Please check if popups are blocked.");
+        }
+
+        // Wait for clearing window to close, then continue with auth
+        const checkClearingWindow = setInterval(() => {
+          if (clearingWindow?.closed) {
+            clearInterval(checkClearingWindow);
+            console.log("Session clearing completed, proceeding with OAuth...");
+            
+            // Now proceed with the actual OAuth flow
+            // The clearing page should redirect to the OAuth URL automatically
+            // But if it doesn't, we'll handle it here
+            setIsReconnecting(false);
+            refreshConnection();
+          }
+        }, 500);
+
+        // Add timeout for clearing window
+        setTimeout(() => {
+          if (!clearingWindow.closed) {
+            clearInterval(checkClearingWindow);
+            clearingWindow.close();
+            setIsReconnecting(false);
+            console.warn("TikTok session clearing timed out");
+          }
+        }, 300000); // 5 minute timeout
+
+        return; // Exit here, the clearing flow will handle the rest
+      }
+
+      // Regular flow when no session clearing is needed
+      if (!data.auth_url) {
+        throw new Error("No authentication URL provided by server");
+      }
+
       // Open the TikTok auth URL in a new window
       const authWindow = window.open(
         data.auth_url,
