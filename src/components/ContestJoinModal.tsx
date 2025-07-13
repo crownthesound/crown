@@ -63,6 +63,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
     connectWithVideoPermissions,
     tikTokAccounts,
     primaryAccount,
+    setPrimaryAccount,
     tikTokProfile, // Legacy compatibility
   } = useTikTokConnection();
   type Step = "join" | "select-video" | "post-video";
@@ -79,6 +80,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
   >(null);
   const [forceAccountSelection, setForceAccountSelection] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+  const [switchingAccount, setSwitchingAccount] = useState<string | null>(null);
 
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
@@ -759,8 +761,28 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                             name="tiktok-account"
                             value={account.id}
                             checked={selectedAccount === account.id}
-                            onChange={(e) => setSelectedAccount(e.target.value)}
-                            className="w-4 h-4 text-blue-600 bg-transparent border-2 border-blue-500 rounded focus:ring-blue-500 focus:ring-2"
+                            onChange={async (e) => {
+                              const newAccountId = e.target.value;
+                              setSelectedAccount(newAccountId);
+                              
+                              // If the selected account is not already primary, switch to it
+                              if (newAccountId !== primaryAccount?.id) {
+                                setSwitchingAccount(newAccountId);
+                                try {
+                                  await setPrimaryAccount(newAccountId);
+                                  toast.success(`Switched to @${account.username} successfully!`);
+                                } catch (error: any) {
+                                  console.error("Failed to switch primary account:", error);
+                                  toast.error(error.message || 'Failed to switch account. Please try again.');
+                                  // Revert selection on error
+                                  setSelectedAccount(primaryAccount?.id || null);
+                                } finally {
+                                  setSwitchingAccount(null);
+                                }
+                              }
+                            }}
+                            disabled={switchingAccount !== null}
+                            className="w-4 h-4 text-blue-600 bg-transparent border-2 border-blue-500 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50"
                           />
                           <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
                             <span className="text-white text-sm font-medium">
@@ -785,6 +807,12 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                           {account.is_primary && (
                             <div className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">
                               Primary
+                            </div>
+                          )}
+                          {switchingAccount === account.id && (
+                            <div className="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-xs flex items-center gap-1">
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                              Switching...
                             </div>
                           )}
                         </label>

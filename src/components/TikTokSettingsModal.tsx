@@ -16,6 +16,7 @@ export function TikTokSettingsModal({
     isConnected,
     tikTokAccounts,
     primaryAccount,
+    setPrimaryAccount,
     tikTokProfile, // Legacy compatibility
     disconnectAllAccounts,
     connectWithVideoPermissions,
@@ -24,6 +25,7 @@ export function TikTokSettingsModal({
   } = useTikTokConnection();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [forceAccountSelection, setForceAccountSelection] = useState(false);
+  const [switchingAccount, setSwitchingAccount] = useState<string | null>(null);
 
   console.log("🔍 TikTokSettingsModal render - isOpen:", isOpen);
 
@@ -174,11 +176,19 @@ export function TikTokSettingsModal({
                           )}
                         </div>
                       </div>
-                      {account.is_primary && (
-                        <div className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">
-                          Primary
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {account.is_primary && (
+                          <div className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">
+                            Primary
+                          </div>
+                        )}
+                        {switchingAccount === account.id && (
+                          <div className="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-xs flex items-center gap-1">
+                            <div className="w-3 h-3 border border-yellow-300 border-t-transparent rounded-full animate-spin"></div>
+                            Switching...
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="flex justify-between">
@@ -198,6 +208,35 @@ export function TikTokSettingsModal({
                         </div>
                       )}
                     </div>
+                    
+                    {/* Set as Active Button */}
+                    {!account.is_primary && (
+                      <div className="mt-3 pt-3 border-t border-white/10">
+                        <button
+                          onClick={async () => {
+                            if (switchingAccount) return; // Prevent multiple clicks
+                            
+                            setSwitchingAccount(account.id);
+                            try {
+                              await setPrimaryAccount(account.id);
+                              toast.success(`Switched to @${account.username} successfully!`);
+                            } catch (error: any) {
+                              console.error("Failed to switch primary account:", error);
+                              toast.error(error.message || 'Failed to switch account. Please try again.');
+                            } finally {
+                              setSwitchingAccount(null);
+                            }
+                          }}
+                          disabled={switchingAccount === account.id || isLoading}
+                          className={`w-full px-3 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 hover:from-blue-500/30 hover:to-purple-500/30 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2 ${
+                            switchingAccount === account.id ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                        >
+                          <Settings className="h-4 w-4" />
+                          {switchingAccount === account.id ? 'Switching...' : 'Set as Active'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
