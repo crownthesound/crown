@@ -67,8 +67,10 @@ export function Profile() {
   const {
     tikTokAccounts,
     primaryAccount,
+    activeSessionAccount,
     setPrimaryAccount,
     validateAccountSession,
+    establishTikTokSession,
     deleteAccount,
     connectWithVideoPermissions,
     isLoading: tikTokLoading,
@@ -961,6 +963,12 @@ export function Profile() {
                                     ✓ Verified
                                   </span>
                                 )}
+                                {activeSessionAccount?.id === account.id && (
+                                  <span className="px-2 py-1 bg-emerald-500/30 text-emerald-200 rounded-full text-xs font-medium flex items-center gap-1">
+                                    <Video className="h-3 w-3" />
+                                    TikTok Connected
+                                  </span>
+                                )}
                               </div>
                               {account.display_name && (
                                 <p className="text-white/70 text-sm mt-1">{account.display_name}</p>
@@ -982,14 +990,8 @@ export function Profile() {
                                     // Switch the account
                                     await setPrimaryAccount(account.id);
                                     
-                                    // Validate the TikTok session for the new primary account
-                                    const validation = await validateAccountSession(account.id);
-                                    
-                                    if (validation?.isValid === false) {
-                                      toast.warning(`Switched to @${account.username}, but TikTok session may need refresh for video access.`);
-                                    } else {
-                                      toast.success(`Switched to @${account.username} successfully!`);
-                                    }
+                                    // The setPrimaryAccount function already handles session establishment
+                                    toast.success(`Switched to @${account.username} and established TikTok session!`);
                                   } catch (error: any) {
                                     console.error("Failed to switch primary account:", error);
                                     

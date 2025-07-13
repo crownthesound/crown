@@ -24,6 +24,7 @@ export const useTikTokConnection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [tikTokAccounts, setTikTokAccounts] = useState<TikTokAccount[]>([]);
   const [primaryAccount, setPrimaryAccountState] = useState<TikTokAccount | null>(null);
+  const [activeSessionAccount, setActiveSessionAccount] = useState<TikTokAccount | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [lastCheckTime, setLastCheckTime] = useState(0);
 
@@ -38,7 +39,8 @@ export const useTikTokConnection = () => {
       setIsConnected(false);
       setIsLoading(false);
       setTikTokAccounts([]);
-      setPrimaryAccount(null);
+      setPrimaryAccountState(null);
+      setActiveSessionAccount(null);
       return;
     }
 
@@ -280,26 +282,13 @@ export const useTikTokConnection = () => {
         throw new Error(errorData.message || "Failed to set primary TikTok account");
       }
 
-      // Step 2: Validate the TikTok session for the selected account
-      const validationResponse = await fetch(
-        `${backendUrl}/api/v1/tiktok/accounts/${accountId}/validate`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
-
-      if (!validationResponse.ok) {
-        console.warn("Could not validate TikTok session for account:", accountId);
-      } else {
-        const validationData = await validationResponse.json();
-        if (!validationData.data?.isValid) {
-          console.warn("TikTok session is not valid for account:", accountId, validationData.data);
-          // Still proceed but warn the user
-        }
+      // Step 2: Establish TikTok session with the selected account
+      try {
+        await establishTikTokSession(accountId);
+        console.log("✅ TikTok session established successfully");
+      } catch (sessionError) {
+        console.warn("⚠️ Could not establish TikTok session:", sessionError);
+        // Still proceed but session might not work for video access
       }
 
       // Step 3: Refresh the accounts list to get the updated state
@@ -336,6 +325,42 @@ export const useTikTokConnection = () => {
     } catch (error) {
       console.error("Error validating TikTok account session:", error);
       return null;
+    }
+  };
+
+  const establishTikTokSession = async (accountId: string) => {
+    if (!session) return null;
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/v1/tiktok/accounts/${accountId}/establish-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to establish TikTok session");
+      }
+
+      const data = await response.json();
+      
+      // Update the active session account
+      const account = tikTokAccounts.find(acc => acc.id === accountId);
+      if (account) {
+        setActiveSessionAccount(account);
+        console.log("✅ TikTok session established for account:", account.username);
+      }
+      
+      return data.data;
+    } catch (error) {
+      console.error("Error establishing TikTok session:", error);
+      throw error;
     }
   };
 
@@ -411,14 +436,16 @@ export const useTikTokConnection = () => {
     isLoading,
     tikTokAccounts,
     primaryAccount,
+    activeSessionAccount,
     refreshConnection,
     connectWithVideoPermissions,
     setPrimaryAccount,
     validateAccountSession,
+    establishTikTokSession,
     deleteAccount,
     disconnectAllAccounts,
     isReconnecting,
-    // Legacy compatibility - return primary account as tikTokProfile
-    tikTokProfile: primaryAccount,
+    // Legacy compatibility - return primary account as tikTokProfile, but prefer activeSessionAccount for video operations
+    tikTokProfile: activeSessionAccount || primaryAccount,
   };
 };
