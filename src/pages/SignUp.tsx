@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { Footer } from "../components/Footer";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 
 // Custom styles for phone input
 const phoneInputStyles = `
@@ -33,6 +34,7 @@ export function SignUp() {
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
   const [smsConsent, setSmsConsent] = useState(false);
   const navigate = useNavigate();
+  const { setRedirectUrl } = useAuthRedirect();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +68,12 @@ export function SignUp() {
 
       if (signUpError) {
         if (signUpError.message.includes("already registered")) {
+          // Preserve redirect URL for signin flow
+          const redirectUrl = localStorage.getItem('auth_return_url');
+          if (redirectUrl) {
+            setRedirectUrl(redirectUrl);
+          }
+          
           throw new Error(
             "This phone number is already registered. Please sign in instead."
           );
@@ -228,6 +236,13 @@ export function SignUp() {
               <Link
                 to="/signin"
                 className="mt-6 w-full inline-block py-3 border border-white/10 rounded-lg text-white hover:bg-white/5 transition-colors"
+                onClick={() => {
+                  // Preserve redirect URL for signin flow
+                  const redirectUrl = localStorage.getItem('auth_return_url');
+                  if (redirectUrl) {
+                    setRedirectUrl(redirectUrl);
+                  }
+                }}
               >
                 Sign In Instead
               </Link>

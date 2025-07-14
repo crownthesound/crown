@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 interface Contest {
   id: string;
@@ -19,6 +20,7 @@ export function Start() {
   const [contests, setContests] = useState<Contest[]>([]);
   const [currentContestIndex, setCurrentContestIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { redirectToAuth } = useAuthRedirect();
 
   useEffect(() => {
     fetchActiveContests();
@@ -55,7 +57,7 @@ export function Start() {
 
   const handleSubmitEntry = () => {
     if (!session) {
-      navigate('/signin');
+      redirectToAuth('/signin');
       return;
     }
     toast.success('Coming soon! Entry submission will be available shortly.');
@@ -86,18 +88,18 @@ export function Start() {
           </Link>
           {!session && (
             <div className="flex items-center gap-2 sm:gap-3">
-              <Link
-                to="/signin"
+              <button
+                onClick={() => redirectToAuth('/signin')}
                 className="px-4 sm:px-6 py-2 text-white hover:bg-white/5 rounded-xl transition-colors whitespace-nowrap"
               >
                 Login
-              </Link>
-              <Link
-                to="/signup"
+              </button>
+              <button
+                onClick={() => redirectToAuth('/signup')}
                 className="bg-white text-[#1A1A1A] px-4 sm:px-6 py-2 rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 font-medium whitespace-nowrap"
               >
                 Create Account
-              </Link>
+              </button>
             </div>
           )}
         </div>

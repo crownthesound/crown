@@ -307,11 +307,13 @@ export function TikTokSettingsModal({
                 </button>
                 <button
                   onClick={handleDisconnect}
-                  disabled={isDisconnecting}
+                  disabled={isDisconnecting || !forceAccountSelection}
                   className="w-full px-4 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isDisconnecting
                     ? "Disconnecting..."
+                    : !forceAccountSelection
+                    ? "Check the box above to disconnect"
                     : `Disconnect All Accounts (${tikTokAccounts.length})`}
                 </button>
               </>

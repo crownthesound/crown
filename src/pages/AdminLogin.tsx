@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Loader2, Crown, Shield, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Footer } from '../components/Footer';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 export function AdminLogin() {
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,7 @@ export function AdminLogin() {
   const [isResetPassword, setIsResetPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { executeRedirect } = useAuthRedirect();
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,12 +76,10 @@ export function AdminLogin() {
 
         toast.success(`Welcome back, ${profile.role}!`);
         
-        const currentPath = location.pathname;
-        if (currentPath.startsWith('/l/')) {
-          window.location.reload();
-        } else {
-          navigate('/');
-        }
+        // Use the redirect system with role-based fallback
+        executeRedirect({ 
+          fallbackPath: profile.role === 'admin' ? '/admin/dashboard' : '/organizer/dashboard' 
+        });
       }
     } catch (error: any) {
       toast.error(error.message || 'An error occurred during sign in');

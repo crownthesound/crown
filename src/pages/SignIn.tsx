@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { Footer } from '../components/Footer';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 // Custom styles for phone input
 const phoneInputStyles = `
@@ -31,6 +32,7 @@ export function SignIn() {
   const [phoneNumber, setPhoneNumber] = useState<string | undefined>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { setRedirectUrl } = useAuthRedirect();
 
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -55,6 +57,13 @@ export function SignIn() {
       if (!profiles || profiles.length === 0) {
         // User doesn't exist, redirect to signup
         toast.error('Phone number not found. Please sign up first.');
+        
+        // Preserve redirect URL for signup flow
+        const redirectUrl = localStorage.getItem('auth_return_url');
+        if (redirectUrl) {
+          setRedirectUrl(redirectUrl);
+        }
+        
         navigate('/signup');
         return;
       }
@@ -162,6 +171,13 @@ export function SignIn() {
               <Link
                 to="/signup"
                 className="mt-6 w-full inline-block py-3 border border-white/10 rounded-lg text-white hover:bg-white/5 transition-colors"
+                onClick={() => {
+                  // Preserve redirect URL for signup flow
+                  const redirectUrl = localStorage.getItem('auth_return_url');
+                  if (redirectUrl) {
+                    setRedirectUrl(redirectUrl);
+                  }
+                }}
               >
                 Create an Account
               </Link>

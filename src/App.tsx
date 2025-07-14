@@ -53,6 +53,8 @@ import { useAuth } from "./contexts/AuthContext";
 import { useScrollToTop } from "./hooks/useScrollToTop";
 import { useSessionExpiry } from "./hooks/useSessionExpiry";
 import { TikTokSettingsModal } from "./components/TikTokSettingsModal";
+import { useAuthRedirect } from "./hooks/useAuthRedirect";
+import { calculateContestStatus } from "./lib/contestUtils";
 import toast from "react-hot-toast";
 
 interface Contest {
@@ -206,6 +208,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [activeContests, setActiveContests] = useState<Contest[]>([]);
   const [showTikTokModal, setShowTikTokModal] = useState(false);
+  const { setRedirectFromCurrent } = useAuthRedirect();
 
   useScrollToTop();
   useSessionExpiry(); // Handle session expiry checking
@@ -231,10 +234,12 @@ function App() {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get("showTikTokModal") === "true" && session) {
       setShowTikTokModal(true);
-      // Clean up URL
-      navigate("/", { replace: true });
+      // Clean up URL parameter without changing the current page
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("showTikTokModal");
+      window.history.replaceState({}, "", newUrl.toString());
     }
-  }, [location.search, session, navigate]);
+  }, [location.search, session]);
 
   useEffect(() => {
     const fetchActiveContests = async () => {
@@ -255,7 +260,16 @@ function App() {
           ),
         }));
 
-        setActiveContests(contestsWithParticipants);
+        // Filter contests to only show those that are actually active based on end_date
+        const activeContests = contestsWithParticipants.filter(contest => {
+          // Ensure contest has required fields and status is not null
+          if (!contest.start_date || !contest.end_date || !contest.status) {
+            return false;
+          }
+          return calculateContestStatus(contest as any) === 'active';
+        });
+
+        setActiveContests(activeContests);
       } catch (error) {
         console.error("Error fetching active contests:", error);
         toast.error("Failed to load contests");
@@ -320,9 +334,11 @@ function App() {
   const ProtectedRoute = ({
     children,
     requireOrganizer = false,
+    redirectPath,
   }: {
     children: React.ReactNode;
     requireOrganizer?: boolean;
+    redirectPath?: string;
   }) => {
     // Show loading while auth is loading OR while we have a session but no profile yet
     if (authLoading || (session && !profile)) {
@@ -342,10 +358,16 @@ function App() {
     }
 
     if (!session) {
-      return <Navigate to="/signin" replace />;
+      // Store current URL for redirect after authentication
+      setRedirectFromCurrent({ preserveParams: true });
+      
+      // Redirect to appropriate auth page
+      const authPath = requireOrganizer ? "/admin-login" : "/signin";
+      return <Navigate to={authPath} replace />;
     }
 
     if (requireOrganizer && !isOrganizer) {
+      // For organizer-only routes, redirect to home instead of storing redirect URL
       return <Navigate to="/" replace />;
     }
 
@@ -363,9 +385,11 @@ function App() {
                 contests={activeContests}
                 loading={loading}
                 session={session}
-                onShowAuth={(isSignUp) =>
-                  navigate(isSignUp ? "/signup" : "/signin")
-                }
+                onShowAuth={(isSignUp) => {
+                  // Store current URL for redirect after authentication
+                  setRedirectFromCurrent({ preserveParams: true });
+                  navigate(isSignUp ? "/signup" : "/signin");
+                }}
               />
             }
           />

@@ -26,6 +26,7 @@ import { supabase } from "../lib/supabase";
 import { useRealtimeData } from "../hooks/useRealtimeData";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { ViewSubmissionModal } from "./ViewSubmissionModal";
+import { calculateContestStatus } from "../lib/contestUtils";
 
 interface LeaderboardContest {
   id: string;
@@ -177,7 +178,16 @@ export function HomeContent({
         })
       );
 
-      setContests(contestsWithParticipants);
+      // Filter contests to only show those that are actually active based on end_date
+      const activeContests = contestsWithParticipants.filter(contest => {
+        // Ensure contest has required fields and status is not null
+        if (!contest.start_date || !contest.end_date || !contest.status) {
+          return false;
+        }
+        return calculateContestStatus(contest as any) === 'active';
+      });
+
+      setContests(activeContests);
     } catch (error) {
       console.error("Error fetching contests:", error);
       toast.error("Failed to load contests");

@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import { Loader2, Crown, ArrowLeft, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
 import { Footer } from "../components/Footer";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 
 interface LocationState {
   phoneNumber: string;
@@ -22,6 +23,7 @@ export function OTPVerification() {
   const navigate = useNavigate();
   const location = useLocation();
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const { executeRedirect } = useAuthRedirect();
 
   const state = location.state as LocationState;
 
@@ -85,9 +87,6 @@ export function OTPVerification() {
 
   const checkTikTokConnectionAndRedirect = async () => {
     try {
-      // Check if user came from a contest page
-      const returnUrl = localStorage.getItem("auth_return_url");
-
       // Check if user has TikTok profile in our database
       const {
         data: { user },
@@ -99,27 +98,26 @@ export function OTPVerification() {
           .eq("user_id", user.id)
           .single();
 
-        if (returnUrl) {
-          // Clear the return URL and redirect back to contest page
-          localStorage.removeItem("auth_return_url");
-          navigate(returnUrl);
-        } else if (!tikTokProfile) {
-          // User not connected to TikTok, show modal
-          navigate("/?showTikTokModal=true");
+        if (!tikTokProfile) {
+          // User not connected to TikTok, get the redirect URL and show modal there
+          const redirectUrl = localStorage.getItem('auth_return_url');
+          if (redirectUrl) {
+            // Navigate to the original page with TikTok modal parameter
+            const separator = redirectUrl.includes('?') ? '&' : '?';
+            navigate(`${redirectUrl}${separator}showTikTokModal=true`);
+          } else {
+            // No redirect URL, show modal on home page
+            navigate("/?showTikTokModal=true");
+          }
         } else {
-          // User connected, redirect to home
-          navigate("/");
+          // User connected, use the redirect system
+          executeRedirect({ fallbackPath: "/" });
         }
       }
     } catch (error) {
       console.error("Error checking TikTok connection:", error);
-      const returnUrl = localStorage.getItem("auth_return_url");
-      if (returnUrl) {
-        localStorage.removeItem("auth_return_url");
-        navigate(returnUrl);
-      } else {
-        navigate("/");
-      }
+      // Use the redirect system for error cases too
+      executeRedirect({ fallbackPath: "/" });
     }
   };
 

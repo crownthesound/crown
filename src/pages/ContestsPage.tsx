@@ -24,6 +24,7 @@ import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import toast from "react-hot-toast";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { 
   calculateContestStatus, 
   getStatusLabel, 
@@ -100,6 +101,7 @@ export function ContestsPage() {
   );
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewVideo, setViewVideo] = useState<any>(null);
+  const { redirectToAuth } = useAuthRedirect();
 
   const { isConnected: isTikTokConnected, refreshConnection } =
     useTikTokConnection();
@@ -205,8 +207,12 @@ export function ContestsPage() {
             top_participants,
           };
 
-          // Add calculated status
-          const calculatedStatus = calculateContestStatus(contestWithData);
+          // Add calculated status - ensure required fields exist
+          let calculatedStatus: 'draft' | 'active' | 'ended' | 'archived' = 'draft';
+          if (contestWithData.start_date && contestWithData.end_date && contestWithData.status) {
+            calculatedStatus = calculateContestStatus(contestWithData);
+          }
+          
           return {
             ...contestWithData,
             calculatedStatus,
@@ -257,7 +263,7 @@ export function ContestsPage() {
     }
 
     if (!session) {
-      navigate("/signin");
+      redirectToAuth("/signin");
       return;
     }
 
@@ -581,18 +587,18 @@ export function ContestsPage() {
               the world
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                to="/signup"
+              <button
+                onClick={() => redirectToAuth("/signup")}
                 className="px-8 py-3 bg-white text-black rounded-lg hover:bg-white/90 transition-colors font-medium"
               >
                 Create Account
-              </Link>
-              <Link
-                to="/signin"
+              </button>
+              <button
+                onClick={() => redirectToAuth("/signin")}
                 className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg transition-colors font-medium"
               >
                 Sign In
-              </Link>
+              </button>
             </div>
           </div>
         )}

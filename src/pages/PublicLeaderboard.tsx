@@ -32,6 +32,7 @@ import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ContestJoinModal } from "../components/ContestJoinModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { supabase as supa } from "../lib/supabase";
 import { 
   calculateContestStatus, 
@@ -241,6 +242,7 @@ export function PublicLeaderboard() {
   const [userSubmission, setUserSubmission] = useState<any>(null);
 
   const { refreshConnection } = useTikTokConnection();
+  const { redirectToAuth } = useAuthRedirect();
   const queryClient = useQueryClient();
 
   // Fetch contest details
@@ -385,9 +387,8 @@ export function PublicLeaderboard() {
     }
 
     if (!session) {
-      // Store current contest page URL for redirect after auth
-      localStorage.setItem("auth_return_url", window.location.pathname);
-      navigate("/signin");
+      // Use the redirect system to handle auth flow
+      redirectToAuth("/signin");
       return;
     }
 
