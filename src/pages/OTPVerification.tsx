@@ -99,12 +99,20 @@ export function OTPVerification() {
           .single();
 
         if (!tikTokProfile) {
-          // User not connected to TikTok, get the redirect URL and show modal there
+          // User not connected to TikTok, get the redirect URL
           const redirectUrl = localStorage.getItem('auth_return_url');
           if (redirectUrl) {
-            // Navigate to the original page with TikTok modal parameter
-            const separator = redirectUrl.includes('?') ? '&' : '?';
-            navigate(`${redirectUrl}${separator}showTikTokModal=true`);
+            // Check if redirect URL is a contest page
+            const isContestPage = redirectUrl.includes('/l/') || redirectUrl.includes('/contest');
+            
+            if (isContestPage) {
+              // For contest pages, let the ContestJoinModal handle TikTok connection
+              navigate(redirectUrl);
+            } else {
+              // For non-contest pages, add TikTok modal parameter
+              const separator = redirectUrl.includes('?') ? '&' : '?';
+              navigate(`${redirectUrl}${separator}showTikTokModal=true`);
+            }
           } else {
             // No redirect URL, show modal on home page
             navigate("/?showTikTokModal=true");

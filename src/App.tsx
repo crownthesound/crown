@@ -232,9 +232,16 @@ function App() {
   // Check for TikTok modal URL parameter
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
-    if (urlParams.get("showTikTokModal") === "true" && session) {
+    const isContestPage = location.pathname.includes('/l/') || location.pathname.includes('/contest');
+    
+    if (urlParams.get("showTikTokModal") === "true" && session && !isContestPage) {
       setShowTikTokModal(true);
       // Clean up URL parameter without changing the current page
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("showTikTokModal");
+      window.history.replaceState({}, "", newUrl.toString());
+    } else if (urlParams.get("showTikTokModal") === "true" && isContestPage) {
+      // Clean up URL parameter for contest pages without opening modal
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("showTikTokModal");
       window.history.replaceState({}, "", newUrl.toString());
