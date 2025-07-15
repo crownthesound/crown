@@ -240,6 +240,7 @@ export function PublicLeaderboard() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [viewVideo, setViewVideo] = useState<any>(null);
   const [userSubmission, setUserSubmission] = useState<any>(null);
+  const [hasAutoOpenedModal, setHasAutoOpenedModal] = useState(false);
 
   const { refreshConnection } = useTikTokConnection();
   const { redirectToAuth, hasRedirectUrl, hasRedirectAction, getRedirectAction, clearRedirectUrl } = useAuthRedirect();
@@ -365,7 +366,7 @@ export function PublicLeaderboard() {
 
   // Auto-open ContestJoinModal after authentication redirect
   useEffect(() => {
-    if (session && contest && !userSubmission && contest.calculatedStatus === 'active') {
+    if (session && contest && !userSubmission && contest.calculatedStatus === 'active' && !hasAutoOpenedModal) {
       // Check for action parameter in URL (fallback for older implementation)
       const urlParams = new URLSearchParams(window.location.search);
       const urlAction = urlParams.get('action');
@@ -373,8 +374,9 @@ export function PublicLeaderboard() {
       // Get action from redirect system (preferred method)
       const redirectAction = getRedirectAction();
       
-      // Check if we have a redirect URL or action parameter
-      const shouldOpenModal = hasRedirectUrl || hasRedirectAction || urlAction === 'join';
+      // Be more restrictive - only trigger if there's BOTH a redirect URL AND action
+      // This prevents triggering on normal page visits
+      const shouldOpenModal = (hasRedirectUrl && hasRedirectAction) || urlAction === 'join';
       const actionToCheck = redirectAction || urlAction;
       
       console.log('🔍 Auto-modal check:', {
@@ -387,13 +389,18 @@ export function PublicLeaderboard() {
         urlAction,
         redirectAction,
         shouldOpenModal,
-        actionToCheck
+        actionToCheck,
+        hasAutoOpenedModal
       });
       
       if (shouldOpenModal && actionToCheck === 'join') {
         console.log('🎯 Opening join modal automatically');
-        setShowJoinModal(true);
-        clearRedirectUrl(); // Clear to prevent repeated opens
+        
+        // IMPORTANT: Clear redirect data IMMEDIATELY to prevent repeated triggers
+        clearRedirectUrl();
+        
+        // Set flag to prevent repeated auto-opens
+        setHasAutoOpenedModal(true);
         
         // Clean up the action parameter from URL if present
         if (urlAction === 'join') {
@@ -404,6 +411,9 @@ export function PublicLeaderboard() {
           window.history.replaceState({}, '', newUrl);
         }
         
+        // Open the modal
+        setShowJoinModal(true);
+        
         // Show success toast for smoother UX
         toast.success('Welcome! Let\'s get you set up to join this contest.', {
           duration: 4000,
@@ -411,9 +421,11 @@ export function PublicLeaderboard() {
         });
       }
     }
-  }, [session, hasRedirectUrl, hasRedirectAction, getRedirectAction, contest, userSubmission, clearRedirectUrl]);
+  }, [session, hasRedirectUrl, hasRedirectAction, getRedirectAction, contest, userSubmission, clearRedirectUrl, hasAutoOpenedModal]);
 
-  // Fallback mechanism - open modal directly if main logic didn't work
+  // Fallback mechanism - DISABLED to prevent annoying popup
+  // TODO: Re-enable after fixing the main auto-modal logic
+  /*
   useEffect(() => {
     if (session && contest && !userSubmission && !showJoinModal && contest.calculatedStatus === 'active') {
       const redirectAction = getRedirectAction();
@@ -448,6 +460,7 @@ export function PublicLeaderboard() {
       }
     }
   }, [session, contest, userSubmission, showJoinModal, getRedirectAction, clearRedirectUrl]);
+  */
 
   const handleShare = async () => {
     try {
