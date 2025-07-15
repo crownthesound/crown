@@ -4,10 +4,12 @@ import { useAuth } from '../contexts/AuthContext';
 
 const REDIRECT_URL_KEY = 'auth_return_url';
 const REDIRECT_PARAMS_KEY = 'auth_return_params';
+const REDIRECT_ACTION_KEY = 'auth_return_action';
 
 export interface AuthRedirectOptions {
   preserveParams?: boolean;
   fallbackPath?: string;
+  action?: string;
 }
 
 export function useAuthRedirect() {
@@ -24,6 +26,10 @@ export function useAuthRedirect() {
         if (currentParams.toString()) {
           localStorage.setItem(REDIRECT_PARAMS_KEY, currentParams.toString());
         }
+      }
+      
+      if (options.action) {
+        localStorage.setItem(REDIRECT_ACTION_KEY, options.action);
       }
     } catch (error) {
       console.warn('Failed to store redirect URL:', error);
@@ -52,10 +58,20 @@ export function useAuthRedirect() {
     }
   }, []);
 
+  const getRedirectAction = useCallback((): string | null => {
+    try {
+      return localStorage.getItem(REDIRECT_ACTION_KEY);
+    } catch (error) {
+      console.warn('Failed to retrieve redirect action:', error);
+      return null;
+    }
+  }, []);
+
   const clearRedirectUrl = useCallback(() => {
     try {
       localStorage.removeItem(REDIRECT_URL_KEY);
       localStorage.removeItem(REDIRECT_PARAMS_KEY);
+      localStorage.removeItem(REDIRECT_ACTION_KEY);
     } catch (error) {
       console.warn('Failed to clear redirect URL:', error);
     }
@@ -125,9 +141,11 @@ export function useAuthRedirect() {
     setRedirectUrl,
     setRedirectFromCurrent,
     getRedirectUrl,
+    getRedirectAction,
     clearRedirectUrl,
     executeRedirect,
     redirectToAuth,
     hasRedirectUrl: !!getRedirectUrl(),
+    hasRedirectAction: !!getRedirectAction(),
   };
 }
