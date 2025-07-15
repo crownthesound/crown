@@ -365,7 +365,7 @@ export function PublicLeaderboard() {
 
   // Auto-open ContestJoinModal after authentication redirect
   useEffect(() => {
-    if (session && contest && !userSubmission) {
+    if (session && contest && !userSubmission && contest.calculatedStatus === 'active') {
       // Check for action parameter in URL (fallback for older implementation)
       const urlParams = new URLSearchParams(window.location.search);
       const urlAction = urlParams.get('action');
@@ -381,6 +381,7 @@ export function PublicLeaderboard() {
         hasSession: !!session,
         hasContest: !!contest,
         hasUserSubmission: !!userSubmission,
+        contestStatus: contest.calculatedStatus,
         hasRedirectUrl,
         hasRedirectAction,
         urlAction,
@@ -390,22 +391,40 @@ export function PublicLeaderboard() {
       });
       
       if (shouldOpenModal && actionToCheck === 'join') {
-        // Check if we're on a contest page and user just completed auth
-        const currentPath = window.location.pathname;
-        const isContestPage = currentPath.includes('/contest') || currentPath.startsWith('/contest');
-        const isActiveContest = contest.calculatedStatus === 'active';
+        console.log('🎯 Opening join modal automatically');
+        setShowJoinModal(true);
+        clearRedirectUrl(); // Clear to prevent repeated opens
         
-        console.log('🔍 Page check:', {
-          currentPath,
-          isContestPage,
-          isActiveContest,
-          contestStatus: contest.calculatedStatus
+        // Clean up the action parameter from URL if present
+        if (urlAction === 'join') {
+          urlParams.delete('action');
+          const newUrl = urlParams.toString() 
+            ? `${window.location.pathname}?${urlParams.toString()}`
+            : window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+        }
+        
+        // Show success toast for smoother UX
+        toast.success('Welcome! Let\'s get you set up to join this contest.', {
+          duration: 4000,
+          icon: '🎉',
         });
-        
-        if (isContestPage && isActiveContest) {
-          // Small delay to ensure all data is loaded
-          const timer = setTimeout(() => {
-            console.log('🎯 Opening join modal automatically');
+      }
+    }
+  }, [session, hasRedirectUrl, hasRedirectAction, getRedirectAction, contest, userSubmission, clearRedirectUrl]);
+
+  // Fallback mechanism - open modal directly if main logic didn't work
+  useEffect(() => {
+    if (session && contest && !userSubmission && !showJoinModal && contest.calculatedStatus === 'active') {
+      const redirectAction = getRedirectAction();
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlAction = urlParams.get('action');
+      
+      // If we have an action but modal didn't open, open it directly
+      if (redirectAction === 'join' || urlAction === 'join') {
+        const timer = setTimeout(() => {
+          if (!showJoinModal) {
+            console.log('🔄 Fallback: Opening join modal directly');
             setShowJoinModal(true);
             clearRedirectUrl(); // Clear to prevent repeated opens
             
@@ -418,43 +437,17 @@ export function PublicLeaderboard() {
               window.history.replaceState({}, '', newUrl);
             }
             
-            // Show success toast for smoother UX
             toast.success('Welcome! Let\'s get you set up to join this contest.', {
               duration: 4000,
               icon: '🎉',
             });
-          }, 300);
-          
-          return () => clearTimeout(timer);
-        } else {
-          console.log('❌ Not opening modal - page/contest check failed');
-        }
-      }
-    }
-  }, [session, hasRedirectUrl, hasRedirectAction, getRedirectAction, contest, userSubmission, clearRedirectUrl]);
-
-  // Fallback mechanism - show toast if modal should have opened but didn't
-  useEffect(() => {
-    if (session && contest && !userSubmission && !showJoinModal) {
-      const redirectAction = getRedirectAction();
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlAction = urlParams.get('action');
-      
-      // If we have an action but modal didn't open, show fallback toast
-      if ((redirectAction === 'join' || urlAction === 'join') && contest.calculatedStatus === 'active') {
-        const timer = setTimeout(() => {
-          if (!showJoinModal) {
-            toast.success('Ready to join the contest? Click "Join Contest" to get started!', {
-              duration: 6000,
-              icon: '👋',
-            });
           }
-        }, 1000);
+        }, 500);
         
         return () => clearTimeout(timer);
       }
     }
-  }, [session, contest, userSubmission, showJoinModal, getRedirectAction]);
+  }, [session, contest, userSubmission, showJoinModal, getRedirectAction, clearRedirectUrl]);
 
   const handleShare = async () => {
     try {
