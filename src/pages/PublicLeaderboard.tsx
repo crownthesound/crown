@@ -245,10 +245,6 @@ export function PublicLeaderboard() {
   const { redirectToAuth, hasRedirectUrl, clearRedirectUrl } = useAuthRedirect();
   const queryClient = useQueryClient();
 
-  // Debug: Track showJoinModal state changes
-  useEffect(() => {
-    console.log('🔍 showJoinModal state changed:', showJoinModal);
-  }, [showJoinModal]);
 
   // Fetch contest details
   const {
@@ -371,21 +367,11 @@ export function PublicLeaderboard() {
   useEffect(() => {
     if (session && hasRedirectUrl && contest && !userSubmission) {
       // Check if we're on a contest page and user just completed auth
-      const isContestPage = window.location.pathname.includes('/contest/');
+      const currentPath = window.location.pathname;
+      const isContestPage = currentPath.includes('/contest') || currentPath.startsWith('/contest');
       const isActiveContest = contest.calculatedStatus === 'active';
       
-      console.log('🔍 Auto-modal check:', {
-        session: !!session,
-        hasRedirectUrl,
-        contest: !!contest,
-        userSubmission: !!userSubmission,
-        isContestPage,
-        isActiveContest,
-        contestStatus: contest?.calculatedStatus
-      });
-      
       if (isContestPage && isActiveContest) {
-        console.log('✅ Opening ContestJoinModal automatically after auth redirect');
         // Small delay to ensure all data is loaded
         const timer = setTimeout(() => {
           setShowJoinModal(true);
@@ -1119,10 +1105,7 @@ export function PublicLeaderboard() {
         {contest && (
           <ContestJoinModal
             isOpen={showJoinModal}
-            onClose={() => {
-              console.log('🔍 ContestJoinModal closed');
-              setShowJoinModal(false);
-            }}
+            onClose={() => setShowJoinModal(false)}
             contest={contest as any}
             onSuccess={handleContestJoined}
           />

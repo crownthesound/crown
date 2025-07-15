@@ -292,7 +292,10 @@ function App() {
             .eq("user_id", session.user.id)
             .single();
 
-          if (!tikTokProfile && location.pathname === "/") {
+          // Only show TikTok modal on home page, not on contest pages
+          const isContestPage = location.pathname.includes('/l/') || location.pathname.includes('/contest');
+          
+          if (!tikTokProfile && location.pathname === "/" && !isContestPage) {
             // User is not connected to TikTok, show modal after a short delay
             setTimeout(() => {
               setShowTikTokModal(true);
