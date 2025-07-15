@@ -242,7 +242,7 @@ export function PublicLeaderboard() {
   const [userSubmission, setUserSubmission] = useState<any>(null);
 
   const { refreshConnection } = useTikTokConnection();
-  const { redirectToAuth } = useAuthRedirect();
+  const { redirectToAuth, hasRedirectUrl, clearRedirectUrl } = useAuthRedirect();
   const queryClient = useQueryClient();
 
   // Fetch contest details
@@ -361,6 +361,25 @@ export function PublicLeaderboard() {
     };
     fetchSubmission();
   }, [session, id, leaderboardResp]);
+
+  // Auto-open ContestJoinModal after authentication redirect
+  useEffect(() => {
+    if (session && hasRedirectUrl && contest && !userSubmission) {
+      // Check if we're on a contest page and user just completed auth
+      const isContestPage = window.location.pathname.includes('/contest/');
+      const isActiveContest = contest.calculatedStatus === 'active';
+      
+      if (isContestPage && isActiveContest) {
+        // Small delay to ensure all data is loaded
+        const timer = setTimeout(() => {
+          setShowJoinModal(true);
+          clearRedirectUrl(); // Clear to prevent repeated opens
+        }, 300);
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [session, hasRedirectUrl, contest, userSubmission, clearRedirectUrl]);
 
   const handleShare = async () => {
     try {
