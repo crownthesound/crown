@@ -245,6 +245,11 @@ export function PublicLeaderboard() {
   const { redirectToAuth, hasRedirectUrl, clearRedirectUrl } = useAuthRedirect();
   const queryClient = useQueryClient();
 
+  // Debug: Track showJoinModal state changes
+  useEffect(() => {
+    console.log('🔍 showJoinModal state changed:', showJoinModal);
+  }, [showJoinModal]);
+
   // Fetch contest details
   const {
     data: contestData,
@@ -369,7 +374,18 @@ export function PublicLeaderboard() {
       const isContestPage = window.location.pathname.includes('/contest/');
       const isActiveContest = contest.calculatedStatus === 'active';
       
+      console.log('🔍 Auto-modal check:', {
+        session: !!session,
+        hasRedirectUrl,
+        contest: !!contest,
+        userSubmission: !!userSubmission,
+        isContestPage,
+        isActiveContest,
+        contestStatus: contest?.calculatedStatus
+      });
+      
       if (isContestPage && isActiveContest) {
+        console.log('✅ Opening ContestJoinModal automatically after auth redirect');
         // Small delay to ensure all data is loaded
         const timer = setTimeout(() => {
           setShowJoinModal(true);
@@ -1103,7 +1119,10 @@ export function PublicLeaderboard() {
         {contest && (
           <ContestJoinModal
             isOpen={showJoinModal}
-            onClose={() => setShowJoinModal(false)}
+            onClose={() => {
+              console.log('🔍 ContestJoinModal closed');
+              setShowJoinModal(false);
+            }}
             contest={contest as any}
             onSuccess={handleContestJoined}
           />
