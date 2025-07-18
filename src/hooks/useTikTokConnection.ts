@@ -441,6 +441,14 @@ export const useTikTokConnection = () => {
         fullResponseData: data.data,
       });
       
+      // Display backend debug logs in frontend for production debugging
+      if (data.debugLogs && data.debugLogs.length > 0) {
+        console.log("🔍 [Backend Debug Logs]:");
+        data.debugLogs.forEach((log: string, index: number) => {
+          console.log(`${index + 1}. ${log}`);
+        });
+      }
+      
       if (!isAccountMatch) {
         console.error("❌ [Frontend] ACCOUNT MISMATCH! Requested:", accountId, "but got:", returnedAccountId);
         console.error("❌ [Frontend] This means the backend is returning wrong account data!");
