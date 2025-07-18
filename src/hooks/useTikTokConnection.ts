@@ -424,10 +424,27 @@ export const useTikTokConnection = () => {
       }
 
       const data = JSON.parse(responseText);
-      console.log("✅ [Frontend] Session establishment successful:", {
+      
+      // IMPORTANT: Check if the returned account matches what we requested
+      const returnedAccountId = data.data?.accountId;
+      const isAccountMatch = returnedAccountId === accountId;
+      
+      console.log("✅ [Frontend] Session establishment response:", {
         duration,
-        data: data.data,
+        requestedAccountId: accountId,
+        returnedAccountId: returnedAccountId,
+        accountMatch: isAccountMatch,
+        returnedUsername: data.data?.username,
+        returnedTikTokUserId: data.data?.tiktokUserId,
+        tokenRefreshed: data.data?.tokenRefreshed,
+        scopeUsed: data.data?.scopeUsed,
+        fullResponseData: data.data,
       });
+      
+      if (!isAccountMatch) {
+        console.error("❌ [Frontend] ACCOUNT MISMATCH! Requested:", accountId, "but got:", returnedAccountId);
+        console.error("❌ [Frontend] This means the backend is returning wrong account data!");
+      }
       
       // Update the active session account
       const account = tikTokAccounts.find(acc => acc.id === accountId);
