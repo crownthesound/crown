@@ -271,12 +271,20 @@ export const useTikTokConnection = () => {
   const setPrimaryAccount = async (accountId: string) => {
     if (!session) return false;
 
+    const startTime = Date.now();
+    console.log("🔍 [Frontend] Starting setPrimaryAccount:", {
+      accountId,
+      sessionUser: session.user?.id,
+      timestamp: new Date().toISOString(),
+    });
+
     try {
       // Clear current state to avoid showing stale data
       setActiveSessionAccount(null);
 
       // Step 1: Set the account as primary in the backend
-      const response = await fetch(
+      console.log("🔍 [Frontend] Step 1: Setting primary account in backend");
+      const setPrimaryResponse = await fetch(
         `${backendUrl}/api/v1/tiktok/accounts/set-primary`,
         {
           method: "POST",
@@ -288,16 +296,25 @@ export const useTikTokConnection = () => {
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      console.log("🔍 [Frontend] Set primary response:", {
+        status: setPrimaryResponse.status,
+        statusText: setPrimaryResponse.statusText,
+        ok: setPrimaryResponse.ok,
+      });
+
+      if (!setPrimaryResponse.ok) {
+        const errorData = await setPrimaryResponse.json();
+        console.error("❌ [Frontend] Failed to set primary account:", errorData);
         throw new Error(errorData.message || "Failed to set primary TikTok account");
       }
 
       // Step 2: Force refresh the accounts list to get the updated state immediately
+      console.log("🔍 [Frontend] Step 2: Refreshing accounts list");
       setLastCheckTime(0); // Clear cache
       await checkTikTokConnection(true);
 
       // Step 3: Establish TikTok session with the selected account
+      console.log("🔍 [Frontend] Step 3: Establishing TikTok session");
       try {
         await establishTikTokSession(accountId);
         console.log("✅ TikTok session established successfully");
@@ -306,9 +323,21 @@ export const useTikTokConnection = () => {
         // Still proceed but session might not work for video access
       }
 
+      const totalDuration = Date.now() - startTime;
+      console.log("✅ [Frontend] setPrimaryAccount completed:", {
+        duration: totalDuration,
+        accountId,
+      });
+
       return true;
     } catch (error) {
-      console.error("Error setting primary TikTok account:", error);
+      const totalDuration = Date.now() - startTime;
+      console.error("❌ [Frontend] Error setting primary TikTok account:", {
+        error,
+        duration: totalDuration,
+        accountId,
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
       throw error;
     }
   };
@@ -344,24 +373,61 @@ export const useTikTokConnection = () => {
   const establishTikTokSession = async (accountId: string) => {
     if (!session) return null;
 
+    const startTime = Date.now();
+    console.log("🔍 [Frontend] Starting TikTok session establishment:", {
+      accountId,
+      backendUrl,
+      sessionUser: session.user?.id,
+      timestamp: new Date().toISOString(),
+    });
+
     try {
-      const response = await fetch(
-        `${backendUrl}/api/v1/tiktok/accounts/${accountId}/establish-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
+      const requestUrl = `${backendUrl}/api/v1/tiktok/accounts/${accountId}/establish-session`;
+      console.log("🔍 [Frontend] Making request to:", requestUrl);
+
+      const response = await fetch(requestUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      const duration = Date.now() - startTime;
+      console.log("🔍 [Frontend] Response received:", {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        duration,
+        headers: {
+          'content-type': response.headers.get('content-type'),
+          'content-length': response.headers.get('content-length'),
+        },
+      });
+
+      const responseText = await response.text();
+      console.log("🔍 [Frontend] Response body:", responseText);
 
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData;
+        try {
+          errorData = JSON.parse(responseText);
+        } catch (e) {
+          errorData = { message: responseText };
+        }
+        console.error("❌ [Frontend] Request failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+        });
         throw new Error(errorData.message || "Failed to establish TikTok session");
       }
 
-      const data = await response.json();
+      const data = JSON.parse(responseText);
+      console.log("✅ [Frontend] Session establishment successful:", {
+        duration,
+        data: data.data,
+      });
       
       // Update the active session account
       const account = tikTokAccounts.find(acc => acc.id === accountId);
@@ -372,7 +438,13 @@ export const useTikTokConnection = () => {
       
       return data.data;
     } catch (error) {
-      console.error("Error establishing TikTok session:", error);
+      const duration = Date.now() - startTime;
+      console.error("❌ [Frontend] Error establishing TikTok session:", {
+        error,
+        duration,
+        accountId,
+        errorMessage: error instanceof Error ? error.message : String(error),
+      });
       throw error;
     }
   };
