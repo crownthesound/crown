@@ -415,11 +415,40 @@ export const useTikTokConnection = () => {
         } catch (e) {
           errorData = { message: responseText };
         }
+        
+        // Display backend debug logs even for errors
+        if (errorData.debugLogs && errorData.debugLogs.length > 0) {
+          console.log("🔍 [Backend Debug Logs - Error Response]:");
+          errorData.debugLogs.forEach((log: string, index: number) => {
+            console.log(`${index + 1}. ${log}`);
+          });
+        }
+        
         console.error("❌ [Frontend] Request failed:", {
           status: response.status,
           statusText: response.statusText,
           errorData,
         });
+        
+        // Handle token contamination specifically
+        if (errorData.error_code === "TOKEN_CONTAMINATION") {
+          console.error("❌ [Frontend] TOKEN CONTAMINATION DETECTED:", {
+            accountId: errorData.details?.accountId,
+            storedUser: errorData.details?.storedUser,
+            tokenBelongsTo: errorData.details?.tokenBelongsTo,
+            requiresReconnection: errorData.details?.requiresReconnection,
+          });
+          
+          // Automatically refresh the accounts list to reflect the cleaned up state
+          console.log("🔄 [Frontend] Refreshing accounts list after contamination cleanup");
+          setTimeout(() => {
+            checkTikTokConnection(true);
+          }, 1000);
+          
+          // Throw a specific error for token contamination
+          throw new Error(`Token contamination detected for account. The account has been reset and requires re-authentication. Please reconnect the account.`);
+        }
+        
         throw new Error(errorData.message || "Failed to establish TikTok session");
       }
 
