@@ -72,6 +72,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
   const [selectedVideo, setSelectedVideo] = useState<TikTokVideo | null>(null);
   const [agreedGuidelines, setAgreedGuidelines] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDownloadingVideo, setIsDownloadingVideo] = useState(false);
   const [isConnectingTikTok, setIsConnectingTikTok] = useState(false);
   const [tikTokConnectionError, setTikTokConnectionError] = useState<
     string | null
@@ -508,6 +509,39 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
       // Generate embed code for the video
       const embedCode = `<blockquote class=\"tiktok-embed\" cite=\"${videoUrl}\" data-video-id=\"${selectedVideo.id}\"><section></section></blockquote><script async src=\"https://www.tiktok.com/embed.js\"></script>`;
 
+      // Download and store the video
+      console.log("🔍 Downloading video:", videoUrl);
+      let downloadedVideoUrl = null;
+      
+      try {
+        setIsDownloadingVideo(true);
+        const downloadResponse = await fetch(`${backendUrl}/api/v1/tiktok/videos/download`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            videoUrl: videoUrl,
+            videoId: selectedVideo.id,
+          }),
+        });
+
+        if (downloadResponse.ok) {
+          const downloadData = await downloadResponse.json();
+          downloadedVideoUrl = downloadData.data.publicUrl;
+          console.log("✅ Video downloaded successfully:", downloadedVideoUrl);
+        } else {
+          console.warn("⚠️ Video download failed, continuing without stored video");
+          const errorData = await downloadResponse.json();
+          console.error("Download error:", errorData);
+        }
+      } catch (downloadError) {
+        console.warn("⚠️ Video download failed, continuing without stored video:", downloadError);
+      } finally {
+        setIsDownloadingVideo(false);
+      }
+
       // Then submit the selected video to the contest
       const { error: submitError } = await supabase
         .from("contest_links")
@@ -531,6 +565,7 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
           embed_code: embedCode,
           video_type: "tiktok",
           duration: selectedVideo.duration,
+          video_url: downloadedVideoUrl, // Store the downloaded video URL
         });
 
       if (submitError) throw submitError;
@@ -1187,7 +1222,9 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Submitting...</span>
+                      <span>
+                        {isDownloadingVideo ? "Downloading video..." : "Submitting..."}
+                      </span>
                     </>
                   ) : (
                     <span>Submit Content</span>
