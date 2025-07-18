@@ -858,14 +858,13 @@ export function Profile() {
                     </p>
                   </div>
                   <button
-                    onClick={async () => {
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       try {
                         await connectWithVideoPermissions();
                         toast.success("TikTok account connected successfully!");
-                        // Force refresh to show new account immediately
-                        setTimeout(() => {
-                          window.location.reload();
-                        }, 1500);
+                        // Don't force refresh - the connection hook will handle state updates
                       } catch (error: any) {
                         console.error("TikTok connection failed:", error);
                         
@@ -902,7 +901,9 @@ export function Profile() {
                     <h4 className="text-lg font-medium text-white mb-2">No TikTok accounts connected</h4>
                     <p className="text-white/60 mb-6">Connect your first TikTok account to participate in contests</p>
                     <button
-                      onClick={async () => {
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         try {
                           await connectWithVideoPermissions();
                         } catch (error: any) {

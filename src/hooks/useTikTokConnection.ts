@@ -161,12 +161,14 @@ export const useTikTokConnection = () => {
 
       console.log("Opening TikTok logout for session clearing...");
 
-      // Step 2: Open TikTok logout in a popup window
+      // Step 2: Open TikTok logout in a popup window with additional parameters
       const logoutPopup = window.open(
-        "https://www.tiktok.com/logout",
+        "https://www.tiktok.com/logout?force=true",
         "tiktok_logout",
         "width=600,height=600,scrollbars=yes,resizable=yes"
       );
+      
+      console.log("🔍 Logout popup opened:", !!logoutPopup);
 
       if (!logoutPopup) {
         throw new Error("Failed to open logout window. Please check if popups are blocked.");
@@ -180,11 +182,14 @@ export const useTikTokConnection = () => {
 
           // Step 4: Open OAuth popup after logout
           const authUrl = `${backendUrl}/api/v1/tiktok/auth?token=${session.access_token}`;
+          console.log("🔍 Opening OAuth popup with URL:", authUrl);
           const authPopup = window.open(
             authUrl,
             "tiktok_auth",
             "width=600,height=700,scrollbars=yes,resizable=yes"
           );
+          
+          console.log("🔍 OAuth popup opened:", !!authPopup);
 
           if (authPopup) {
             // Monitor the auth popup
@@ -224,11 +229,14 @@ export const useTikTokConnection = () => {
 
           // Proceed with OAuth after logout timeout
           const authUrl = `${backendUrl}/api/v1/tiktok/auth?token=${session.access_token}`;
+          console.log("🔍 Opening OAuth popup after logout timeout with URL:", authUrl);
           const authPopup = window.open(
             authUrl,
             "tiktok_auth",
             "width=600,height=700,scrollbars=yes,resizable=yes"
           );
+          
+          console.log("🔍 OAuth popup opened after timeout:", !!authPopup);
 
           if (authPopup) {
             // Monitor the auth popup
