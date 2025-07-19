@@ -31,6 +31,7 @@ import { Footer } from "../components/Footer";
 import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ContestJoinModal } from "../components/ContestJoinModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
+import { MobileVideoModal } from "../components/MobileVideoModal";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { supabase as supa } from "../lib/supabase";
@@ -240,6 +241,7 @@ export function PublicLeaderboard() {
   const [showTikTokSettings, setShowTikTokSettings] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [viewVideo, setViewVideo] = useState<any>(null);
+  const [mobileVideo, setMobileVideo] = useState<any>(null);
   const [userSubmission, setUserSubmission] = useState<any>(null);
   const [hasAutoOpenedModal, setHasAutoOpenedModal] = useState(false);
 
@@ -484,7 +486,16 @@ export function PublicLeaderboard() {
   };
 
   const handlePlayVideo = (video: Participant) => {
-    setViewVideo(video);
+    // Check if we're on mobile and have a stored video
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile && video.video_url) {
+      // Mobile with stored video: Show full-screen modal directly
+      setMobileVideo(video);
+    } else {
+      // Desktop or TikTok iframe: Show regular modal with stats
+      setViewVideo(video);
+    }
   };
 
   const handleJoinCompetition = () => {
@@ -1206,6 +1217,15 @@ export function PublicLeaderboard() {
             isOpen={!!viewVideo}
             onClose={() => setViewVideo(null)}
             video={viewVideo}
+          />
+        )}
+
+        {/* Mobile full-screen video modal */}
+        {mobileVideo && (
+          <MobileVideoModal
+            isOpen={!!mobileVideo}
+            onClose={() => setMobileVideo(null)}
+            video={mobileVideo}
           />
         )}
 
