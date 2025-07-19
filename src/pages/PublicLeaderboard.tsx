@@ -299,6 +299,13 @@ export function PublicLeaderboard() {
       leaderboardResp.data &&
       leaderboardResp.data.leaderboard
     ) {
+      // Debug logging to check if video_url is being received
+      console.group('📊 Leaderboard Data Debug');
+      console.log('Leaderboard response:', leaderboardResp.data.leaderboard);
+      console.log('First participant video_url:', leaderboardResp.data.leaderboard[0]?.video_url);
+      console.log('Participants with video_url:', leaderboardResp.data.leaderboard.filter((p: any) => p.video_url).length);
+      console.groupEnd();
+      
       setParticipants(leaderboardResp.data.leaderboard);
     }
   }, [leaderboardResp]);

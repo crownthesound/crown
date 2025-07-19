@@ -30,6 +30,20 @@ export const ViewSubmissionModal: React.FC<ViewSubmissionModalProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [showFullScreen, setShowFullScreen] = useState(false);
+  
+  // Debug logging to check video_url field
+  React.useEffect(() => {
+    if (isOpen && video) {
+      console.group('🎥 ViewSubmissionModal Debug');
+      console.log('Video object:', video);
+      console.log('video_url field:', video.video_url);
+      console.log('video_url type:', typeof video.video_url);
+      console.log('video_url exists:', !!video.video_url);
+      console.log('url field:', video.url);
+      console.log('Will show:', video.video_url ? 'HTML5 video' : 'TikTok iframe');
+      console.groupEnd();
+    }
+  }, [isOpen, video]);
 
   // Generate fallback embed code if not available
   const generateEmbedCode = (video: VideoLink) => {
