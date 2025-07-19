@@ -49,7 +49,8 @@ interface Participant {
   rank: number;
   previousRank?: number;
   views: number;
-  video_url?: string;
+  video_url?: string | null;  // Our stored video URL from Supabase
+  url?: string;             // Original TikTok URL
   thumbnail?: string;
   title?: string;
   embed_code?: string | null;

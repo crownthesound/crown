@@ -5,6 +5,7 @@ interface VideoLink {
   id: string;
   title: string;
   url: string;
+  video_url?: string | null;  // Our stored video URL from Supabase
   thumbnail: string;
   username: string;
   views: number | null;
@@ -28,6 +29,7 @@ export const ViewSubmissionModal: React.FC<ViewSubmissionModalProps> = ({
 }) => {
   const [isMuted, setIsMuted] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [showFullScreen, setShowFullScreen] = useState(false);
 
   // Generate fallback embed code if not available
   const generateEmbedCode = (video: VideoLink) => {
@@ -106,30 +108,60 @@ export const ViewSubmissionModal: React.FC<ViewSubmissionModalProps> = ({
                 <Loader2 className="h-6 w-6 animate-spin text-white/60" />
               </div>
             )}
-            {/* Embed code */}
-            <iframe
-              src={`https://www.tiktok.com/embed/v2/${
-                video.tiktok_video_id || extractVideoId(video.url)
-              }`}
-              allow="encrypted-media; fullscreen"
-              scrolling="no"
-              frameBorder="0"
-              className="absolute inset-0 w-full h-full"
-              onLoad={() => setIsLoading(false)}
-            ></iframe>
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
-            {/* Mute Button */}
-            <button
-              onClick={toggleMute}
-              className="absolute bottom-3 right-3 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/60 transition-colors"
-            >
-              {isMuted ? (
-                <VolumeX className="h-4 w-4" />
-              ) : (
-                <Volume2 className="h-4 w-4" />
-              )}
-            </button>
+            
+            {/* Conditional rendering: video_url takes priority over TikTok iframe */}
+            {video.video_url ? (
+              // Our stored video from Supabase
+              <>
+                <video
+                  src={video.video_url}
+                  controls
+                  muted={isMuted}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onLoadedData={() => setIsLoading(false)}
+                  onClick={() => setShowFullScreen(true)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+                
+                {/* Mobile full-screen trigger overlay for better UX */}
+                <div 
+                  className="absolute inset-0 bg-transparent cursor-pointer md:hidden"
+                  onClick={() => setShowFullScreen(true)}
+                  title="Tap to view full screen"
+                />
+              </>
+            ) : (
+              // Fallback to TikTok iframe
+              <>
+                <iframe
+                  src={`https://www.tiktok.com/embed/v2/${
+                    video.tiktok_video_id || extractVideoId(video.url)
+                  }`}
+                  allow="encrypted-media; fullscreen"
+                  scrolling="no"
+                  frameBorder="0"
+                  className="absolute inset-0 w-full h-full"
+                  onLoad={() => setIsLoading(false)}
+                ></iframe>
+                
+                {/* Gradient overlay for iframe only */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+                
+                {/* Mute Button for iframe only */}
+                <button
+                  onClick={toggleMute}
+                  className="absolute bottom-3 right-3 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/60 transition-colors"
+                >
+                  {isMuted ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
+                </button>
+              </>
+            )}
           </div>
 
           {/* Stats */}
@@ -140,6 +172,36 @@ export const ViewSubmissionModal: React.FC<ViewSubmissionModalProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Full-screen video modal for mobile */}
+      {showFullScreen && video.video_url && (
+        <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center">
+          {/* Close button */}
+          <button
+            onClick={() => setShowFullScreen(false)}
+            className="absolute top-4 right-4 z-10 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/70 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          
+          {/* Full-screen video */}
+          <video
+            src={video.video_url}
+            controls
+            autoPlay
+            muted={isMuted}
+            className="w-full h-full object-contain"
+          >
+            Your browser does not support the video tag.
+          </video>
+          
+          {/* Background tap to close */}
+          <div 
+            className="absolute inset-0 -z-10"
+            onClick={() => setShowFullScreen(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
