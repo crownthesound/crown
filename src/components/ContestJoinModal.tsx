@@ -531,10 +531,49 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
           const downloadData = await downloadResponse.json();
           downloadedVideoUrl = downloadData.data.publicUrl;
           console.log("✅ Video downloaded successfully:", downloadedVideoUrl);
+          
+          // Display detailed logs from backend
+          if (downloadData.data.logs && downloadData.data.logs.length > 0) {
+            console.group("📋 Detailed Download Logs:");
+            downloadData.data.logs.forEach((log: any, index: number) => {
+              const emoji = log.level === 'success' ? '✅' : log.level === 'error' ? '❌' : log.level === 'warn' ? '⚠️' : 'ℹ️';
+              console.log(`${index + 1}. ${emoji} [${log.step}] ${log.message}`, log.details || '');
+            });
+            console.groupEnd();
+            
+            // Also show summary information
+            const finalLog = downloadData.data.logs[downloadData.data.logs.length - 1];
+            if (finalLog && finalLog.details) {
+              console.log("📊 Download Summary:", {
+                fileName: downloadData.data.fileName,
+                publicUrl: downloadedVideoUrl,
+                totalLogs: downloadData.data.logs.length,
+                finalStep: finalLog.step
+              });
+            }
+          }
         } else {
           console.warn("⚠️ Video download failed, continuing without stored video");
           const errorData = await downloadResponse.json();
           console.error("Download error:", errorData);
+          
+          // Display detailed error logs
+          if (errorData.error && errorData.error.logs && errorData.error.logs.length > 0) {
+            console.group("📋 Detailed Error Logs:");
+            errorData.error.logs.forEach((log: any, index: number) => {
+              const emoji = log.level === 'success' ? '✅' : log.level === 'error' ? '❌' : log.level === 'warn' ? '⚠️' : 'ℹ️';
+              console.log(`${index + 1}. ${emoji} [${log.step}] ${log.message}`, log.details || '');
+            });
+            console.groupEnd();
+            
+            // Show error summary
+            console.error("💥 Error Summary:", {
+              message: errorData.error.message,
+              type: errorData.error.type,
+              stage: errorData.error.debugging?.stage,
+              totalLogs: errorData.error.logs.length
+            });
+          }
         }
       } catch (downloadError) {
         console.warn("⚠️ Video download failed, continuing without stored video:", downloadError);
