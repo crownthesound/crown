@@ -1040,7 +1040,7 @@ export function PublicLeaderboard() {
                       )}
                       <div className="min-w-0">
                         <div className="font-medium text-white truncate">
-                          {participant.username}
+                          {participant.tiktok_display_name || participant.username}
                         </div>
                         <div className="text-xs text-white/60">
                           {formatNumber(participant.views)} views
@@ -1143,10 +1143,26 @@ export function PublicLeaderboard() {
                       {formatNumber(participant.views)}
                     </div>
                     <div className="col-span-1 flex justify-center">
-                      {/* Play button now integrated into thumbnail */}
-                      <div className="text-white/40 text-xs">
-                        {participant.thumbnail ? 'Click thumbnail' : 'No preview'}
-                      </div>
+                      {participant.thumbnail ? (
+                        <div 
+                          className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
+                          onClick={() => handlePlayVideo(participant)}
+                          title="Play video"
+                        >
+                          <img
+                            src={participant.thumbnail}
+                            alt="Video preview"
+                            className="w-6 h-6 rounded object-cover opacity-60 hover:opacity-80"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Play className="h-2 w-2 text-white/80 drop-shadow" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-white/30 text-xs">
+                          No preview
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
