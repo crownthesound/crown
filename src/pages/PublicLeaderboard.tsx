@@ -306,11 +306,14 @@ export function PublicLeaderboard() {
       leaderboardResp.data &&
       leaderboardResp.data.leaderboard
     ) {
-      // Debug logging to check if video_url is being received
+      // Debug logging to check if video_url and avatar_url are being received
       console.group('📊 Leaderboard Data Debug');
       console.log('Leaderboard response:', leaderboardResp.data.leaderboard);
       console.log('First participant video_url:', leaderboardResp.data.leaderboard[0]?.video_url);
+      console.log('First participant avatar_url:', leaderboardResp.data.leaderboard[0]?.avatar_url);
+      console.log('First participant tiktok_display_name:', leaderboardResp.data.leaderboard[0]?.tiktok_display_name);
       console.log('Participants with video_url:', leaderboardResp.data.leaderboard.filter((p: any) => p.video_url).length);
+      console.log('Participants with avatar_url:', leaderboardResp.data.leaderboard.filter((p: any) => p.avatar_url).length);
       console.groupEnd();
       
       setParticipants(leaderboardResp.data.leaderboard);
@@ -1017,11 +1020,11 @@ export function PublicLeaderboard() {
                           </span>
                         </div>
                       )}
-                      {/* Video Thumbnail for mobile */}
+                      {/* Video Thumbnail with Play Button for mobile */}
                       {participant.thumbnail && (
-                        <button
+                        <div 
+                          className="relative flex-shrink-0 cursor-pointer"
                           onClick={() => handlePlayVideo(participant)}
-                          className="flex-shrink-0"
                           title="Play video"
                         >
                           <img
@@ -1029,7 +1032,11 @@ export function PublicLeaderboard() {
                             alt={`${participant.username} video thumbnail`}
                             className="w-8 h-8 rounded-lg object-cover border border-white/10"
                           />
-                        </button>
+                          {/* Play icon overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded-lg transition-all opacity-90 hover:opacity-100">
+                            <Play className="h-3 w-3 text-white drop-shadow-lg" />
+                          </div>
+                        </div>
                       )}
                       <div className="min-w-0">
                         <div className="font-medium text-white truncate">
@@ -1045,13 +1052,7 @@ export function PublicLeaderboard() {
                         )}
                       </div>
                     </div>
-                    <button
-                      onClick={() => handlePlayVideo(participant)}
-                      className="p-1.5 rounded-full hover:bg-white/10 transition-colors flex-shrink-0"
-                      title="Play video"
-                    >
-                      <Play className="h-4 w-4 text-white/60 hover:text-white" />
-                    </button>
+                    {/* Play button now integrated into thumbnail */}
                   </div>
                 </div>
               ))}
@@ -1063,7 +1064,7 @@ export function PublicLeaderboard() {
                 <div className="col-span-1">Rank</div>
                 <div className="col-span-6">Participant</div>
                 <div className="col-span-2 text-right">Views</div>
-                <div className="col-span-1 text-center">Play</div>
+                <div className="col-span-1 text-center">Preview</div>
               </div>
 
               <div className="divide-y divide-white/10">
@@ -1105,11 +1106,11 @@ export function PublicLeaderboard() {
                             </span>
                           </div>
                         )}
-                        {/* Video Thumbnail */}
+                        {/* Video Thumbnail with Play Button */}
                         {participant.thumbnail && (
-                          <button
+                          <div
+                            className="relative flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-white/20 rounded-lg transition-all"
                             onClick={() => handlePlayVideo(participant)}
-                            className="flex-shrink-0 rounded-lg hover:ring-2 hover:ring-white/20 transition-all"
                             title="Play video"
                           >
                             <img
@@ -1117,7 +1118,11 @@ export function PublicLeaderboard() {
                               alt={`${participant.username} video thumbnail`}
                               className="w-10 h-10 rounded-lg object-cover border border-white/10"
                             />
-                          </button>
+                            {/* Play icon overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100">
+                              <Play className="h-4 w-4 text-white drop-shadow-lg" />
+                            </div>
+                          </div>
                         )}
                       </div>
                       <div className="min-w-0">
@@ -1138,13 +1143,10 @@ export function PublicLeaderboard() {
                       {formatNumber(participant.views)}
                     </div>
                     <div className="col-span-1 flex justify-center">
-                      <button
-                        onClick={() => handlePlayVideo(participant)}
-                        className="p-2 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition-colors group"
-                        title="Play video"
-                      >
-                        <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
-                      </button>
+                      {/* Play button now integrated into thumbnail */}
+                      <div className="text-white/40 text-xs">
+                        {participant.thumbnail ? 'Click thumbnail' : 'No preview'}
+                      </div>
                     </div>
                   </div>
                 ))}

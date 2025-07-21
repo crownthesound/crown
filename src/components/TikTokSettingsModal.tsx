@@ -166,13 +166,21 @@ export function TikTokSettingsModal({
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs font-medium">
-                            {account.display_name?.charAt(0) ||
-                              account.username?.charAt(0) ||
-                              "T"}
-                          </span>
-                        </div>
+                        {account.avatar_url ? (
+                          <img
+                            src={account.avatar_url}
+                            alt={`${account.username} profile`}
+                            className="w-8 h-8 rounded-full object-cover border border-white/10"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10">
+                            <span className="text-white text-xs font-medium">
+                              {account.display_name?.charAt(0) ||
+                                account.username?.charAt(0) ||
+                                "T"}
+                            </span>
+                          </div>
+                        )}
                         <div>
                           <div className="text-white font-medium text-sm">
                             @{account.username || "N/A"}
