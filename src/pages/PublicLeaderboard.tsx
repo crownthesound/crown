@@ -56,6 +56,8 @@ interface Participant {
   title?: string;
   embed_code?: string | null;
   tiktok_video_id?: string | null;
+  avatar_url?: string | null; // TikTok profile avatar
+  tiktok_display_name?: string | null; // TikTok display name
 }
 
 interface ContestDetails {
@@ -90,6 +92,8 @@ const mockParticipants: Participant[] = [
     views: 1200000,
     previousRank: 2,
     video_url: "https://example.com/video1",
+    avatar_url: "https://example.com/avatar1.jpg",
+    tiktok_display_name: "Mukonazwothe Khabubu",
   },
   {
     id: "2",
@@ -999,7 +1003,15 @@ export function PublicLeaderboard() {
                           participant.previousRank
                         )}
                       </div>
-                      {/* Thumbnail for mobile */}
+                      {/* Profile Avatar for mobile */}
+                      {participant.avatar_url && (
+                        <img
+                          src={participant.avatar_url}
+                          alt={`${participant.username} profile`}
+                          className="w-8 h-8 rounded-full object-cover border border-white/10 flex-shrink-0"
+                        />
+                      )}
+                      {/* Video Thumbnail for mobile */}
                       {participant.thumbnail && (
                         <button
                           onClick={() => handlePlayVideo(participant)}
@@ -1009,7 +1021,7 @@ export function PublicLeaderboard() {
                           <img
                             src={participant.thumbnail}
                             alt={`${participant.username} video thumbnail`}
-                            className="w-8 h-8 rounded-full object-cover border border-white/10"
+                            className="w-8 h-8 rounded-lg object-cover border border-white/10"
                           />
                         </button>
                       )}
@@ -1072,26 +1084,42 @@ export function PublicLeaderboard() {
                       )}
                     </div>
                     <div className="col-span-6 flex items-center gap-3">
-                      {participant.thumbnail && (
-                        <button
-                          onClick={() => handlePlayVideo(participant)}
-                          className="flex-shrink-0 rounded-full hover:ring-2 hover:ring-white/20 transition-all"
-                          title="Play video"
-                        >
+                      <div className="flex items-center gap-2">
+                        {/* Profile Avatar */}
+                        {participant.avatar_url && (
                           <img
-                            src={participant.thumbnail}
-                            alt={`${participant.username} video thumbnail`}
-                            className="w-10 h-10 rounded-full object-cover border border-white/10"
+                            src={participant.avatar_url}
+                            alt={`${participant.username} profile`}
+                            className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
                           />
-                        </button>
-                      )}
+                        )}
+                        {/* Video Thumbnail */}
+                        {participant.thumbnail && (
+                          <button
+                            onClick={() => handlePlayVideo(participant)}
+                            className="flex-shrink-0 rounded-lg hover:ring-2 hover:ring-white/20 transition-all"
+                            title="Play video"
+                          >
+                            <img
+                              src={participant.thumbnail}
+                              alt={`${participant.username} video thumbnail`}
+                              className="w-10 h-10 rounded-lg object-cover border border-white/10"
+                            />
+                          </button>
+                        )}
+                      </div>
                       <div className="min-w-0">
                         <div className="font-medium text-white truncate">
-                          {participant.username}
+                          {participant.tiktok_display_name || participant.username}
                         </div>
                         <div className="text-sm text-white/60 line-clamp-1">
-                          {participant.title || ""}
+                          @{participant.username}
                         </div>
+                        {participant.title && (
+                          <div className="text-xs text-white/40 line-clamp-1">
+                            {participant.title}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="col-span-2 text-right font-medium text-white">
