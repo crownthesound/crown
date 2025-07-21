@@ -1004,12 +1004,18 @@ export function PublicLeaderboard() {
                         )}
                       </div>
                       {/* Profile Avatar for mobile */}
-                      {participant.avatar_url && (
+                      {participant.avatar_url ? (
                         <img
                           src={participant.avatar_url}
                           alt={`${participant.username} profile`}
                           className="w-8 h-8 rounded-full object-cover border border-white/10 flex-shrink-0"
                         />
+                      ) : (
+                        <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                          <span className="text-white text-xs font-medium">
+                            {participant.tiktok_display_name?.charAt(0) || participant.username?.charAt(0) || 'U'}
+                          </span>
+                        </div>
                       )}
                       {/* Video Thumbnail for mobile */}
                       {participant.thumbnail && (
@@ -1086,12 +1092,18 @@ export function PublicLeaderboard() {
                     <div className="col-span-6 flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         {/* Profile Avatar */}
-                        {participant.avatar_url && (
+                        {participant.avatar_url ? (
                           <img
                             src={participant.avatar_url}
                             alt={`${participant.username} profile`}
                             className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
                           />
+                        ) : (
+                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                            <span className="text-white text-sm font-medium">
+                              {participant.tiktok_display_name?.charAt(0) || participant.username?.charAt(0) || 'U'}
+                            </span>
+                          </div>
                         )}
                         {/* Video Thumbnail */}
                         {participant.thumbnail && (

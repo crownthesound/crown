@@ -12,6 +12,8 @@ interface VideoData {
   likes: number | null;
   comments: number | null;
   shares: number | null;
+  avatar_url?: string | null; // TikTok profile avatar
+  tiktok_display_name?: string | null; // TikTok display name
 }
 
 interface MobileVideoModalProps {
@@ -113,9 +115,29 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
             <h3 className="text-white text-sm font-medium line-clamp-2">
               {video.title}
             </h3>
-            <p className="text-white/70 text-xs mt-1">
-              by @{video.username}
-            </p>
+            <div className="flex items-center gap-2 mt-2">
+              {video.avatar_url ? (
+                <img
+                  src={video.avatar_url}
+                  alt={`${video.username} profile`}
+                  className="w-6 h-6 rounded-full object-cover border border-white/20"
+                />
+              ) : (
+                <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/20">
+                  <span className="text-white text-xs font-medium">
+                    {video.tiktok_display_name?.charAt(0) || video.username?.charAt(0) || 'U'}
+                  </span>
+                </div>
+              )}
+              <div>
+                <p className="text-white/90 text-xs font-medium">
+                  {video.tiktok_display_name || video.username}
+                </p>
+                <p className="text-white/60 text-xs">
+                  @{video.username}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

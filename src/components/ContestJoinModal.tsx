@@ -795,11 +795,19 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                     // Single account - just show it
                     <div className="mt-3 p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm font-medium">
-                            {tikTokAccounts[0].display_name?.charAt(0) || tikTokAccounts[0].username?.charAt(0) || 'T'}
-                          </span>
-                        </div>
+                        {tikTokAccounts[0].avatar_url ? (
+                          <img
+                            src={tikTokAccounts[0].avatar_url}
+                            alt={`${tikTokAccounts[0].username} profile`}
+                            className="w-10 h-10 rounded-full object-cover border border-white/10"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm font-medium">
+                              {tikTokAccounts[0].display_name?.charAt(0) || tikTokAccounts[0].username?.charAt(0) || 'T'}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex-1">
                           <div className="text-green-200 font-medium">
                             @{tikTokAccounts[0].username || 'TikTok User'}
@@ -864,11 +872,19 @@ export const ContestJoinModal: React.FC<ContestJoinModalProps> = ({
                             disabled={switchingAccount !== null}
                             className="w-4 h-4 text-blue-600 bg-transparent border-2 border-blue-500 rounded focus:ring-blue-500 focus:ring-2 disabled:opacity-50"
                           />
-                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                            <span className="text-white text-sm font-medium">
-                              {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
-                            </span>
-                          </div>
+                          {account.avatar_url ? (
+                            <img
+                              src={account.avatar_url}
+                              alt={`${account.username} profile`}
+                              className="w-10 h-10 rounded-full object-cover border border-white/10"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                              <span className="text-white text-sm font-medium">
+                                {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
+                              </span>
+                            </div>
+                          )}
                           <div className="flex-1">
                             <div className="text-green-200 font-medium">
                               @{account.username || 'TikTok User'}

@@ -392,9 +392,19 @@ export function Profile() {
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-600/20 animate-gradient-x"></div>
             <div className="relative flex flex-col sm:flex-row sm:items-center gap-6">
               {/* Avatar */}
-              <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center border-2 border-white/20 mx-auto sm:mx-0">
-                <User className="h-10 w-10 text-white" />
-              </div>
+              {tikTokAccounts.find(account => account.is_primary)?.avatar_url ? (
+                <img
+                  src={tikTokAccounts.find(account => account.is_primary)?.avatar_url!}
+                  alt={`${tikTokAccounts.find(account => account.is_primary)?.username} profile`}
+                  className="w-24 h-24 rounded-full object-cover border-2 border-white/20 mx-auto sm:mx-0"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border-2 border-white/20 mx-auto sm:mx-0">
+                  <span className="text-white text-2xl font-medium">
+                    {profile?.full_name?.charAt(0) || tikTokAccounts.find(account => account.is_primary)?.username?.charAt(0) || 'U'}
+                  </span>
+                </div>
+              )}
 
               {/* Profile Info */}
               <div className="flex-1 text-center sm:text-left">
@@ -940,19 +950,29 @@ export function Profile() {
                       }`}>
                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                           <div className="flex items-center gap-4">
-                            <div className={`w-14 h-14 rounded-full flex items-center justify-center relative ${
-                              account.is_primary 
-                                ? 'bg-gradient-to-br from-blue-500 to-purple-600' 
-                                : 'bg-gradient-to-br from-pink-500 to-purple-600'
-                            }`}>
+                            <div className="relative">
+                              {account.avatar_url ? (
+                                <img
+                                  src={account.avatar_url}
+                                  alt={`${account.username} profile`}
+                                  className="w-14 h-14 rounded-full object-cover border border-white/10"
+                                />
+                              ) : (
+                                <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
+                                  account.is_primary 
+                                    ? 'bg-gradient-to-br from-blue-500 to-purple-600' 
+                                    : 'bg-gradient-to-br from-pink-500 to-purple-600'
+                                }`}>
+                                  <span className="text-white text-lg font-medium">
+                                    {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
+                                  </span>
+                                </div>
+                              )}
                               {account.is_primary && (
                                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-400 rounded-full flex items-center justify-center">
                                   <Crown className="h-3 w-3 text-white" />
                                 </div>
                               )}
-                              <span className="text-white text-lg font-medium">
-                                {account.display_name?.charAt(0) || account.username?.charAt(0) || 'T'}
-                              </span>
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2 flex-wrap">

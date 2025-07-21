@@ -14,6 +14,8 @@ interface VideoLink {
   shares: number | null;
   tiktok_video_id?: string | null;
   embed_code?: string | null;
+  avatar_url?: string | null; // TikTok profile avatar
+  tiktok_display_name?: string | null; // TikTok display name
 }
 
 interface ViewSubmissionModalProps {
@@ -113,6 +115,32 @@ export const ViewSubmissionModal: React.FC<ViewSubmissionModalProps> = ({
           <h2 className="text-xl font-semibold text-white mb-3 line-clamp-2">
             {video.title}
           </h2>
+          
+          {/* User Info Section */}
+          <div className="flex items-center gap-3 mb-4">
+            {video.avatar_url ? (
+              <img
+                src={video.avatar_url}
+                alt={`${video.username} profile`}
+                className="w-10 h-10 rounded-full object-cover border border-white/10"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10">
+                <span className="text-white text-sm font-medium">
+                  {video.tiktok_display_name?.charAt(0) || video.username?.charAt(0) || 'U'}
+                </span>
+              </div>
+            )}
+            <div className="flex-1">
+              <div className="font-medium text-white">
+                {video.tiktok_display_name || video.username}
+              </div>
+              <div className="text-sm text-white/60">
+                @{video.username}
+              </div>
+            </div>
+          </div>
+          
           <div
             className="relative w-full rounded-xl overflow-hidden"
             style={{ aspectRatio: "9/16" }}
