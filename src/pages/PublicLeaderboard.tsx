@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import {
@@ -224,6 +224,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 export function PublicLeaderboard() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { session, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [contest, setContest] = useState<ContestDetails | null>(null);
@@ -433,6 +434,22 @@ export function PublicLeaderboard() {
     }
   }, [session, hasRedirectUrl, hasRedirectAction, getRedirectAction, contest, userSubmission, clearRedirectUrl, hasAutoOpenedModal]);
 
+  // Handle video URL parameters for direct video access
+  useEffect(() => {
+    const videoId = searchParams.get('video');
+    if (videoId && participants.length > 0 && !viewVideo && !mobileVideo) {
+      const videoParticipant = participants.find(p => p.id === videoId);
+      if (videoParticipant) {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && videoParticipant.video_url) {
+          setMobileVideo(videoParticipant);
+        } else {
+          setViewVideo(videoParticipant);
+        }
+      }
+    }
+  }, [searchParams, participants, viewVideo, mobileVideo]);
+
   // Fallback mechanism - DISABLED to prevent annoying popup
   // TODO: Re-enable after fixing the main auto-modal logic
   /*
@@ -486,6 +503,11 @@ export function PublicLeaderboard() {
   };
 
   const handlePlayVideo = (video: Participant) => {
+    // Update URL with video parameter for shareable links
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('video', video.id);
+    setSearchParams(newSearchParams);
+    
     // Check if we're on mobile and have a stored video
     const isMobile = window.innerWidth < 768;
     
@@ -959,7 +981,7 @@ export function PublicLeaderboard() {
               {participants.map((participant) => (
                 <div key={participant.id} className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         <div
                           className={`w-6 text-center font-medium ${getRankColor(
@@ -977,18 +999,37 @@ export function PublicLeaderboard() {
                           participant.previousRank
                         )}
                       </div>
-                      <div>
-                        <div className="font-medium text-white">
+                      {/* Thumbnail for mobile */}
+                      {participant.thumbnail && (
+                        <button
+                          onClick={() => handlePlayVideo(participant)}
+                          className="flex-shrink-0"
+                          title="Play video"
+                        >
+                          <img
+                            src={participant.thumbnail}
+                            alt={`${participant.username} video thumbnail`}
+                            className="w-8 h-8 rounded-full object-cover border border-white/10"
+                          />
+                        </button>
+                      )}
+                      <div className="min-w-0">
+                        <div className="font-medium text-white truncate">
                           {participant.username}
                         </div>
                         <div className="text-xs text-white/60">
                           {formatNumber(participant.views)} views
                         </div>
+                        {participant.title && (
+                          <div className="text-xs text-white/40 truncate">
+                            {participant.title}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <button
                       onClick={() => handlePlayVideo(participant)}
-                      className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                      className="p-1.5 rounded-full hover:bg-white/10 transition-colors flex-shrink-0"
                       title="Play video"
                     >
                       <Play className="h-4 w-4 text-white/60 hover:text-white" />
@@ -1032,13 +1073,20 @@ export function PublicLeaderboard() {
                     </div>
                     <div className="col-span-6 flex items-center gap-3">
                       {participant.thumbnail && (
-                        <img
-                          src={participant.thumbnail}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
+                        <button
+                          onClick={() => handlePlayVideo(participant)}
+                          className="flex-shrink-0 rounded-full hover:ring-2 hover:ring-white/20 transition-all"
+                          title="Play video"
+                        >
+                          <img
+                            src={participant.thumbnail}
+                            alt={`${participant.username} video thumbnail`}
+                            className="w-10 h-10 rounded-full object-cover border border-white/10"
+                          />
+                        </button>
                       )}
-                      <div>
-                        <div className="font-medium text-white">
+                      <div className="min-w-0">
+                        <div className="font-medium text-white truncate">
                           {participant.username}
                         </div>
                         <div className="text-sm text-white/60 line-clamp-1">
@@ -1215,7 +1263,13 @@ export function PublicLeaderboard() {
         {viewVideo && (
           <ViewSubmissionModal
             isOpen={!!viewVideo}
-            onClose={() => setViewVideo(null)}
+            onClose={() => {
+              setViewVideo(null);
+              // Remove video parameter from URL when closing
+              const newSearchParams = new URLSearchParams(searchParams);
+              newSearchParams.delete('video');
+              setSearchParams(newSearchParams);
+            }}
             video={viewVideo}
           />
         )}
@@ -1224,7 +1278,13 @@ export function PublicLeaderboard() {
         {mobileVideo && (
           <MobileVideoModal
             isOpen={!!mobileVideo}
-            onClose={() => setMobileVideo(null)}
+            onClose={() => {
+              setMobileVideo(null);
+              // Remove video parameter from URL when closing
+              const newSearchParams = new URLSearchParams(searchParams);
+              newSearchParams.delete('video');
+              setSearchParams(newSearchParams);
+            }}
             video={mobileVideo}
           />
         )}
