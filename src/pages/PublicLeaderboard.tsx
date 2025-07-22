@@ -876,12 +876,12 @@ export function PublicLeaderboard() {
 
             {/* Mobile View */}
             <div className="sm:hidden">
-              <div className="max-h-[50vh] overflow-y-auto divide-y divide-white/10">
+              <div className="max-h-[30vh] sm:max-h-[50vh] overflow-y-auto divide-y divide-white/10">
                 {participants.map((participant) => (
-                  <div key={participant.id} className="p-2">
-                    <div className="flex items-center gap-2">
+                  <div key={participant.id} className="p-1.5">
+                    <div className="flex items-center gap-1.5">
                       {/* Rank Section */}
-                      <div className="flex flex-col items-center gap-0.5 min-w-[32px]">
+                      <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
                         <div className="flex items-center gap-0.5">
                           <div
                             className={`text-xs font-bold ${getRankColor(
@@ -890,12 +890,14 @@ export function PublicLeaderboard() {
                           >
                             #{participant.rank}
                           </div>
-                          {getRankIcon(
-                            participant.rank,
-                            participant.rank <= (contest.num_winners || 3)
-                          )}
+                          <div className="scale-75">
+                            {getRankIcon(
+                              participant.rank,
+                              participant.rank <= (contest.num_winners || 3)
+                            )}
+                          </div>
                         </div>
-                        <div className="scale-75">
+                        <div className="scale-[0.6]">
                           {getRankChangeIcon(
                             participant.rank,
                             participant.previousRank
@@ -908,10 +910,10 @@ export function PublicLeaderboard() {
                         <img
                           src={participant.avatar_url}
                           alt={`${participant.username} profile`}
-                          className="w-8 h-8 rounded-full object-cover border border-white/10 flex-shrink-0"
+                          className="w-6 h-6 rounded-full object-cover border border-white/10 flex-shrink-0"
                         />
                       ) : (
-                        <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                        <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
                           <span className="text-white text-xs font-medium">
                             {participant.tiktok_display_name?.charAt(0) ||
                               participant.username?.charAt(0) ||
@@ -924,49 +926,32 @@ export function PublicLeaderboard() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium text-white text-xs truncate leading-tight">
+                            <div className="font-medium text-white text-xs truncate leading-none mb-0.5">
                               {participant.tiktok_display_name ||
                                 participant.username}
                             </div>
-                            <div className="text-xs text-white/60 leading-tight">
-                              @{participant.username}
+                            <div className="text-xs text-white/60 leading-none">
+                              {formatNumber(participant.views)} views
                             </div>
-                            {participant.title && (
-                              <div className="text-xs text-white/40 truncate leading-tight">
-                                {participant.title}
-                              </div>
-                            )}
                           </div>
 
-                          {/* Views and Play Button */}
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <div className="text-right">
-                              <div className="text-xs font-semibold text-white leading-tight">
-                                {formatNumber(participant.views)}
-                              </div>
-                              <div className="text-xs text-white/60 leading-tight">
-                                views
+                          {/* Video Thumbnail with Play Button */}
+                          {participant.thumbnail && (
+                            <div
+                              className="relative flex-shrink-0 cursor-pointer ml-2"
+                              onClick={() => handlePlayVideo(participant)}
+                              title="Play video"
+                            >
+                              <img
+                                src={participant.thumbnail}
+                                alt={`${participant.username} video thumbnail`}
+                                className="w-6 h-6 rounded object-cover border border-white/10"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded transition-all opacity-90 hover:opacity-100">
+                                <Play className="h-3 w-3 text-white drop-shadow-lg" />
                               </div>
                             </div>
-
-                            {/* Video Thumbnail with Play Button */}
-                            {participant.thumbnail && (
-                              <div
-                                className="relative flex-shrink-0 cursor-pointer"
-                                onClick={() => handlePlayVideo(participant)}
-                                title="Play video"
-                              >
-                                <img
-                                  src={participant.thumbnail}
-                                  alt={`${participant.username} video thumbnail`}
-                                  className="w-8 h-8 rounded-lg object-cover border border-white/10"
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded-lg transition-all opacity-90 hover:opacity-100">
-                                  <Play className="h-3.5 w-3.5 text-white drop-shadow-lg" />
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
                     </div>
