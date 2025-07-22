@@ -349,7 +349,11 @@ export function PublicLeaderboard() {
 
           const isMobile = window.innerWidth < 640;
           if (isMobile) {
-            setTimeLeft(`${days}d ${hours}h`);
+            if (days > 0) {
+              setTimeLeft(`${days}d ${hours}h`);
+            } else {
+              setTimeLeft(`${hours}h ${minutes}m`);
+            }
           } else {
             setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
           }
@@ -651,7 +655,7 @@ export function PublicLeaderboard() {
 
     return (
       <div
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+        className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-medium border min-h-[24px] ${
           statusColors[calculatedStatus as keyof typeof statusColors]
         }`}
       >
@@ -758,10 +762,10 @@ export function PublicLeaderboard() {
         <div className="relative">
           {/* Logo */}
           <div className="absolute top-0 left-0 right-0 z-10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <Link to="/" className="flex items-center gap-3">
-                <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white drop-shadow-lg" />
-                <span className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-lg">
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+              <Link to="/" className="flex items-center gap-2 sm:gap-3">
+                <Crown className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 text-white drop-shadow-lg" />
+                <span className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight drop-shadow-lg">
                   Crown
                 </span>
               </Link>
@@ -778,32 +782,27 @@ export function PublicLeaderboard() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
               {/* Title and Controls - Updated for better mobile display */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
                 <div className="max-w-7xl mx-auto">
-                  <div className="flex flex-col gap-3 sm:gap-4">
-                    <div className="flex items-start sm:items-center justify-between gap-3">
+                  <div className="flex flex-col gap-2 sm:gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="space-y-2">
-                        <h1 className="text-xl xs:text-2xl sm:text-4xl font-black text-white drop-shadow-sm line-clamp-2">
+                        <h1 className="text-lg xs:text-xl sm:text-3xl lg:text-4xl font-black text-white drop-shadow-sm line-clamp-2 pr-2">
                           {contest?.name}
                         </h1>
                         {getStatusBadge()}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="hidden xs:flex items-center gap-2 text-sm text-white/90 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                          <Clock className="h-4 w-4" />
-                          <span>{timeLeft}</span>
-                        </div>
-                        {/* Mobile Timer */}
-                        <div className="xs:hidden flex items-center gap-1.5 text-xs text-white/90 bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm">
-                          <Clock className="h-3 w-3" />
-                          <span>{timeLeft}</span>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-white/90 bg-black/40 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full backdrop-blur-sm">
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                          <span className="font-medium">{timeLeft}</span>
                         </div>
                         <button
                           onClick={handleShare}
-                          className="p-2 rounded-full bg-black/30 hover:bg-black/40 text-white/90 backdrop-blur-sm transition-colors"
+                          className="p-2 sm:p-2 rounded-full bg-black/40 hover:bg-black/50 text-white/90 backdrop-blur-sm transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                           title="Share contest"
                         >
-                          <Share2 className="h-4 w-4" />
+                          <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </button>
                       </div>
                     </div>
@@ -814,31 +813,26 @@ export function PublicLeaderboard() {
           ) : (
             // Fallback header when no cover image
             <div className="relative bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A] border-b border-white/10">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
-                <div className="flex flex-col gap-4 sm:gap-6">
-                  <div className="flex items-start sm:items-center justify-between gap-4">
-                    <div className="space-y-3">
-                      <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-black text-white line-clamp-2">
+              <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-6 sm:pb-8">
+                <div className="flex flex-col gap-3 sm:gap-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                    <div className="space-y-2 sm:space-y-3">
+                      <h1 className="text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-black text-white line-clamp-2 pr-2">
                         {contest?.name}
                       </h1>
                       {getStatusBadge()}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="hidden xs:flex items-center gap-2 text-sm text-white/90 bg-white/10 px-3 py-2 rounded-full backdrop-blur-sm">
-                        <Clock className="h-4 w-4" />
-                        <span>{timeLeft}</span>
-                      </div>
-                      {/* Mobile Timer */}
-                      <div className="xs:hidden flex items-center gap-1.5 text-xs text-white/90 bg-white/10 px-2 py-1.5 rounded-full backdrop-blur-sm">
-                        <Clock className="h-3 w-3" />
-                        <span>{timeLeft}</span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-1.5 text-xs sm:text-sm text-white/90 bg-white/10 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full backdrop-blur-sm">
+                        <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="font-medium">{timeLeft}</span>
                       </div>
                       <button
                         onClick={handleShare}
-                        className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/90 backdrop-blur-sm transition-colors"
+                        className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/90 backdrop-blur-sm transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                         title="Share contest"
                       >
-                        <Share2 className="h-4 w-4" />
+                        <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </button>
                     </div>
                   </div>
@@ -848,16 +842,16 @@ export function PublicLeaderboard() {
           )}
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 py-6 space-y-6 pb-32">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-32">
           {/* Contest Info */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-            <div className="space-y-4">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-6">
+            <div className="space-y-3 sm:space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2">
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">
                   About this Contest
                 </h3>
                 <p
-                  className={`text-white/80 leading-relaxed ${
+                  className={`text-sm sm:text-base text-white/80 leading-relaxed ${
                     !showFullDescription && "line-clamp-3"
                   }`}
                 >
@@ -866,7 +860,7 @@ export function PublicLeaderboard() {
                 {contest.description.length > 150 && (
                   <button
                     onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="text-white hover:text-white/90 text-sm mt-2 font-medium"
+                    className="text-white hover:text-white/90 text-sm mt-3 font-medium min-h-[44px] flex items-center"
                   >
                     {showFullDescription ? "Show less" : "Read more"}
                   </button>
@@ -877,27 +871,27 @@ export function PublicLeaderboard() {
 
           {/* Resources Section */}
           {contest.resources && contest.resources.length > 0 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-6">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <LinkIcon className="h-4 w-4 text-white" />
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-base sm:text-lg font-semibold text-white">
                   Helpful Resources
                 </h2>
               </div>
 
-              <div className="grid gap-2">
+              <div className="grid gap-2 sm:gap-3">
                 {contest.resources.map((resource, index) => (
                   <div
                     key={index}
-                    className="group bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors"
+                    className="group bg-white/5 rounded-lg p-3 sm:p-4 hover:bg-white/10 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-medium text-white truncate">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1 mb-1">
                           {resource.title}
                         </h3>
                         {resource.description && (
-                          <p className="text-xs text-white/60 line-clamp-2">
+                          <p className="text-xs sm:text-sm text-white/60 line-clamp-2">
                             {resource.description}
                           </p>
                         )}
@@ -906,7 +900,7 @@ export function PublicLeaderboard() {
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-shrink-0 p-1 -m-1 rounded-full text-white/60 hover:text-white transition-colors"
+                        className="flex-shrink-0 p-2 rounded-full text-white/60 hover:text-white transition-colors hover:bg-white/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
                       >
                         <LinkIcon className="h-4 w-4" />
                       </a>
@@ -918,20 +912,20 @@ export function PublicLeaderboard() {
           )}
 
           {/* Prize Distribution */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-white" />
-                <h2 className="text-lg font-semibold text-white">
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                <h2 className="text-base sm:text-lg font-semibold text-white">
                   {contest.prize_tier === "monetary" ? "Prize Pool" : "Prizes"}
                 </h2>
               </div>
-              <div className="text-sm text-white/60">
+              <div className="text-xs sm:text-sm text-white/60">
                 {contest.prize_titles.length} Winners
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
               {contest.prize_titles.map((prize, index) => (
                 <button
                   key={index}
@@ -944,12 +938,12 @@ export function PublicLeaderboard() {
                           : prize.title,
                     })
                   }
-                  className="p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all hover:scale-105"
+                  className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all hover:scale-105 min-h-[80px] sm:min-h-[90px] flex flex-col justify-center"
                 >
-                  <div className="flex items-center gap-1.5 mb-1.5">
+                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
                     {getRankIcon(index + 1, true)}
                     <span
-                      className={`text-xs font-medium ${getRankColor(
+                      className={`text-xs sm:text-sm font-medium ${getRankColor(
                         index + 1
                       )}`}
                     >
@@ -963,7 +957,7 @@ export function PublicLeaderboard() {
                         : "th"}
                     </span>
                   </div>
-                  <div className="text-xs font-medium text-white leading-tight line-clamp-2">
+                  <div className="text-xs sm:text-sm font-medium text-white leading-tight line-clamp-2 text-center">
                     {contest.prize_tier === "monetary"
                       ? `$${formatNumber(
                           contest.prize_per_winner * (1 - index * 0.2)
@@ -977,8 +971,8 @@ export function PublicLeaderboard() {
 
           {/* Leaderboard */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-            <div className="px-6 py-4 border-b border-white/10">
-              <h2 className="text-lg font-semibold text-white">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10">
+              <h2 className="text-base sm:text-lg font-semibold text-white">
                 Current Rankings
               </h2>
             </div>
@@ -986,12 +980,13 @@ export function PublicLeaderboard() {
             {/* Mobile View */}
             <div className="sm:hidden divide-y divide-white/10">
               {participants.map((participant) => (
-                <div key={participant.id} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
+                <div key={participant.id} className="p-3 sm:p-4">
+                  <div className="flex items-center gap-3">
+                    {/* Rank Section */}
+                    <div className="flex flex-col items-center gap-1 min-w-[40px]">
+                      <div className="flex items-center gap-1">
                         <div
-                          className={`w-6 text-center font-medium ${getRankColor(
+                          className={`text-sm font-bold ${getRankColor(
                             participant.rank
                           )}`}
                         >
@@ -1001,58 +996,74 @@ export function PublicLeaderboard() {
                           participant.rank,
                           participant.rank <= (contest.num_winners || 3)
                         )}
-                        {getRankChangeIcon(
-                          participant.rank,
-                          participant.previousRank
-                        )}
                       </div>
-                      {/* Profile Avatar for mobile */}
-                      {participant.avatar_url ? (
-                        <img
-                          src={participant.avatar_url}
-                          alt={`${participant.username} profile`}
-                          className="w-8 h-8 rounded-full object-cover border border-white/10 flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                          <span className="text-white text-xs font-medium">
-                            {participant.tiktok_display_name?.charAt(0) || participant.username?.charAt(0) || 'U'}
-                          </span>
-                        </div>
+                      {getRankChangeIcon(
+                        participant.rank,
+                        participant.previousRank
                       )}
-                      {/* Video Thumbnail with Play Button for mobile */}
-                      {participant.thumbnail && (
-                        <div 
-                          className="relative flex-shrink-0 cursor-pointer"
-                          onClick={() => handlePlayVideo(participant)}
-                          title="Play video"
-                        >
-                          <img
-                            src={participant.thumbnail}
-                            alt={`${participant.username} video thumbnail`}
-                            className="w-8 h-8 rounded-lg object-cover border border-white/10"
-                          />
-                          {/* Play icon overlay */}
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded-lg transition-all opacity-90 hover:opacity-100">
-                            <Play className="h-3 w-3 text-white drop-shadow-lg" />
+                    </div>
+                    
+                    {/* Avatar */}
+                    {participant.avatar_url ? (
+                      <img
+                        src={participant.avatar_url}
+                        alt={`${participant.username} profile`}
+                        className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                        <span className="text-white text-sm font-medium">
+                          {participant.tiktok_display_name?.charAt(0) || participant.username?.charAt(0) || 'U'}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Main Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-white text-sm truncate">
+                            {participant.tiktok_display_name || participant.username}
                           </div>
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <div className="font-medium text-white truncate">
-                          {participant.tiktok_display_name || participant.username}
-                        </div>
-                        <div className="text-xs text-white/60">
-                          {formatNumber(participant.views)} views
-                        </div>
-                        {participant.title && (
-                          <div className="text-xs text-white/40 truncate">
-                            {participant.title}
+                          <div className="text-xs text-white/60">
+                            @{participant.username}
                           </div>
-                        )}
+                          {participant.title && (
+                            <div className="text-xs text-white/40 truncate mt-0.5">
+                              {participant.title}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Views and Play Button */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <div className="text-right">
+                            <div className="text-sm font-semibold text-white">
+                              {formatNumber(participant.views)}
+                            </div>
+                            <div className="text-xs text-white/60">views</div>
+                          </div>
+                          
+                          {/* Video Thumbnail with Play Button */}
+                          {participant.thumbnail && (
+                            <div 
+                              className="relative flex-shrink-0 cursor-pointer"
+                              onClick={() => handlePlayVideo(participant)}
+                              title="Play video"
+                            >
+                              <img
+                                src={participant.thumbnail}
+                                alt={`${participant.username} video thumbnail`}
+                                className="w-10 h-10 rounded-lg object-cover border border-white/10"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded-lg transition-all opacity-90 hover:opacity-100">
+                                <Play className="h-4 w-4 text-white drop-shadow-lg" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    {/* Play button now integrated into thumbnail */}
                   </div>
                 </div>
               ))}
@@ -1173,28 +1184,29 @@ export function PublicLeaderboard() {
 
         {/* Join Competition Button */}
         {contest.status === "active" && (
-          <div className="fixed bottom-0 left-0 right-0 py-2 px-4 bg-black/95 backdrop-blur-lg border-t border-white/10">
+          <div className="fixed bottom-0 left-0 right-0 py-3 px-3 sm:py-2 sm:px-4 bg-black/95 backdrop-blur-lg border-t border-white/10 pb-safe">
             <div className="max-w-6xl mx-auto">
               {session ? (
                 <div className="flex justify-center">
-                  <div className="flex gap-4 w-full max-w-md">
+                  <div className="flex gap-2 sm:gap-4 w-full max-w-md">
                     {userSubmission && (
-                      <div className="flex gap-3 w-full">
+                      <div className="flex gap-2 sm:gap-3 w-full">
                         <div className="flex-1">
                           <button
                             onClick={() =>
                               navigate(`/contest-management/${id}`)
                             }
-                            className="w-full px-3 py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
                           >
                             <Settings className="h-4 w-4" />
-                            <span>Manage</span>
+                            <span className="hidden xs:inline">Manage</span>
+                            <span className="xs:hidden">Edit</span>
                           </button>
                         </div>
                         <div className="flex-1">
                           <button
                             onClick={() => navigate(`/share/${id}`)}
-                            className="w-full px-3 py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5"
+                            className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
                           >
                             <Share2 className="h-4 w-4" />
                             <span>Share</span>
@@ -1209,13 +1221,18 @@ export function PublicLeaderboard() {
                   <button
                     onClick={handleJoinCompetition}
                     disabled={contest?.calculatedStatus === 'ended'}
-                    className={`w-full font-medium py-3 rounded-lg transition-colors ${
+                    className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base ${
                       contest?.calculatedStatus === 'ended'
                         ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                         : 'bg-white text-black hover:bg-white/90'
                     }`}
                   >
-                    {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : 'Sign up to Join Contest'}
+                    {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : (
+                      <>
+                        <span className="hidden xs:inline">Sign up to Join Contest</span>
+                        <span className="xs:hidden">Sign Up to Join</span>
+                      </>
+                    )}
                   </button>
                 </div>
               )}
@@ -1225,14 +1242,19 @@ export function PublicLeaderboard() {
                 <button
                   onClick={handleJoinCompetition}
                   disabled={contest?.calculatedStatus === 'ended'}
-                  className={`w-full max-w-md font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
+                  className={`w-full max-w-md font-semibold py-2.5 sm:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base ${
                     contest?.calculatedStatus === 'ended'
                       ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
                       : 'bg-white text-black hover:bg-white/90'
                   }`}
                 >
                   <UserPlus className="h-4 w-4" />
-                  {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : 'Join Contest'}
+                  {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : (
+                    <>
+                      <span className="hidden xs:inline">Join Contest</span>
+                      <span className="xs:hidden">Join</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
@@ -1241,12 +1263,12 @@ export function PublicLeaderboard() {
 
         {/* Prize Modal */}
         {selectedPrize && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="bg-[#1A1A1A] rounded-xl border border-white/10 shadow-xl max-w-sm w-full">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50">
+            <div className="bg-[#1A1A1A] rounded-xl border border-white/10 shadow-xl max-w-sm w-full mx-2">
               <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {getRankIcon(selectedPrize.rank, true)}
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-base sm:text-lg font-semibold text-white">
                     {selectedPrize.rank}
                     {selectedPrize.rank === 1
                       ? "st"
@@ -1260,23 +1282,23 @@ export function PublicLeaderboard() {
                 </div>
                 <button
                   onClick={() => setSelectedPrize(null)}
-                  className="p-1.5 hover:bg-white/10 rounded-full transition-colors"
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 >
                   <X className="h-5 w-5 text-white/60" />
                 </button>
               </div>
-              <div className="p-4">
+              <div className="p-4 sm:p-6">
                 <div className="text-center">
                   {contest.prize_tier === "monetary" ? (
                     <>
-                      <div className="text-2xl font-bold text-white">
+                      <div className="text-xl sm:text-2xl font-bold text-white">
                         ${formatNumber(selectedPrize.prize as number)}
                       </div>
                       <p className="text-sm text-white/60 mt-1">Cash Prize</p>
                     </>
                   ) : (
                     <>
-                      <div className="text-2xl font-bold text-white">
+                      <div className="text-lg sm:text-2xl font-bold text-white line-clamp-2">
                         {selectedPrize.prize}
                       </div>
                       <p className="text-sm text-white/60 mt-1">
@@ -1289,7 +1311,7 @@ export function PublicLeaderboard() {
               <div className="p-4 border-t border-white/10 bg-white/5">
                 <button
                   onClick={() => setSelectedPrize(null)}
-                  className="w-full bg-white text-black py-2 rounded-lg hover:bg-white/90 transition-colors"
+                  className="w-full bg-white text-black py-2.5 rounded-lg hover:bg-white/90 transition-colors font-medium min-h-[48px]"
                 >
                   Close
                 </button>
@@ -1347,7 +1369,7 @@ export function PublicLeaderboard() {
           />
         )}
 
-        <Footer className="pb-32" />
+        <Footer className="pb-20 sm:pb-32" />
       </div>
     </>
   );
