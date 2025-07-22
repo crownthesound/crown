@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  useParams,
+  Link,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 import {
@@ -8,19 +13,15 @@ import {
   Trophy,
   Play,
   Share2,
-  Gift,
   X,
   Loader2,
   Home,
-  Award,
-  Info,
   Sparkles,
   ArrowUp,
   ArrowDown,
   Minus,
   Link as LinkIcon,
   Settings,
-  User,
   UserPlus,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
@@ -32,16 +33,9 @@ import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ContestJoinModal } from "../components/ContestJoinModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import { MobileVideoModal } from "../components/MobileVideoModal";
-import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { supabase as supa } from "../lib/supabase";
-import { 
-  calculateContestStatus, 
-  getStatusLabel, 
-  getStatusColor,
-  formatTimeRemaining,
-  getTimeRemaining 
-} from "../lib/contestUtils";
+import { calculateContestStatus } from "../lib/contestUtils";
 
 interface Participant {
   id: string;
@@ -50,8 +44,8 @@ interface Participant {
   rank: number;
   previousRank?: number;
   views: number;
-  video_url?: string | null;  // Our stored video URL from Supabase
-  url?: string;             // Original TikTok URL
+  video_url?: string | null; // Our stored video URL from Supabase
+  url?: string; // Original TikTok URL
   thumbnail?: string;
   title?: string;
   embed_code?: string | null;
@@ -71,7 +65,7 @@ interface ContestDetails {
   prize_per_winner: number;
   num_winners: number;
   status: "draft" | "active" | "completed" | "hidden";
-  calculatedStatus?: 'draft' | 'active' | 'ended' | 'archived';
+  calculatedStatus?: "draft" | "active" | "ended" | "archived";
   resources: Array<{
     title: string;
     description?: string;
@@ -82,146 +76,6 @@ interface ContestDetails {
   }>;
   top_participants?: Participant[];
 }
-
-const mockParticipants: Participant[] = [
-  {
-    id: "1",
-    rank: 1,
-    username: "baeb__8",
-    full_name: "Mukonazwothe Khabubu",
-    views: 1200000,
-    previousRank: 2,
-    video_url: "https://example.com/video1",
-    avatar_url: "https://example.com/avatar1.jpg",
-    tiktok_display_name: "Mukonazwothe Khabubu",
-  },
-  {
-    id: "2",
-    rank: 2,
-    username: "lordmust",
-    full_name: "Lordmust Sadulloev",
-    views: 850000,
-    previousRank: 1,
-    video_url: "https://example.com/video2",
-  },
-  {
-    id: "3",
-    rank: 3,
-    username: "glen_versoza",
-    full_name: "Glen Versoza",
-    views: 620000,
-    previousRank: 3,
-    video_url: "https://example.com/video3",
-  },
-  {
-    id: "4",
-    rank: 4,
-    username: "dance_queen",
-    full_name: "Sarah Johnson",
-    views: 450000,
-    previousRank: 5,
-    video_url: "https://example.com/video4",
-  },
-  {
-    id: "5",
-    rank: 5,
-    username: "beatmaster",
-    full_name: "James Wilson",
-    views: 380000,
-    previousRank: 4,
-    video_url: "https://example.com/video5",
-  },
-  {
-    id: "6",
-    rank: 6,
-    username: "rhythm_master",
-    full_name: "Michael Chen",
-    views: 320000,
-    previousRank: 7,
-    video_url: "https://example.com/video6",
-  },
-  {
-    id: "7",
-    rank: 7,
-    username: "melody_queen",
-    full_name: "Emma Thompson",
-    views: 280000,
-    previousRank: 6,
-    video_url: "https://example.com/video7",
-  },
-  {
-    id: "8",
-    rank: 8,
-    username: "groove_guru",
-    full_name: "David Martinez",
-    views: 250000,
-    previousRank: 8,
-    video_url: "https://example.com/video8",
-  },
-  {
-    id: "9",
-    rank: 9,
-    username: "beat_breaker",
-    full_name: "Sophie Anderson",
-    views: 220000,
-    previousRank: 10,
-    video_url: "https://example.com/video9",
-  },
-  {
-    id: "10",
-    rank: 10,
-    username: "music_maverick",
-    full_name: "Ryan O'Connor",
-    views: 200000,
-    previousRank: 9,
-    video_url: "https://example.com/video10",
-  },
-  {
-    id: "11",
-    rank: 11,
-    username: "vibes_master",
-    full_name: "Aisha Patel",
-    views: 180000,
-    previousRank: 12,
-    video_url: "https://example.com/video11",
-  },
-  {
-    id: "12",
-    rank: 12,
-    username: "sound_wave",
-    full_name: "Lucas Kim",
-    views: 160000,
-    previousRank: 11,
-    video_url: "https://example.com/video12",
-  },
-  {
-    id: "13",
-    rank: 13,
-    username: "harmony_hub",
-    full_name: "Isabella Garcia",
-    views: 140000,
-    previousRank: 13,
-    video_url: "https://example.com/video13",
-  },
-  {
-    id: "14",
-    rank: 14,
-    username: "tempo_king",
-    full_name: "Marcus Lee",
-    views: 120000,
-    previousRank: 15,
-    video_url: "https://example.com/video14",
-  },
-  {
-    id: "15",
-    rank: 15,
-    username: "beat_flow",
-    full_name: "Nina Rodriguez",
-    views: 100000,
-    previousRank: 14,
-    video_url: "https://example.com/video15",
-  },
-];
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -250,10 +104,14 @@ export function PublicLeaderboard() {
   const [userSubmission, setUserSubmission] = useState<any>(null);
   const [hasAutoOpenedModal, setHasAutoOpenedModal] = useState(false);
 
-  const { refreshConnection } = useTikTokConnection();
-  const { redirectToAuth, hasRedirectUrl, hasRedirectAction, getRedirectAction, clearRedirectUrl } = useAuthRedirect();
+  const {
+    redirectToAuth,
+    hasRedirectUrl,
+    hasRedirectAction,
+    getRedirectAction,
+    clearRedirectUrl,
+  } = useAuthRedirect();
   const queryClient = useQueryClient();
-
 
   // Fetch contest details
   const {
@@ -294,7 +152,7 @@ export function PublicLeaderboard() {
     if (contestData) {
       const contestWithStatus = {
         ...contestData,
-        calculatedStatus: calculateContestStatus(contestData)
+        calculatedStatus: calculateContestStatus(contestData),
       } as unknown as ContestDetails;
       setContest(contestWithStatus);
     }
@@ -307,15 +165,30 @@ export function PublicLeaderboard() {
       leaderboardResp.data.leaderboard
     ) {
       // Debug logging to check if video_url and avatar_url are being received
-      console.group('📊 Leaderboard Data Debug');
-      console.log('Leaderboard response:', leaderboardResp.data.leaderboard);
-      console.log('First participant video_url:', leaderboardResp.data.leaderboard[0]?.video_url);
-      console.log('First participant avatar_url:', leaderboardResp.data.leaderboard[0]?.avatar_url);
-      console.log('First participant tiktok_display_name:', leaderboardResp.data.leaderboard[0]?.tiktok_display_name);
-      console.log('Participants with video_url:', leaderboardResp.data.leaderboard.filter((p: any) => p.video_url).length);
-      console.log('Participants with avatar_url:', leaderboardResp.data.leaderboard.filter((p: any) => p.avatar_url).length);
+      console.group("📊 Leaderboard Data Debug");
+      console.log("Leaderboard response:", leaderboardResp.data.leaderboard);
+      console.log(
+        "First participant video_url:",
+        leaderboardResp.data.leaderboard[0]?.video_url
+      );
+      console.log(
+        "First participant avatar_url:",
+        leaderboardResp.data.leaderboard[0]?.avatar_url
+      );
+      console.log(
+        "First participant tiktok_display_name:",
+        leaderboardResp.data.leaderboard[0]?.tiktok_display_name
+      );
+      console.log(
+        "Participants with video_url:",
+        leaderboardResp.data.leaderboard.filter((p: any) => p.video_url).length
+      );
+      console.log(
+        "Participants with avatar_url:",
+        leaderboardResp.data.leaderboard.filter((p: any) => p.avatar_url).length
+      );
       console.groupEnd();
-      
+
       setParticipants(leaderboardResp.data.leaderboard);
     }
   }, [leaderboardResp]);
@@ -388,20 +261,27 @@ export function PublicLeaderboard() {
 
   // Auto-open ContestJoinModal after authentication redirect
   useEffect(() => {
-    if (session && contest && !userSubmission && contest.calculatedStatus === 'active' && !hasAutoOpenedModal) {
+    if (
+      session &&
+      contest &&
+      !userSubmission &&
+      contest.calculatedStatus === "active" &&
+      !hasAutoOpenedModal
+    ) {
       // Check for action parameter in URL (fallback for older implementation)
       const urlParams = new URLSearchParams(window.location.search);
-      const urlAction = urlParams.get('action');
-      
+      const urlAction = urlParams.get("action");
+
       // Get action from redirect system (preferred method)
       const redirectAction = getRedirectAction();
-      
+
       // Be more restrictive - only trigger if there's BOTH a redirect URL AND action
       // This prevents triggering on normal page visits
-      const shouldOpenModal = (hasRedirectUrl && hasRedirectAction) || urlAction === 'join';
+      const shouldOpenModal =
+        (hasRedirectUrl && hasRedirectAction) || urlAction === "join";
       const actionToCheck = redirectAction || urlAction;
-      
-      console.log('🔍 Auto-modal check:', {
+
+      console.log("🔍 Auto-modal check:", {
         hasSession: !!session,
         hasContest: !!contest,
         hasUserSubmission: !!userSubmission,
@@ -412,44 +292,53 @@ export function PublicLeaderboard() {
         redirectAction,
         shouldOpenModal,
         actionToCheck,
-        hasAutoOpenedModal
+        hasAutoOpenedModal,
       });
-      
-      if (shouldOpenModal && actionToCheck === 'join') {
-        console.log('🎯 Opening join modal automatically');
-        
+
+      if (shouldOpenModal && actionToCheck === "join") {
+        console.log("🎯 Opening join modal automatically");
+
         // IMPORTANT: Clear redirect data IMMEDIATELY to prevent repeated triggers
         clearRedirectUrl();
-        
+
         // Set flag to prevent repeated auto-opens
         setHasAutoOpenedModal(true);
-        
+
         // Clean up the action parameter from URL if present
-        if (urlAction === 'join') {
-          urlParams.delete('action');
-          const newUrl = urlParams.toString() 
+        if (urlAction === "join") {
+          urlParams.delete("action");
+          const newUrl = urlParams.toString()
             ? `${window.location.pathname}?${urlParams.toString()}`
             : window.location.pathname;
-          window.history.replaceState({}, '', newUrl);
+          window.history.replaceState({}, "", newUrl);
         }
-        
+
         // Open the modal
         setShowJoinModal(true);
-        
+
         // Show success toast for smoother UX
-        toast.success('Welcome! Let\'s get you set up to join this contest.', {
+        toast.success("Welcome! Let's get you set up to join this contest.", {
           duration: 4000,
-          icon: '🎉',
+          icon: "🎉",
         });
       }
     }
-  }, [session, hasRedirectUrl, hasRedirectAction, getRedirectAction, contest, userSubmission, clearRedirectUrl, hasAutoOpenedModal]);
+  }, [
+    session,
+    hasRedirectUrl,
+    hasRedirectAction,
+    getRedirectAction,
+    contest,
+    userSubmission,
+    clearRedirectUrl,
+    hasAutoOpenedModal,
+  ]);
 
   // Handle video URL parameters for direct video access
   useEffect(() => {
-    const videoId = searchParams.get('video');
+    const videoId = searchParams.get("video");
     if (videoId && participants.length > 0 && !viewVideo && !mobileVideo) {
-      const videoParticipant = participants.find(p => p.id === videoId);
+      const videoParticipant = participants.find((p) => p.id === videoId);
       if (videoParticipant) {
         const isMobile = window.innerWidth < 768;
         if (isMobile && videoParticipant.video_url) {
@@ -516,12 +405,12 @@ export function PublicLeaderboard() {
   const handlePlayVideo = (video: Participant) => {
     // Update URL with video parameter for shareable links
     const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('video', video.id);
+    newSearchParams.set("video", video.id);
     setSearchParams(newSearchParams);
-    
+
     // Check if we're on mobile and have a stored video
     const isMobile = window.innerWidth < 768;
-    
+
     if (isMobile && video.video_url) {
       // Mobile with stored video: Show full-screen modal directly
       setMobileVideo(video);
@@ -533,17 +422,19 @@ export function PublicLeaderboard() {
 
   const handleJoinCompetition = () => {
     // Check if contest has ended
-    if (contest?.calculatedStatus === 'ended') {
-      toast.error('This contest has ended and is no longer accepting participants.');
+    if (contest?.calculatedStatus === "ended") {
+      toast.error(
+        "This contest has ended and is no longer accepting participants."
+      );
       return;
     }
 
     if (!session) {
       // Show loading toast to indicate authentication is starting
-      toast.loading('Redirecting to sign in...', { duration: 2000 });
-      
+      toast.loading("Redirecting to sign in...", { duration: 2000 });
+
       // Use the improved redirect system with action context
-      redirectToAuth("/signin", { action: 'join' });
+      redirectToAuth("/signin", { action: "join" });
       return;
     }
 
@@ -638,7 +529,7 @@ export function PublicLeaderboard() {
   const getStatusBadge = () => {
     if (!contest) return null;
 
-    const calculatedStatus = contest.calculatedStatus || 'draft';
+    const calculatedStatus = contest.calculatedStatus || "draft";
     const statusColors = {
       active: "bg-green-100 text-green-800 border-green-200",
       ended: "bg-red-100 text-red-800 border-red-200",
@@ -773,7 +664,7 @@ export function PublicLeaderboard() {
           </div>
 
           {contest?.cover_image ? (
-            <div className="relative h-[50vh] sm:h-[60vh] lg:h-[65vh] w-full">
+            <div className="relative h-[35vh] sm:h-[50vh] lg:h-[60vh] w-full">
               <img
                 src={contest.cover_image}
                 alt={contest.name}
@@ -842,7 +733,7 @@ export function PublicLeaderboard() {
           )}
         </div>
 
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-32">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-24 sm:pb-32">
           {/* Contest Info */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-6">
             <div className="space-y-3 sm:space-y-4">
@@ -938,7 +829,7 @@ export function PublicLeaderboard() {
                           : prize.title,
                     })
                   }
-                  className="p-3 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all hover:scale-105 min-h-[80px] sm:min-h-[90px] flex flex-col justify-center"
+                  className="p-2.5 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all hover:scale-105 min-h-[60px] sm:min-h-[80px] flex flex-col justify-center"
                 >
                   <div className="flex items-center justify-center gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
                     {getRankIcon(index + 1, true)}
@@ -978,95 +869,104 @@ export function PublicLeaderboard() {
             </div>
 
             {/* Mobile View */}
-            <div className="sm:hidden divide-y divide-white/10">
-              {participants.map((participant) => (
-                <div key={participant.id} className="p-3 sm:p-4">
-                  <div className="flex items-center gap-3">
-                    {/* Rank Section */}
-                    <div className="flex flex-col items-center gap-1 min-w-[40px]">
-                      <div className="flex items-center gap-1">
-                        <div
-                          className={`text-sm font-bold ${getRankColor(
-                            participant.rank
-                          )}`}
-                        >
-                          #{participant.rank}
-                        </div>
-                        {getRankIcon(
-                          participant.rank,
-                          participant.rank <= (contest.num_winners || 3)
-                        )}
-                      </div>
-                      {getRankChangeIcon(
-                        participant.rank,
-                        participant.previousRank
-                      )}
-                    </div>
-                    
-                    {/* Avatar */}
-                    {participant.avatar_url ? (
-                      <img
-                        src={participant.avatar_url}
-                        alt={`${participant.username} profile`}
-                        className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                        <span className="text-white text-sm font-medium">
-                          {participant.tiktok_display_name?.charAt(0) || participant.username?.charAt(0) || 'U'}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Main Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-white text-sm truncate">
-                            {participant.tiktok_display_name || participant.username}
+            <div className="sm:hidden">
+              <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/10">
+                {participants.map((participant) => (
+                  <div key={participant.id} className="p-2.5">
+                    <div className="flex items-center gap-2">
+                      {/* Rank Section */}
+                      <div className="flex flex-col items-center gap-0.5 min-w-[32px]">
+                        <div className="flex items-center gap-0.5">
+                          <div
+                            className={`text-xs font-bold ${getRankColor(
+                              participant.rank
+                            )}`}
+                          >
+                            #{participant.rank}
                           </div>
-                          <div className="text-xs text-white/60">
-                            @{participant.username}
-                          </div>
-                          {participant.title && (
-                            <div className="text-xs text-white/40 truncate mt-0.5">
-                              {participant.title}
-                            </div>
+                          {getRankIcon(
+                            participant.rank,
+                            participant.rank <= (contest.num_winners || 3)
                           )}
                         </div>
-                        
-                        {/* Views and Play Button */}
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <div className="text-right">
-                            <div className="text-sm font-semibold text-white">
-                              {formatNumber(participant.views)}
+                        <div className="scale-75">
+                          {getRankChangeIcon(
+                            participant.rank,
+                            participant.previousRank
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Avatar */}
+                      {participant.avatar_url ? (
+                        <img
+                          src={participant.avatar_url}
+                          alt={`${participant.username} profile`}
+                          className="w-8 h-8 rounded-full object-cover border border-white/10 flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                          <span className="text-white text-xs font-medium">
+                            {participant.tiktok_display_name?.charAt(0) ||
+                              participant.username?.charAt(0) ||
+                              "U"}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Main Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-white text-xs truncate leading-tight">
+                              {participant.tiktok_display_name ||
+                                participant.username}
                             </div>
-                            <div className="text-xs text-white/60">views</div>
+                            <div className="text-xs text-white/60 leading-tight">
+                              @{participant.username}
+                            </div>
+                            {participant.title && (
+                              <div className="text-xs text-white/40 truncate leading-tight">
+                                {participant.title}
+                              </div>
+                            )}
                           </div>
-                          
-                          {/* Video Thumbnail with Play Button */}
-                          {participant.thumbnail && (
-                            <div 
-                              className="relative flex-shrink-0 cursor-pointer"
-                              onClick={() => handlePlayVideo(participant)}
-                              title="Play video"
-                            >
-                              <img
-                                src={participant.thumbnail}
-                                alt={`${participant.username} video thumbnail`}
-                                className="w-10 h-10 rounded-lg object-cover border border-white/10"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded-lg transition-all opacity-90 hover:opacity-100">
-                                <Play className="h-4 w-4 text-white drop-shadow-lg" />
+
+                          {/* Views and Play Button */}
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <div className="text-right">
+                              <div className="text-xs font-semibold text-white leading-tight">
+                                {formatNumber(participant.views)}
+                              </div>
+                              <div className="text-xs text-white/60 leading-tight">
+                                views
                               </div>
                             </div>
-                          )}
+
+                            {/* Video Thumbnail with Play Button */}
+                            {participant.thumbnail && (
+                              <div
+                                className="relative flex-shrink-0 cursor-pointer"
+                                onClick={() => handlePlayVideo(participant)}
+                                title="Play video"
+                              >
+                                <img
+                                  src={participant.thumbnail}
+                                  alt={`${participant.username} video thumbnail`}
+                                  className="w-8 h-8 rounded-lg object-cover border border-white/10"
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded-lg transition-all opacity-90 hover:opacity-100">
+                                  <Play className="h-3.5 w-3.5 text-white drop-shadow-lg" />
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Desktop View */}
@@ -1113,7 +1013,9 @@ export function PublicLeaderboard() {
                         ) : (
                           <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
                             <span className="text-white text-sm font-medium">
-                              {participant.tiktok_display_name?.charAt(0) || participant.username?.charAt(0) || 'U'}
+                              {participant.tiktok_display_name?.charAt(0) ||
+                                participant.username?.charAt(0) ||
+                                "U"}
                             </span>
                           </div>
                         )}
@@ -1138,7 +1040,8 @@ export function PublicLeaderboard() {
                       </div>
                       <div className="min-w-0">
                         <div className="font-medium text-white truncate">
-                          {participant.tiktok_display_name || participant.username}
+                          {participant.tiktok_display_name ||
+                            participant.username}
                         </div>
                         <div className="text-sm text-white/60 line-clamp-1">
                           @{participant.username}
@@ -1155,7 +1058,7 @@ export function PublicLeaderboard() {
                     </div>
                     <div className="col-span-1 flex justify-center">
                       {participant.thumbnail ? (
-                        <div 
+                        <div
                           className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
                           onClick={() => handlePlayVideo(participant)}
                           title="Play video"
@@ -1170,9 +1073,7 @@ export function PublicLeaderboard() {
                           </div>
                         </div>
                       ) : (
-                        <div className="text-white/30 text-xs">
-                          No preview
-                        </div>
+                        <div className="text-white/30 text-xs">No preview</div>
                       )}
                     </div>
                   </div>
@@ -1184,7 +1085,7 @@ export function PublicLeaderboard() {
 
         {/* Join Competition Button */}
         {contest.status === "active" && (
-          <div className="fixed bottom-0 left-0 right-0 py-3 px-3 sm:py-2 sm:px-4 bg-black/95 backdrop-blur-lg border-t border-white/10 pb-safe">
+          <div className="fixed bottom-0 left-0 right-0 py-2 px-3 sm:py-2 sm:px-4 bg-black/95 backdrop-blur-lg border-t border-white/10 pb-safe-area-inset-bottom">
             <div className="max-w-6xl mx-auto">
               {session ? (
                 <div className="flex justify-center">
@@ -1220,16 +1121,20 @@ export function PublicLeaderboard() {
                 <div className="w-full">
                   <button
                     onClick={handleJoinCompetition}
-                    disabled={contest?.calculatedStatus === 'ended'}
+                    disabled={contest?.calculatedStatus === "ended"}
                     className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base ${
-                      contest?.calculatedStatus === 'ended'
-                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                        : 'bg-white text-black hover:bg-white/90'
+                      contest?.calculatedStatus === "ended"
+                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                        : "bg-white text-black hover:bg-white/90"
                     }`}
                   >
-                    {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : (
+                    {contest?.calculatedStatus === "ended" ? (
+                      "Contest Ended"
+                    ) : (
                       <>
-                        <span className="hidden xs:inline">Sign up to Join Contest</span>
+                        <span className="hidden xs:inline">
+                          Sign up to Join Contest
+                        </span>
                         <span className="xs:hidden">Sign Up to Join</span>
                       </>
                     )}
@@ -1241,15 +1146,17 @@ export function PublicLeaderboard() {
               <div className="max-w-6xl mx-auto mt-2 flex justify-center">
                 <button
                   onClick={handleJoinCompetition}
-                  disabled={contest?.calculatedStatus === 'ended'}
+                  disabled={contest?.calculatedStatus === "ended"}
                   className={`w-full max-w-md font-semibold py-2.5 sm:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base ${
-                    contest?.calculatedStatus === 'ended'
-                      ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-                      : 'bg-white text-black hover:bg-white/90'
+                    contest?.calculatedStatus === "ended"
+                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                      : "bg-white text-black hover:bg-white/90"
                   }`}
                 >
                   <UserPlus className="h-4 w-4" />
-                  {contest?.calculatedStatus === 'ended' ? 'Contest Ended' : (
+                  {contest?.calculatedStatus === "ended" ? (
+                    "Contest Ended"
+                  ) : (
                     <>
                       <span className="hidden xs:inline">Join Contest</span>
                       <span className="xs:hidden">Join</span>
@@ -1347,7 +1254,7 @@ export function PublicLeaderboard() {
               setViewVideo(null);
               // Remove video parameter from URL when closing
               const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.delete('video');
+              newSearchParams.delete("video");
               setSearchParams(newSearchParams);
             }}
             video={viewVideo}
@@ -1362,14 +1269,14 @@ export function PublicLeaderboard() {
               setMobileVideo(null);
               // Remove video parameter from URL when closing
               const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.delete('video');
+              newSearchParams.delete("video");
               setSearchParams(newSearchParams);
             }}
             video={mobileVideo}
           />
         )}
 
-        <Footer className="pb-20 sm:pb-32" />
+        <Footer className="pb-16 sm:pb-32" />
       </div>
     </>
   );
