@@ -267,11 +267,6 @@ export function ContestsPage() {
       return;
     }
 
-    if (!isTikTokConnected) {
-      setShowTikTokModal(true);
-      return;
-    }
-
     setSelectedContest(contest);
     setShowJoinModal(true);
   };
