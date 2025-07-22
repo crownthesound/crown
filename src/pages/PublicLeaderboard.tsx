@@ -664,7 +664,7 @@ export function PublicLeaderboard() {
           </div>
 
           {contest?.cover_image ? (
-            <div className="relative h-[35vh] sm:h-[50vh] lg:h-[60vh] w-full">
+            <div className="relative h-[30vh] sm:h-[45vh] lg:h-[55vh] w-full">
               <img
                 src={contest.cover_image}
                 alt={contest.name}
@@ -733,25 +733,27 @@ export function PublicLeaderboard() {
           )}
         </div>
 
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-24 sm:pb-32">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 pb-20 sm:pb-32 max-h-screen overflow-y-auto">
           {/* Contest Info */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-6">
-            <div className="space-y-3 sm:space-y-4">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
+            <div className="space-y-2 sm:space-y-4">
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2">
                   About this Contest
                 </h3>
-                <p
-                  className={`text-sm sm:text-base text-white/80 leading-relaxed ${
-                    !showFullDescription && "line-clamp-3"
-                  }`}
-                >
-                  {contest.description}
-                </p>
+                <div className="max-h-[25vh] sm:max-h-none overflow-y-auto">
+                  <p
+                    className={`text-sm sm:text-base text-white/80 leading-relaxed ${
+                      !showFullDescription && "line-clamp-4 sm:line-clamp-3"
+                    }`}
+                  >
+                    {contest.description}
+                  </p>
+                </div>
                 {contest.description.length > 150 && (
                   <button
                     onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="text-white hover:text-white/90 text-sm mt-3 font-medium min-h-[44px] flex items-center"
+                    className="text-white hover:text-white/90 text-sm mt-2 font-medium min-h-[44px] flex items-center"
                   >
                     {showFullDescription ? "Show less" : "Read more"}
                   </button>
@@ -762,49 +764,51 @@ export function PublicLeaderboard() {
 
           {/* Resources Section */}
           {contest.resources && contest.resources.length > 0 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-6">
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
+              <div className="flex items-center gap-2 mb-2 sm:mb-4">
                 <LinkIcon className="h-4 w-4 text-white" />
                 <h2 className="text-base sm:text-lg font-semibold text-white">
                   Helpful Resources
                 </h2>
               </div>
 
-              <div className="grid gap-2 sm:gap-3">
-                {contest.resources.map((resource, index) => (
-                  <div
-                    key={index}
-                    className="group bg-white/5 rounded-lg p-3 sm:p-4 hover:bg-white/10 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1 mb-1">
-                          {resource.title}
-                        </h3>
-                        {resource.description && (
-                          <p className="text-xs sm:text-sm text-white/60 line-clamp-2">
-                            {resource.description}
-                          </p>
-                        )}
+              <div className="max-h-[25vh] sm:max-h-none overflow-y-auto">
+                <div className="grid gap-2 sm:gap-3">
+                  {contest.resources.map((resource, index) => (
+                    <div
+                      key={index}
+                      className="group bg-white/5 rounded-lg p-2.5 sm:p-4 hover:bg-white/10 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1 mb-1">
+                            {resource.title}
+                          </h3>
+                          {resource.description && (
+                            <p className="text-xs sm:text-sm text-white/60 line-clamp-1 sm:line-clamp-2">
+                              {resource.description}
+                            </p>
+                          )}
+                        </div>
+                        <a
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-shrink-0 p-2 rounded-full text-white/60 hover:text-white transition-colors hover:bg-white/10 min-w-[40px] min-h-[40px] flex items-center justify-center"
+                        >
+                          <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </a>
                       </div>
-                      <a
-                        href={resource.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-shrink-0 p-2 rounded-full text-white/60 hover:text-white transition-colors hover:bg-white/10 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                      </a>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {/* Prize Distribution */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-3 sm:mb-4">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
+            <div className="flex items-center justify-between mb-2 sm:mb-4">
               <div className="flex items-center gap-2">
                 <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                 <h2 className="text-base sm:text-lg font-semibold text-white">
@@ -816,53 +820,55 @@ export function PublicLeaderboard() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
-              {contest.prize_titles.map((prize, index) => (
-                <button
-                  key={index}
-                  onClick={() =>
-                    setSelectedPrize({
-                      rank: index + 1,
-                      prize:
-                        contest.prize_tier === "monetary"
-                          ? contest.prize_per_winner * (1 - index * 0.2)
-                          : prize.title,
-                    })
-                  }
-                  className="p-2.5 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all hover:scale-105 min-h-[60px] sm:min-h-[80px] flex flex-col justify-center"
-                >
-                  <div className="flex items-center justify-center gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
-                    {getRankIcon(index + 1, true)}
-                    <span
-                      className={`text-xs sm:text-sm font-medium ${getRankColor(
-                        index + 1
-                      )}`}
-                    >
-                      {index + 1}
-                      {index === 0
-                        ? "st"
-                        : index === 1
-                        ? "nd"
-                        : index === 2
-                        ? "rd"
-                        : "th"}
-                    </span>
-                  </div>
-                  <div className="text-xs sm:text-sm font-medium text-white leading-tight line-clamp-2 text-center">
-                    {contest.prize_tier === "monetary"
-                      ? `$${formatNumber(
-                          contest.prize_per_winner * (1 - index * 0.2)
-                        )}`
-                      : prize.title}
-                  </div>
-                </button>
-              ))}
+            <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+                {contest.prize_titles.map((prize, index) => (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      setSelectedPrize({
+                        rank: index + 1,
+                        prize:
+                          contest.prize_tier === "monetary"
+                            ? contest.prize_per_winner * (1 - index * 0.2)
+                            : prize.title,
+                      })
+                    }
+                    className="p-2 sm:p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all hover:scale-105 min-h-[50px] sm:min-h-[70px] flex flex-col justify-center"
+                  >
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
+                      {getRankIcon(index + 1, true)}
+                      <span
+                        className={`text-xs sm:text-sm font-medium ${getRankColor(
+                          index + 1
+                        )}`}
+                      >
+                        {index + 1}
+                        {index === 0
+                          ? "st"
+                          : index === 1
+                          ? "nd"
+                          : index === 2
+                          ? "rd"
+                          : "th"}
+                      </span>
+                    </div>
+                    <div className="text-xs sm:text-sm font-medium text-white leading-tight line-clamp-2 text-center px-1">
+                      {contest.prize_tier === "monetary"
+                        ? `$${formatNumber(
+                            contest.prize_per_winner * (1 - index * 0.2)
+                          )}`
+                        : prize.title}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Leaderboard */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/10">
+            <div className="px-3 sm:px-6 py-2 sm:py-4 border-b border-white/10">
               <h2 className="text-base sm:text-lg font-semibold text-white">
                 Current Rankings
               </h2>
@@ -870,9 +876,9 @@ export function PublicLeaderboard() {
 
             {/* Mobile View */}
             <div className="sm:hidden">
-              <div className="max-h-[60vh] overflow-y-auto divide-y divide-white/10">
+              <div className="max-h-[50vh] overflow-y-auto divide-y divide-white/10">
                 {participants.map((participant) => (
-                  <div key={participant.id} className="p-2.5">
+                  <div key={participant.id} className="p-2">
                     <div className="flex items-center gap-2">
                       {/* Rank Section */}
                       <div className="flex flex-col items-center gap-0.5 min-w-[32px]">
