@@ -279,20 +279,10 @@ export function TikTokSettingsModal({
                 </span>
                 <p className="text-blue-200/60 text-xs mt-1">
                   {isConnected && tikTokAccounts.length > 0 ? (
-                    tikTokAccounts.length === 1 ? (
-                      <>
-                        You're currently connected to @
-                        {tikTokAccounts[0].username ||
-                          tikTokAccounts[0].display_name ||
-                          "TikTok User"}
-                        . Check this to connect to a different account instead.
-                      </>
-                    ) : (
-                      <>
-                        You have {tikTokAccounts.length} TikTok accounts
-                        connected. Check this to connect an additional account.
-                      </>
-                    )
+                    <>
+                      You have {tikTokAccounts.length} TikTok account{tikTokAccounts.length === 1 ? '' : 's'}
+                      connected. Check this to connect a different account.
+                    </>
                   ) : (
                     "Check this if you want to select a different TikTok account or create a new connection"
                   )}
@@ -322,7 +312,7 @@ export function TikTokSettingsModal({
                     ? "Disconnecting..."
                     : !forceAccountSelection
                     ? "Check the box above to disconnect"
-                    : `Disconnect All Accounts (${tikTokAccounts.length})`}
+                    : `Disconnect ${tikTokAccounts.length === 1 ? 'Account' : `All Accounts (${tikTokAccounts.length})`}`}
                 </button>
               </>
             ) : (

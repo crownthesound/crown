@@ -1050,10 +1050,6 @@ export function Profile() {
                             )}
                             <button
                               onClick={async () => {
-                                if (tikTokAccounts.length === 1) {
-                                  toast.error('Cannot delete your only TikTok account');
-                                  return;
-                                }
                                 if (confirm(`Are you sure you want to disconnect @${account.username}?`)) {
                                   try {
                                     await deleteAccount(account.id);
@@ -1066,8 +1062,6 @@ export function Profile() {
                                       toast.error('Network error. Please check your connection and try again.');
                                     } else if (error.message?.includes('not found')) {
                                       toast.error('Account not found. It may have already been removed.');
-                                    } else if (error.message?.includes('only TikTok account')) {
-                                      toast.error('Cannot delete your only TikTok account.');
                                     } else if (error.message?.includes('unauthorized')) {
                                       toast.error('Session expired. Please log in again.');
                                     } else {
