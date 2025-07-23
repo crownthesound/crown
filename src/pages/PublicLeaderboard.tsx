@@ -880,7 +880,7 @@ export function PublicLeaderboard() {
                 {participants.map((participant) => (
                   <div key={participant.id} className="p-1.5">
                     <div className="flex items-center gap-1.5">
-                      {/* Rank Section */}
+            <div className="p-4 sm:p-6 space-y-4">
                       <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
                         <div className="flex items-center gap-0.5">
                           <div
@@ -1075,7 +1075,7 @@ export function PublicLeaderboard() {
                       )}
                     </div>
                   </div>
-                ))}
+                      <div className="flex items-center gap-2 min-w-[50px]">
               </div>
             </div>
           </div>
@@ -1084,9 +1084,33 @@ export function PublicLeaderboard() {
         {/* Join Competition Button */}
         {contest.status === "active" && (
           <div className="fixed bottom-0 left-0 right-0 py-2 px-3 sm:py-2 sm:px-4 bg-black/95 backdrop-blur-lg border-t border-white/10 pb-safe-area-inset-bottom">
-            <div className="max-w-6xl mx-auto">
-              {session ? (
-                <div className="flex justify-center">
+                      {/* Video Thumbnail */}
+                      <div className="relative w-16 h-20 sm:w-20 sm:h-24 flex-shrink-0">
+                        <div className="w-full h-full bg-black rounded-lg overflow-hidden border border-white/20">
+                          {participant.thumbnail ? (
+                            <img
+                              src={participant.thumbnail}
+                              alt={`${participant.tiktok_username || 'User'}'s video`}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+                              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                {participant.tiktok_display_name?.charAt(0) || participant.tiktok_username?.charAt(0) || 'U'}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Play Button Overlay */}
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                               onClick={() => handleViewVideo(participant)}>
+                            <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+                              <Play className="h-4 w-4 text-black ml-0.5" />
+                            </div>
+                          </div>
+                        </div>
                   <div className="flex gap-2 sm:gap-4 w-full max-w-md">
                     {userSubmission && (
                       <div className="flex gap-2 sm:gap-3 w-full">
@@ -1119,21 +1143,15 @@ export function PublicLeaderboard() {
                 <div className="w-full">
                   <button
                     onClick={handleJoinCompetition}
-                    disabled={contest?.calculatedStatus === "ended"}
+                    className="bg-white/5 rounded-xl border border-white/10 p-4 hover:bg-white/10 transition-all duration-300 group hover:scale-[1.02]"
                     className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base ${
                       contest?.calculatedStatus === "ended"
-                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                        : "bg-white text-black hover:bg-white/90"
-                    }`}
-                  >
-                    {contest?.calculatedStatus === "ended" ? (
-                      "Contest Ended"
-                    ) : (
-                      <>
-                        <span className="hidden xs:inline">
-                          Sign up to Join Contest
-                        </span>
-                        <span className="xs:hidden">Sign Up to Join</span>
+                      {/* View Count */}
+                      <div className="text-right min-w-[60px]">
+                        <div className="text-xl font-bold text-white">
+                          {formatNumber(participant.views || 0)}
+                        </div>
+                        <div className="text-xs text-white/60">views</div>
                       </>
                     )}
                   </button>
