@@ -104,7 +104,7 @@ export function HomeContent({
           let top_participants: any[] = [];
           try {
             // Check if backend URL is available before making request
-            if (backendUrl && backendUrl !== "http://localhost:3000") {
+            if (backendUrl) {
               const controller = new AbortController();
               const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
@@ -146,9 +146,7 @@ export function HomeContent({
                 );
               }
             } else {
-              console.warn(
-                "Backend URL not configured or using default localhost"
-              );
+              console.warn("Backend URL not configured");
             }
           } catch (error) {
             // Only log as warning instead of error to avoid console spam
@@ -286,7 +284,29 @@ export function HomeContent({
   // Fetch contests on component mount to ensure we have the latest data
   useEffect(() => {
     fetchContests();
+    testBackendConnection();
   }, []);
+
+  const testBackendConnection = async () => {
+    try {
+      console.log('Testing backend connection to:', backendUrl);
+      const response = await fetch(`${backendUrl}/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        console.log('✅ Backend is reachable');
+      } else {
+        console.warn('⚠️ Backend returned:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('❌ Backend connection failed:', error);
+      toast.error('Backend server is not reachable. Some features may not work.');
+    }
+  };
 
   // Handle TikTok callback redirect
   useEffect(() => {

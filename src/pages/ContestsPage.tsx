@@ -130,7 +130,7 @@ export function ContestsPage() {
           let top_participants: any[] = [];
 
           // Only attempt to fetch leaderboard if backend URL is properly configured
-          if (backendUrl && backendUrl !== "http://localhost:3000") {
+          if (backendUrl) {
             try {
               // Create AbortController for timeout
               const controller = new AbortController();
