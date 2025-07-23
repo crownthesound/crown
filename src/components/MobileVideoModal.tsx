@@ -161,12 +161,12 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
             <div className="flex items-center justify-between mb-2">
               {video.rank && (
                 <div className="flex items-center gap-2">
-                  <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                  <div className={`px-3 py-1.5 rounded-lg text-xs font-bold backdrop-blur-md border ${
                     video.rank === 1 ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30' :
                     video.rank === 2 ? 'bg-gray-300/20 text-gray-300 border border-gray-300/30' :
                     video.rank === 3 ? 'bg-amber-600/20 text-amber-600 border border-amber-600/30' :
                     video.rank <= 10 ? 'bg-blue-400/20 text-blue-400 border border-blue-400/30' :
-                    'bg-white/20 text-white/80 border border-white/20'
+                    'bg-black/40 text-white/90 border border-white/20'
                   }`}>
                     Current Rank: #{video.rank}
                   </div>
