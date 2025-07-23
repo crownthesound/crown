@@ -108,7 +108,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
       {/* Video content */}
       {video.video_url ? (
         // Our stored video from Supabase
-        <div className="flex items-center justify-center w-full h-full p-4 relative">
+        <div className="flex items-center justify-center w-full h-full p-4 relative bg-gradient-to-br from-white via-gray-50 to-gray-100">
           <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
             <video
               src={video.video_url}
