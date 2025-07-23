@@ -108,7 +108,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-20 p-3 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/70 transition-colors"
+        className="absolute top-6 right-6 z-20 p-3 bg-black/80 backdrop-blur-md rounded-full text-white hover:bg-black/90 transition-all duration-300 border border-white/20 hover:border-white/40 shadow-lg hover:shadow-xl transform hover:scale-110"
         aria-label="Close video"
       >
         <X className="h-6 w-6" />
