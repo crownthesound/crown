@@ -290,21 +290,30 @@ export function HomeContent({
   const testBackendConnection = async () => {
     try {
       console.log('Testing backend connection to:', backendUrl);
-      const response = await fetch(`${backendUrl}/health`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
       
-      if (response.ok) {
-        console.log('✅ Backend is reachable');
+      // Only test connection if backend URL is not localhost (to avoid errors in development)
+      if (backendUrl && !backendUrl.includes('localhost')) {
+        const response = await fetch(`${backendUrl}/health`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          console.log('✅ Backend is reachable');
+        } else {
+          console.warn('⚠️ Backend returned:', response.status, response.statusText);
+        }
       } else {
-        console.warn('⚠️ Backend returned:', response.status, response.statusText);
+        console.log('🔧 Using localhost backend - skipping connection test');
       }
     } catch (error) {
-      console.error('❌ Backend connection failed:', error);
-      toast.error('Backend server is not reachable. Some features may not work.');
+      console.warn('⚠️ Backend connection failed:', error);
+      // Don't show error toast for localhost connections
+      if (backendUrl && !backendUrl.includes('localhost')) {
+        toast.error('Backend server is not reachable. Some features may not work.');
+      }
     }
   };
 
