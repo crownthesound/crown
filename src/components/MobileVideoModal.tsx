@@ -124,6 +124,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
               autoPlay
               muted={isMuted}
               playsInline
+              loop
               className="w-full aspect-[9/16] object-cover rounded-2xl"
               onPlay={() => setIsMuted(false)}
             >
