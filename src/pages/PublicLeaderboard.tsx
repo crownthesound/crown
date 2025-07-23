@@ -648,7 +648,7 @@ export function PublicLeaderboard() {
         )}
       </Helmet>
 
-      <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A] flex flex-col">
+      <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
         {/* Contest Header */}
         <div className="relative">
           {/* Logo */}
