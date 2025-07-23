@@ -156,7 +156,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
       
       {/* Optional: Video title overlay (can be hidden for pure full-screen experience) */}
       {video.title && (
-        <div className="absolute bottom-4 left-4 right-16 z-10">
+        <div className="absolute bottom-0 left-0 right-0 z-10">
           <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3">
             {/* Ranking and Views */}
             <div className="flex items-center justify-between mb-2">
