@@ -117,8 +117,8 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
       {/* Video content */}
       {video.video_url ? (
         // Our stored video from Supabase
-        <div className="flex items-center justify-center w-full h-full p-4">
-          <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden transform-gpu hover:scale-[1.02] transition-all duration-500">
+        <div className="flex items-center justify-center w-full h-full p-4 relative">
+          <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
             <video
               src={video.video_url}
               controls
@@ -131,6 +131,54 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
             >
               Your browser does not support the video tag.
             </video>
+            
+            {/* Video Info Overlay - Inside Video Container */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
+              {/* Ranking and Views */}
+              <div className="flex items-center justify-between mb-3">
+                {video.rank && (
+                  <div className={`px-3 py-1.5 rounded-lg text-xs font-bold backdrop-blur-md border ${
+                    video.rank === 1 ? 'bg-yellow-400/20 text-yellow-400 border-yellow-400/30' :
+                    video.rank === 2 ? 'bg-gray-300/20 text-gray-300 border-gray-300/30' :
+                    video.rank === 3 ? 'bg-amber-600/20 text-amber-600 border-amber-600/30' :
+                    video.rank <= 10 ? 'bg-blue-400/20 text-blue-400 border-blue-400/30' :
+                    'bg-black/40 text-white/90 border-white/20'
+                  }`}>
+                    Current Rank: #{video.rank}
+                  </div>
+                )}
+                {video.views !== null && video.views !== undefined && (
+                  <div className="text-white/90 text-xs font-medium bg-black/40 backdrop-blur-sm px-2 py-1 rounded-lg">
+                    {video.views.toLocaleString()} views
+                  </div>
+                )}
+              </div>
+              
+              {/* User Info */}
+              <div className="flex items-center gap-2">
+                {video.avatar_url ? (
+                  <img
+                    src={video.avatar_url}
+                    alt={`${video.username} profile`}
+                    className="w-8 h-8 rounded-full object-cover border border-white/20"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/20">
+                    <span className="text-white text-xs font-medium">
+                      {video.username.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <p className="text-white/90 text-sm font-medium">
+                    {video.tiktok_display_name || video.username}
+                  </p>
+                  <p className="text-white/70 text-xs">
+                    @{video.username}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
@@ -153,58 +201,6 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
         onClick={onClose}
         aria-label="Close video"
       />
-      
-      {/* Optional: Video title overlay (can be hidden for pure full-screen experience) */}
-      {video.title && (
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3">
-            {/* Ranking and Views */}
-            <div className="flex items-center justify-between mb-2">
-              {video.rank && (
-                <div className="flex items-center gap-2">
-                  <div className={`px-3 py-1.5 rounded-lg text-xs font-bold backdrop-blur-md border ${
-                    video.rank === 1 ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30' :
-                    video.rank === 2 ? 'bg-gray-300/20 text-gray-300 border border-gray-300/30' :
-                    video.rank === 3 ? 'bg-amber-600/20 text-amber-600 border border-amber-600/30' :
-                    video.rank <= 10 ? 'bg-blue-400/20 text-blue-400 border border-blue-400/30' :
-                    'bg-black/40 text-white/90 border border-white/20'
-                  }`}>
-                    Current Rank: #{video.rank}
-                  </div>
-                </div>
-              )}
-              {video.views !== null && video.views !== undefined && (
-                <div className="text-white/80 text-xs font-medium">
-                  {video.views.toLocaleString()} views
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              {video.avatar_url ? (
-                <img
-                  src={video.avatar_url}
-                  alt={`${video.username} profile`}
-                  className="w-6 h-6 rounded-full object-cover border border-white/20"
-                />
-              ) : (
-                <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/20">
-                  <span className="text-white text-xs font-medium">
-                    {video.username.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
-              <div>
-                <p className="text-white/90 text-xs font-medium">
-                  {video.tiktok_display_name || video.username}
-                </p>
-                <p className="text-white/60 text-xs">
-                  @{video.username}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
