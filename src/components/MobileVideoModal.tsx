@@ -121,12 +121,10 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
           <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
             <video
               src={video.video_url}
-              controls
               autoPlay
               muted={isMuted}
               playsInline
               className="w-full aspect-[9/16] object-cover rounded-2xl"
-              controlsList="nodownload"
               onPlay={() => setIsMuted(false)}
             >
               Your browser does not support the video tag.
