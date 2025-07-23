@@ -105,15 +105,6 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center">
-      {/* Close button */}
-      <button
-        onClick={onClose}
-        className="absolute top-6 right-6 z-20 p-3 bg-black/80 backdrop-blur-md rounded-full text-white hover:bg-black/90 transition-all duration-300 border border-white/20 hover:border-white/40 shadow-lg hover:shadow-xl transform hover:scale-110"
-        aria-label="Close video"
-      >
-        <X className="h-6 w-6" />
-      </button>
-      
       {/* Video content */}
       {video.video_url ? (
         // Our stored video from Supabase
@@ -130,6 +121,15 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
             >
               Your browser does not support the video tag.
             </video>
+            
+            {/* Close button positioned in video corner */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-30 p-2 bg-black/60 backdrop-blur-sm rounded-full text-white hover:bg-black/80 transition-all duration-300 border border-white/10 hover:border-white/30 shadow-lg hover:shadow-xl transform hover:scale-110"
+              aria-label="Close video"
+            >
+              <X className="h-5 w-5" />
+            </button>
             
             {/* Video Info Overlay - Inside Video Container */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
