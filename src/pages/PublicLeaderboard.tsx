@@ -853,13 +853,13 @@ export function PublicLeaderboard() {
                           : "th"}
                       </span>
                     </div>
-                    <div className="text-xs sm:text-sm font-medium text-white leading-tight line-clamp-2 text-center px-1">
+                   <div className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 snap-x snap-mandatory scrollbar-hide">
                       {contest.prize_tier === "monetary"
                         ? `$${formatNumber(
                             contest.prize_per_winner * (1 - index * 0.2)
                           )}`
                         : prize.title}
-                    </div>
+                           className="p-4 rounded-lg border bg-black/20 border-white/10 transition-all hover:bg-white/5 snap-start flex-shrink-0 min-w-[140px]"
                   </button>
                 ))}
               </div>
