@@ -178,9 +178,6 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
                 </div>
               )}
             </div>
-            <h3 className="text-white text-sm font-medium line-clamp-2">
-              {video.title}
-            </h3>
             <div className="flex items-center gap-2 mt-2">
               {video.avatar_url ? (
                 <img
