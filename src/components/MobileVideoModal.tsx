@@ -61,6 +61,46 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
     };
   }, [isOpen, onClose]);
 
+  const getRankDisplay = (rank: number | null) => {
+    if (!rank) return null;
+
+    const getRankSuffix = (num: number) => {
+      if (num >= 11 && num <= 13) return 'th';
+      switch (num % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
+
+    const rankText = `#${rank} ${rank}${getRankSuffix(rank)} Place`;
+    
+    // Color coding based on rank
+    let bgColor = 'bg-white/20 border-white/30';
+    let textColor = 'text-white';
+    
+    if (rank === 1) {
+      bgColor = 'bg-gradient-to-r from-yellow-400 to-yellow-600 border-yellow-300';
+      textColor = 'text-yellow-900';
+    } else if (rank === 2) {
+      bgColor = 'bg-gradient-to-r from-gray-300 to-gray-500 border-gray-200';
+      textColor = 'text-gray-900';
+    } else if (rank === 3) {
+      bgColor = 'bg-gradient-to-r from-amber-600 to-amber-800 border-amber-400';
+      textColor = 'text-amber-100';
+    } else if (rank <= 10) {
+      bgColor = 'bg-gradient-to-r from-blue-500 to-blue-700 border-blue-300';
+      textColor = 'text-blue-100';
+    }
+
+    return (
+      <div className={`px-3 py-2 rounded-lg backdrop-blur-sm border ${bgColor} ${textColor} font-bold text-sm shadow-lg`}>
+        {rankText}
+      </div>
+    );
+  };
+
   if (!isOpen || !video) return null;
 
   return (
