@@ -118,7 +118,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
       {video.video_url ? (
         // Our stored video from Supabase
         <div className="flex items-center justify-center w-full h-full p-4">
-          <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden transform-gpu hover:scale-[1.02] transition-all duration-500">
+          <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border-4 border-white/40 shadow-2xl overflow-hidden transform-gpu hover:scale-[1.02] transition-all duration-500">
             <video
               src={video.video_url}
               controls
