@@ -944,17 +944,17 @@ export function PublicLeaderboard() {
                             >
                               <img
                                 src={participant.thumbnail}
-                                 className="w-16 h-16 object-cover rounded-lg"
-                                 loading="lazy"
-                                 decoding="async"
-                                 onLoad={(e) => {
-                                   const overlay = e.currentTarget.nextElementSibling as HTMLElement;
-                                   if (overlay) overlay.style.opacity = '0';
-                                 }}
-                                className="w-6 h-6 rounded object-cover border border-white/10"
-                               <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
-                                    style={{ transition: 'opacity 0.3s ease' }}>
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 rounded transition-all opacity-90 hover:opacity-100">
+                                alt={`${participant.username} video thumbnail`}
+                                className="w-16 h-16 object-cover rounded-lg"
+                                loading="lazy"
+                                decoding="async"
+                                onLoad={(e) => {
+                                  const overlay = e.currentTarget.nextElementSibling as HTMLElement;
+                                  if (overlay) overlay.style.opacity = '0';
+                                }}
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
+                                   style={{ transition: 'opacity 0.3s ease' }}>
                                 <Play className="h-3 w-3 text-white drop-shadow-lg" />
                               </div>
                             </div>
