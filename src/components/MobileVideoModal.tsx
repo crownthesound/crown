@@ -164,6 +164,27 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
       {video.title && (
         <div className="absolute bottom-4 left-4 right-16 z-10">
           <div className="bg-black/50 backdrop-blur-sm rounded-lg p-3">
+            {/* Ranking and Views */}
+            <div className="flex items-center justify-between mb-2">
+              {video.rank && (
+                <div className="flex items-center gap-2">
+                  <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                    video.rank === 1 ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30' :
+                    video.rank === 2 ? 'bg-gray-300/20 text-gray-300 border border-gray-300/30' :
+                    video.rank === 3 ? 'bg-amber-600/20 text-amber-600 border border-amber-600/30' :
+                    video.rank <= 10 ? 'bg-blue-400/20 text-blue-400 border border-blue-400/30' :
+                    'bg-white/20 text-white/80 border border-white/20'
+                  }`}>
+                    #{video.rank}
+                  </div>
+                </div>
+              )}
+              {video.views !== null && video.views !== undefined && (
+                <div className="text-white/80 text-xs font-medium">
+                  {video.views.toLocaleString()} views
+                </div>
+              )}
+            </div>
             <h3 className="text-white text-sm font-medium line-clamp-2">
               {video.title}
             </h3>
