@@ -105,13 +105,6 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center">
-      {/* Rank Badge - Top Left */}
-      {video.rank && (
-        <div className="absolute top-4 left-4 z-20">
-          {getRankDisplay(video.rank)}
-        </div>
-      )}
-      
       {/* Close button */}
       <button
         onClick={onClose}
