@@ -853,13 +853,13 @@ export function PublicLeaderboard() {
                           : "th"}
                       </span>
                     </div>
-                   <div className="flex gap-3 overflow-x-auto pb-2 -mx-3 px-3 snap-x snap-mandatory scrollbar-hide">
+                    <div className="text-xs sm:text-sm text-white/80 text-center line-clamp-2">
                       {contest.prize_tier === "monetary"
                         ? `$${formatNumber(
                             contest.prize_per_winner * (1 - index * 0.2)
                           )}`
                         : prize.title}
-                           className="p-4 rounded-lg border bg-black/20 border-white/10 transition-all hover:bg-white/5 snap-start flex-shrink-0 min-w-[140px]"
+                    </div>
                   </button>
                 ))}
               </div>
@@ -1115,7 +1115,7 @@ export function PublicLeaderboard() {
                   <button
                     onClick={handleJoinCompetition}
                     disabled={contest?.calculatedStatus === "ended"}
-                    className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base ${
+                    className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base flex items-center justify-center gap-1.5 ${
                       contest?.calculatedStatus === "ended"
                         ? "bg-gray-400 text-gray-600 cursor-not-allowed"
                         : "bg-white text-black hover:bg-white/90"
