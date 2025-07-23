@@ -821,7 +821,7 @@ export function PublicLeaderboard() {
             </div>
 
             <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
-              <div className="flex gap-1 overflow-x-auto pb-2 -mx-1 px-4 snap-x snap-mandatory scrollbar-hide">
+              <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
                 {contest.prize_titles.map((prize, index) => (
                   <button
                     key={index}
@@ -834,7 +834,7 @@ export function PublicLeaderboard() {
                             : prize.title,
                       })
                     }
-                    className="p-1.5 rounded-lg border snap-start flex-shrink-0 min-w-[70px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
+                    className="p-3 rounded-lg border snap-center flex-shrink-0 w-[280px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
                   >
                     <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
                       {getRankIcon(index + 1, true)}
@@ -853,7 +853,7 @@ export function PublicLeaderboard() {
                           : "th"}
                       </span>
                     </div>
-                    <div className="text-[10px] font-medium leading-tight line-clamp-2 text-white">
+                    <div className="text-sm font-medium leading-tight text-white text-center">
                       {contest.prize_tier === "monetary"
                         ? `$${formatNumber(
                             contest.prize_per_winner * (1 - index * 0.2)
