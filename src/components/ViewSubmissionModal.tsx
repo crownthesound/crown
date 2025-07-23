@@ -155,17 +155,19 @@ export const ViewSubmissionModal: React.FC<ViewSubmissionModalProps> = ({
             {video.video_url ? (
               // Our stored video from Supabase
               <>
-                <video
-                  src={video.video_url}
-                  controls
-                  muted={isMuted}
-                  className="absolute inset-0 w-full h-full object-cover rounded-xl shadow-2xl"
-                  onLoadedData={() => setIsLoading(false)}
-                  onClick={() => setShowFullScreen(true)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  Your browser does not support the video tag.
-                </video>
+                <div className="absolute inset-0 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+                  <video
+                    src={video.video_url}
+                    controls
+                    muted={isMuted}
+                    className="w-full h-full object-cover rounded-xl shadow-2xl transform-gpu hover:scale-[1.02] transition-all duration-300"
+                    onLoadedData={() => setIsLoading(false)}
+                    onClick={() => setShowFullScreen(true)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
                 
                 {/* Mobile full-screen trigger overlay for better UX */}
                 <div 

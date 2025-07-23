@@ -76,17 +76,21 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
       {/* Video content */}
       {video.video_url ? (
         // Our stored video from Supabase
-        <video
-          src={video.video_url}
-          controls
-          autoPlay
-          muted={isMuted}
-          className="w-full h-full object-contain rounded-lg shadow-2xl"
-          controlsList="nodownload"
-          onPlay={() => setIsMuted(false)}
-        >
-          Your browser does not support the video tag.
-        </video>
+        <div className="flex items-center justify-center w-full h-full p-4">
+          <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden transform-gpu hover:scale-[1.02] transition-all duration-500">
+            <video
+              src={video.video_url}
+              controls
+              autoPlay
+              muted={isMuted}
+              className="w-full aspect-[9/16] object-cover rounded-2xl"
+              controlsList="nodownload"
+              onPlay={() => setIsMuted(false)}
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
       ) : (
         // Fallback to TikTok iframe for full-screen
         <div className="w-full h-full flex items-center justify-center">
