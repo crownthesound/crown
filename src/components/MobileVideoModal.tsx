@@ -168,7 +168,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
                     video.rank <= 10 ? 'bg-blue-400/20 text-blue-400 border border-blue-400/30' :
                     'bg-white/20 text-white/80 border border-white/20'
                   }`}>
-                    #{video.rank}
+                    Current Rank: #{video.rank}
                   </div>
                 </div>
               )}
