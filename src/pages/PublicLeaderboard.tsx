@@ -821,7 +821,7 @@ export function PublicLeaderboard() {
             </div>
 
             <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
-              <div className="flex gap-1 overflow-x-auto pb-2 -mx-1 px-4 snap-x snap-mandatory scrollbar-hide justify-center">
+              <div className="flex gap-1 overflow-x-auto pb-2 -mx-1 px-4 snap-x snap-mandatory scrollbar-hide">
                 {contest.prize_titles.map((prize, index) => (
                   <button
                     key={index}
