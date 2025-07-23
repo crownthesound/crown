@@ -188,7 +188,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
               ) : (
                 <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/20">
                   <span className="text-white text-xs font-medium">
-            <div className="relative max-w-sm w-full bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden">
+                    {video.username.charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
