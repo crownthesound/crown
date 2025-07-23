@@ -14,6 +14,7 @@ interface VideoData {
   shares: number | null;
   avatar_url?: string | null; // TikTok profile avatar
   tiktok_display_name?: string | null; // TikTok display name
+  rank?: number | null; // Current rank in contest
 }
 
 interface MobileVideoModalProps {
@@ -62,12 +63,48 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
 
   if (!isOpen || !video) return null;
 
+  const getRankDisplay = (rank: number | null) => {
+    if (!rank) return null;
+    
+    const getRankSuffix = (num: number) => {
+      if (num >= 11 && num <= 13) return 'th';
+      switch (num % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
+
+    const getRankColor = (rank: number) => {
+      if (rank === 1) return 'text-yellow-400 bg-yellow-400/20 border-yellow-400/30';
+      if (rank === 2) return 'text-gray-300 bg-gray-300/20 border-gray-300/30';
+      if (rank === 3) return 'text-amber-600 bg-amber-600/20 border-amber-600/30';
+      if (rank <= 10) return 'text-blue-400 bg-blue-400/20 border-blue-400/30';
+      return 'text-white/80 bg-white/10 border-white/20';
+    return (
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-bold ${getRankColor(rank)}`}>
+        <span className="text-lg">#{rank}</span>
+        <span className="text-xs opacity-80">
+          {rank}{getRankSuffix(rank)} Place
+        </span>
+      </div>
+    );
+  };
+    };
   return (
     <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center">
+      {/* Rank Badge - Top Left */}
+      {video.rank && (
+        <div className="absolute top-4 left-4 z-20">
+          {getRankDisplay(video.rank)}
+        </div>
+      )}
+      
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 p-3 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/70 transition-colors"
+        className="absolute top-4 right-4 z-20 p-3 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/70 transition-colors"
         aria-label="Close video"
       >
         <X className="h-6 w-6" />

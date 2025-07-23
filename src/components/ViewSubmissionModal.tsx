@@ -16,6 +16,7 @@ interface VideoLink {
   embed_code?: string | null;
   avatar_url?: string | null; // TikTok profile avatar
   tiktok_display_name?: string | null; // TikTok display name
+  rank?: number | null; // Current rank in contest
 }
 
 interface ViewSubmissionModalProps {
