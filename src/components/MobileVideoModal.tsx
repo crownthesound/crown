@@ -92,6 +92,37 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
     );
   };
     };
+  const getRankDisplay = (rank: number | null) => {
+    if (!rank) return null;
+    
+    const getRankSuffix = (num: number) => {
+      if (num >= 11 && num <= 13) return 'th';
+      switch (num % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
+
+    const getRankColor = (rank: number) => {
+      if (rank === 1) return 'text-yellow-400 bg-yellow-400/20 border-yellow-400/30';
+      if (rank === 2) return 'text-gray-300 bg-gray-300/20 border-gray-300/30';
+      if (rank === 3) return 'text-amber-600 bg-amber-600/20 border-amber-600/30';
+      if (rank <= 10) return 'text-blue-400 bg-blue-400/20 border-blue-400/30';
+      return 'text-white/80 bg-white/10 border-white/20';
+    };
+
+    return (
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-bold ${getRankColor(rank)}`}>
+        <span className="text-lg">#{rank}</span>
+        <span className="text-xs opacity-80">
+          {rank}{getRankSuffix(rank)} Place
+        </span>
+      </div>
+    );
+  };
+  
   return (
     <div className="fixed inset-0 bg-black z-[100] flex items-center justify-center">
       {/* Rank Badge - Top Left */}
