@@ -81,7 +81,7 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
           controls
           autoPlay
           muted={isMuted}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain rounded-lg shadow-2xl"
           controlsList="nodownload"
           onPlay={() => setIsMuted(false)}
         >

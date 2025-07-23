@@ -159,7 +159,7 @@ export const ViewSubmissionModal: React.FC<ViewSubmissionModalProps> = ({
                   src={video.video_url}
                   controls
                   muted={isMuted}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover rounded-xl shadow-2xl"
                   onLoadedData={() => setIsLoading(false)}
                   onClick={() => setShowFullScreen(true)}
                   style={{ cursor: 'pointer' }}
