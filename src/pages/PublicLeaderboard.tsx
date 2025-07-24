@@ -591,6 +591,7 @@ export function PublicLeaderboard() {
         </div>
       </div>
 
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Contest Header */}
         <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden mb-8">
@@ -1219,4 +1220,5 @@ export function PublicLeaderboard() {
       </div>
     </div>
   );
-}
+    {/* Contest Header - Full Screen */}
+    <div className="relative bg-white/5 backdrop-blur-sm overflow-hidden mb-8">
