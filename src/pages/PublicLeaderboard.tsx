@@ -1145,7 +1145,7 @@ export function PublicLeaderboard() {
           </div>
         )}
       </div>
-
+        <div className="relative p-0">
       {/* Modals */}
       <TikTokSettingsModal
         isOpen={showTikTokModal}
