@@ -27,9 +27,6 @@ import {
   Volume2,
   ChevronLeft,
   ChevronRight,
-  Info,
-  Music,
-  Users,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
 import { useAuth } from "../contexts/AuthContext";
@@ -87,7 +84,6 @@ interface ContestDetails {
     title: string;
   }>;
   top_participants?: Participant[];
-  music_category?: string;
 }
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
@@ -857,38 +853,29 @@ export function PublicLeaderboard() {
 
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 pb-20 sm:pb-32">
           {/* Contest Info */}
-          <div className="bg-gradient-to-br from-white/10 via-white/5 to-white/5 backdrop-blur-sm rounded-2xl border border-white/20 p-8 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-              <div className="p-2 bg-blue-500/20 rounded-lg">
-                <Info className="h-6 w-6 text-blue-400" />
-              </div>
-              About this Contest
-            </h2>
-            <div className="space-y-4">
-              <p className="text-white/90 leading-relaxed text-base">
-                {contest.description}
-              </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/10">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/20 rounded-lg">
-                    <Music className="h-5 w-5 text-purple-400" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-white/60">Category</div>
-                    <div className="text-white font-medium">{contest.music_category}</div>
-                  </div>
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
+            <div className="space-y-2 sm:space-y-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">
+                  About this Contest
+                </h3>
+                <div className="max-h-[25vh] sm:max-h-none overflow-y-auto">
+                  <p
+                    className={`text-sm sm:text-base text-white/80 leading-relaxed ${
+                      !showFullDescription && "line-clamp-4 sm:line-clamp-3"
+                    }`}
+                  >
+                    {contest.description}
+                  </p>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-500/20 rounded-lg">
-                    <Users className="h-5 w-5 text-green-400" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-white/60">Participants</div>
-                    <div className="text-white font-medium">{participants.length}</div>
-                  </div>
-                </div>
+                {contest.description.length > 150 && (
+                  <button
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    className="text-white hover:text-white/90 text-sm mt-2 font-medium min-h-[44px] flex items-center"
+                  >
+                    {showFullDescription ? "Show less" : "Read more"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -938,68 +925,62 @@ export function PublicLeaderboard() {
           )}
 
           {/* Prize Distribution */}
-          <div className="bg-gradient-to-br from-white/10 via-white/5 to-white/5 backdrop-blur-sm rounded-2xl border border-white/20 p-8 shadow-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white flex items-center gap-3">
-                <div className="p-2 bg-yellow-500/20 rounded-lg">
-                  <Trophy className="h-6 w-6 text-yellow-400" />
-                </div>
-                Prize Distribution
-              </h2>
-              <span className="text-sm text-white/80 bg-white/10 px-3 py-1 rounded-full font-medium">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
+            <div className="flex items-center justify-between mb-2 sm:mb-4">
+              <div className="flex items-center gap-2">
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                <h2 className="text-base sm:text-lg font-semibold text-white">
+                  {contest.prize_tier === "monetary" ? "Prize Pool" : "Prizes"}
+                </h2>
+              </div>
+              <div className="text-xs sm:text-sm text-white/60">
                 {contest.prize_titles.length} Winners
-              </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-              {contest.prize_titles.map((prize, index) => (
-                <button
-                  key={index}
-                  onClick={() =>
-                    setSelectedPrize({
-                      rank: index + 1,
-                      prize:
-                        contest.prize_tier === "monetary"
-                          ? contest.prize_per_winner * (1 - index * 0.2)
-                          : prize.title,
-                    })
-                  }
-                  className={`group relative p-6 rounded-xl border-2 hover:scale-105 transition-all duration-300 backdrop-blur-sm ${
-                    index === 0
-                      ? "bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border-yellow-400/30 hover:border-yellow-400/50"
-                      : index === 1
-                      ? "bg-gradient-to-br from-gray-400/20 to-gray-500/10 border-gray-400/30 hover:border-gray-400/50"
-                      : index === 2
-                      ? "bg-gradient-to-br from-amber-600/20 to-amber-700/10 border-amber-500/30 hover:border-amber-500/50"
-                      : "bg-gradient-to-br from-white/10 to-white/5 border-white/20 hover:border-white/30"
-                  }`}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    {getRankIcon(index + 1, true)}
-                    <span
-                      className={`text-base font-bold ${getRankColor(
-                        index + 1
-                      )}`}
-                    >
-                      {index + 1}
-                      {index === 0
-                        ? "st"
-                        : index === 1
-                        ? "nd"
-                        : index === 2
-                        ? "rd"
-                        : "th"}
-                    </span>
-                  </div>
-                  <div className="text-sm font-semibold text-white group-hover:text-white/90 transition-colors">
-                    {contest.prize_tier === "monetary"
-                      ? `$${formatNumber(
-                          contest.prize_per_winner * (1 - index * 0.2)
-                        )}`
-                      : prize.title}
-                  </div>
-                </button>
-              ))}
+            <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
+              <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+                {contest.prize_titles.map((prize, index) => (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      setSelectedPrize({
+                        rank: index + 1,
+                        prize:
+                          contest.prize_tier === "monetary"
+                            ? contest.prize_per_winner * (1 - index * 0.2)
+                            : prize.title,
+                      })
+                    }
+                    className="p-3 rounded-lg border snap-center flex-shrink-0 w-[280px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
+                  >
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
+                      {getRankIcon(index + 1, true)}
+                      <span
+                        className={`text-xs sm:text-sm font-medium ${getRankColor(
+                          index + 1
+                        )}`}
+                      >
+                        {index + 1}
+                        {index === 0
+                          ? "st"
+                          : index === 1
+                          ? "nd"
+                          : index === 2
+                          ? "rd"
+                          : "th"}
+                      </span>
+                    </div>
+                    <div className="text-sm font-medium leading-tight text-white text-center">
+                      {contest.prize_tier === "monetary"
+                        ? `$${formatNumber(
+                            contest.prize_per_winner * (1 - index * 0.2)
+                          )}`
+                        : prize.title}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
