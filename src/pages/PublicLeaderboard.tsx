@@ -854,11 +854,6 @@ export function PublicLeaderboard() {
         </div>
 
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 pb-20 sm:pb-32">
-          {/* Contest Info */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
-            <div className="space-y-2 sm:space-y-4">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">
                   About this Contest
                 </h3>
                 <div className="max-h-[25vh] sm:max-h-none overflow-y-auto">
