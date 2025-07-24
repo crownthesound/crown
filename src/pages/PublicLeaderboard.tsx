@@ -853,10 +853,18 @@ export function PublicLeaderboard() {
           )}
         </div>
 
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 pb-20 sm:pb-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 space-y-8 sm:space-y-12 pb-24 sm:pb-40">
           {/* Video Carousel */}
           {participants.length > 0 && (
-            <div className="mb-8">
+            <div className="mb-12 lg:mb-16">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3 tracking-tight">
+                  Contest Submissions
+                </h2>
+                <p className="text-white/70 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                  Watch the latest entries from our talented participants
+                </p>
+              </div>
               <div className="relative max-w-7xl mx-auto w-full">
                 <div className="overflow-hidden w-full" ref={emblaRef}>
                   <div className="flex">
@@ -1000,30 +1008,289 @@ export function PublicLeaderboard() {
             </div>
           )}
 
-          {/* Contest Info */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
-            <div className="space-y-2 sm:space-y-4">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">
-                  About this Contest
-                </h3>
-                <div className="max-h-[25vh] sm:max-h-none overflow-y-auto">
-                  <p
-                    className={`text-sm sm:text-base text-white/80 leading-relaxed ${
-                      !showFullDescription && "line-clamp-4 sm:line-clamp-3"
-                    }`}
-                  >
-                    {contest.description}
-                  </p>
+          {/* Contest Info Grid */}
+          <div className="grid gap-6 sm:gap-8 lg:gap-10">
+            {/* About Contest */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 sm:p-8 lg:p-10 hover:bg-white/[0.07] transition-all duration-300">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4 sm:mb-6 flex items-center gap-3">
+                <div className="w-2 h-8 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full"></div>
+                About this Contest
+              </h2>
+              <p className="text-white/80 leading-relaxed text-base sm:text-lg lg:text-xl font-light">
+                {contest.description}
+              </p>
+            </div>
+
+            {/* Prize Distribution */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 sm:p-8 lg:p-10 hover:bg-white/[0.07] transition-all duration-300">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
+                  <div className="w-2 h-8 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full"></div>
+                  <Trophy className="h-6 w-6 sm:h-7 sm:w-7 text-yellow-400" />
+                  Prizes
+                </h2>
+                <span className="text-sm sm:text-base text-white/70 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium backdrop-blur-sm border border-white/10">
+                  {contest.num_winners} Winners
+                </span>
+              </div>
+
+              <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
+                <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+                  {contest.prize_titles.map((prize, index) => (
+                    <button
+                      key={index}
+                      onClick={() =>
+                        setSelectedPrize({
+                          rank: index + 1,
+                          prize:
+                            contest.prize_tier === "monetary"
+                              ? contest.prize_per_winner * (1 - index * 0.2)
+                              : prize.title,
+                        })
+                      }
+                      className="p-3 rounded-lg border snap-center flex-shrink-0 w-[280px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
+                    >
+                      <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
+                        {getRankIcon(index + 1, true)}
+                        <span
+                          className={`text-xs sm:text-sm font-medium ${getRankColor(
+                            index + 1
+                          )}`}
+                        >
+                          {index + 1}
+                          {index === 0
+                            ? "st"
+                            : index === 1
+                            ? "nd"
+                            : index === 2
+                            ? "rd"
+                            : "th"}
+                        </span>
+                      </div>
+                      <div className="text-sm font-medium leading-tight text-white text-center">
+                        {contest.prize_tier === "monetary"
+                          ? `$${formatNumber(
+                              contest.prize_per_winner * (1 - index * 0.2)
+                            )}`
+                          : prize.title}
+                      </div>
+                    </button>
+                  ))}
                 </div>
-                {contest.description.length > 150 && (
-                  <button
-                    onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="text-white hover:text-white/90 text-sm mt-2 font-medium min-h-[44px] flex items-center"
-                  >
-                    {showFullDescription ? "Show less" : "Read more"}
-                  </button>
-                )}
+              </div>
+            </div>
+
+            {/* Current Rankings */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden hover:bg-white/[0.07] transition-all duration-300">
+              <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-6 border-b border-white/10 bg-white/5">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
+                  <div className="w-2 h-8 bg-gradient-to-b from-green-400 to-blue-500 rounded-full"></div>
+                  Current Rankings
+                </h2>
+              </div>
+
+              {/* Mobile View */}
+              <div className="sm:hidden">
+                <div className="max-h-[30vh] sm:max-h-[50vh] overflow-y-auto divide-y divide-white/10">
+                  {participants.map((participant) => (
+                    <div key={participant.id} className="p-1.5">
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
+                          <div className="flex items-center gap-0.5">
+                            <div
+                              className={`text-xs font-bold ${getRankColor(
+                                participant.rank
+                              )}`}
+                            >
+                              #{participant.rank}
+                            </div>
+                            <div className="scale-75">
+                              {getRankIcon(
+                                participant.rank,
+                                participant.rank <= (contest.num_winners || 3)
+                              )}
+                            </div>
+                          </div>
+                          <div className="scale-[0.6]">
+                            {getRankChangeIcon(
+                              participant.rank,
+                              participant.previousRank
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Avatar */}
+                        {participant.avatar_url ? (
+                          <img
+                            src={participant.avatar_url}
+                            alt={`${participant.username} profile`}
+                            className="w-6 h-6 rounded-full object-cover border border-white/10 flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                            <span className="text-white text-xs font-medium">
+                              {participant.tiktok_display_name?.charAt(0) ||
+                                participant.username?.charAt(0) ||
+                                "U"}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Main Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="font-medium text-white text-xs truncate leading-none mb-0.5">
+                                {participant.tiktok_display_name ||
+                                  participant.username}
+                              </div>
+                              <div className="text-xs text-white/60 leading-none">
+                                {formatNumber(participant.views)} views
+                              </div>
+                            </div>
+
+                            {/* Video Thumbnail with Play Button */}
+                            {participant.thumbnail && (
+                              <div
+                                className="relative flex-shrink-0 cursor-pointer ml-2"
+                                onClick={() => handlePlayVideo(participant)}
+                                title="Play video"
+                              >
+                                <img
+                                  src={participant.thumbnail}
+                                  alt={`${participant.username} video thumbnail`}
+                                  className="w-16 h-16 object-cover rounded-lg"
+                                  loading="lazy"
+                                  decoding="async"
+                                  onLoad={(e) => {
+                                    const overlay = e.currentTarget.nextElementSibling as HTMLElement;
+                                    if (overlay) overlay.style.opacity = '0';
+                                  }}
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
+                                     style={{ transition: 'opacity 0.3s ease' }}>
+                                  <Play className="h-3 w-3 text-white drop-shadow-lg" />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop View */}
+              <div className="hidden sm:block">
+                <div className="grid grid-cols-10 gap-4 px-6 py-3 bg-white/5 text-sm font-medium text-white/60">
+                  <div className="col-span-1">Rank</div>
+                  <div className="col-span-6">Participant</div>
+                  <div className="col-span-2 text-right">Views</div>
+                  <div className="col-span-1 text-center">Preview</div>
+                </div>
+
+                <div className="divide-y divide-white/10">
+                  {participants.map((participant) => (
+                    <div
+                      key={participant.id}
+                      className="grid grid-cols-10 gap-4 px-6 py-4 items-center hover:bg-white/5"
+                    >
+                      <div className="col-span-1 flex items-center gap-2">
+                        {getRankIcon(
+                          participant.rank,
+                          participant.rank <= (contest.num_winners || 3)
+                        )}
+                        <span
+                          className={`text-sm font-medium ${getRankColor(
+                            participant.rank
+                          )}`}
+                        >
+                          #{participant.rank}
+                        </span>
+                        {getRankChangeIcon(
+                          participant.rank,
+                          participant.previousRank
+                        )}
+                      </div>
+                      <div className="col-span-6 flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          {/* Profile Avatar */}
+                          {participant.avatar_url ? (
+                            <img
+                              src={participant.avatar_url}
+                              alt={`${participant.username} profile`}
+                              className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                              <span className="text-white text-sm font-medium">
+                                {participant.tiktok_display_name?.charAt(0) ||
+                                  participant.username?.charAt(0) ||
+                                  "U"}
+                              </span>
+                            </div>
+                          )}
+                          {/* Video Thumbnail with Play Button */}
+                          {participant.thumbnail && (
+                            <div
+                              className="relative flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-white/20 rounded-lg transition-all"
+                              onClick={() => handlePlayVideo(participant)}
+                              title="Play video"
+                            >
+                              <img
+                                src={participant.thumbnail}
+                                alt={`${participant.username} video thumbnail`}
+                                className="w-10 h-10 rounded-lg object-cover border border-white/10"
+                              />
+                              {/* Play icon overlay */}
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100">
+                                <Play className="h-4 w-4 text-white drop-shadow-lg" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-medium text-white truncate">
+                            {participant.tiktok_display_name ||
+                              participant.username}
+                          </div>
+                          <div className="text-sm text-white/60 line-clamp-1">
+                            @{participant.username}
+                          </div>
+                          {participant.title && (
+                            <div className="text-xs text-white/40 line-clamp-1">
+                              {participant.title}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="col-span-2 text-right font-medium text-white">
+                        {formatNumber(participant.views)}
+                      </div>
+                      <div className="col-span-1 flex justify-center">
+                        {participant.thumbnail ? (
+                          <div
+                            className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
+                            onClick={() => handlePlayVideo(participant)}
+                            title="Play video"
+                          >
+                            <img
+                              src={participant.thumbnail}
+                              alt="Video preview"
+                              className="w-6 h-6 rounded object-cover opacity-60 hover:opacity-80"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Play className="h-2 w-2 text-white/80 drop-shadow" />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-white/30 text-xs">No preview</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -1071,279 +1338,6 @@ export function PublicLeaderboard() {
               </div>
             </div>
           )}
-
-          {/* Prize Distribution */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
-            <div className="flex items-center justify-between mb-2 sm:mb-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                <h2 className="text-base sm:text-lg font-semibold text-white">
-                  {contest.prize_tier === "monetary" ? "Prize Pool" : "Prizes"}
-                </h2>
-              </div>
-              <div className="text-xs sm:text-sm text-white/60">
-                {contest.prize_titles.length} Winners
-              </div>
-            </div>
-
-            <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
-              <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
-                {contest.prize_titles.map((prize, index) => (
-                  <button
-                    key={index}
-                    onClick={() =>
-                      setSelectedPrize({
-                        rank: index + 1,
-                        prize:
-                          contest.prize_tier === "monetary"
-                            ? contest.prize_per_winner * (1 - index * 0.2)
-                            : prize.title,
-                      })
-                    }
-                    className="p-3 rounded-lg border snap-center flex-shrink-0 w-[280px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
-                  >
-                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
-                      {getRankIcon(index + 1, true)}
-                      <span
-                        className={`text-xs sm:text-sm font-medium ${getRankColor(
-                          index + 1
-                        )}`}
-                      >
-                        {index + 1}
-                        {index === 0
-                          ? "st"
-                          : index === 1
-                          ? "nd"
-                          : index === 2
-                          ? "rd"
-                          : "th"}
-                      </span>
-                    </div>
-                    <div className="text-sm font-medium leading-tight text-white text-center">
-                      {contest.prize_tier === "monetary"
-                        ? `$${formatNumber(
-                            contest.prize_per_winner * (1 - index * 0.2)
-                          )}`
-                        : prize.title}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Leaderboard */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-            <div className="px-3 sm:px-6 py-2 sm:py-4 border-b border-white/10">
-              <h2 className="text-base sm:text-lg font-semibold text-white">
-                Current Rankings
-              </h2>
-            </div>
-
-            {/* Mobile View */}
-            <div className="sm:hidden">
-              <div className="max-h-[30vh] sm:max-h-[50vh] overflow-y-auto divide-y divide-white/10">
-                {participants.map((participant) => (
-                  <div key={participant.id} className="p-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
-                        <div className="flex items-center gap-0.5">
-                          <div
-                            className={`text-xs font-bold ${getRankColor(
-                              participant.rank
-                            )}`}
-                          >
-                            #{participant.rank}
-                          </div>
-                          <div className="scale-75">
-                            {getRankIcon(
-                              participant.rank,
-                              participant.rank <= (contest.num_winners || 3)
-                            )}
-                          </div>
-                        </div>
-                        <div className="scale-[0.6]">
-                          {getRankChangeIcon(
-                            participant.rank,
-                            participant.previousRank
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Avatar */}
-                      {participant.avatar_url ? (
-                        <img
-                          src={participant.avatar_url}
-                          alt={`${participant.username} profile`}
-                          className="w-6 h-6 rounded-full object-cover border border-white/10 flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                          <span className="text-white text-xs font-medium">
-                            {participant.tiktok_display_name?.charAt(0) ||
-                              participant.username?.charAt(0) ||
-                              "U"}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Main Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <div className="min-w-0 flex-1">
-                            <div className="font-medium text-white text-xs truncate leading-none mb-0.5">
-                              {participant.tiktok_display_name ||
-                                participant.username}
-                            </div>
-                            <div className="text-xs text-white/60 leading-none">
-                              {formatNumber(participant.views)} views
-                            </div>
-                          </div>
-
-                          {/* Video Thumbnail with Play Button */}
-                          {participant.thumbnail && (
-                            <div
-                              className="relative flex-shrink-0 cursor-pointer ml-2"
-                              onClick={() => handlePlayVideo(participant)}
-                              title="Play video"
-                            >
-                              <img
-                                src={participant.thumbnail}
-                                alt={`${participant.username} video thumbnail`}
-                                className="w-16 h-16 object-cover rounded-lg"
-                                loading="lazy"
-                                decoding="async"
-                                onLoad={(e) => {
-                                  const overlay = e.currentTarget.nextElementSibling as HTMLElement;
-                                  if (overlay) overlay.style.opacity = '0';
-                                }}
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
-                                   style={{ transition: 'opacity 0.3s ease' }}>
-                                <Play className="h-3 w-3 text-white drop-shadow-lg" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Desktop View */}
-            <div className="hidden sm:block">
-              <div className="grid grid-cols-10 gap-4 px-6 py-3 bg-white/5 text-sm font-medium text-white/60">
-                <div className="col-span-1">Rank</div>
-                <div className="col-span-6">Participant</div>
-                <div className="col-span-2 text-right">Views</div>
-                <div className="col-span-1 text-center">Preview</div>
-              </div>
-
-              <div className="divide-y divide-white/10">
-                {participants.map((participant) => (
-                  <div
-                    key={participant.id}
-                    className="grid grid-cols-10 gap-4 px-6 py-4 items-center hover:bg-white/5"
-                  >
-                    <div className="col-span-1 flex items-center gap-2">
-                      {getRankIcon(
-                        participant.rank,
-                        participant.rank <= (contest.num_winners || 3)
-                      )}
-                      <span
-                        className={`text-sm font-medium ${getRankColor(
-                          participant.rank
-                        )}`}
-                      >
-                        #{participant.rank}
-                      </span>
-                      {getRankChangeIcon(
-                        participant.rank,
-                        participant.previousRank
-                      )}
-                    </div>
-                    <div className="col-span-6 flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        {/* Profile Avatar */}
-                        {participant.avatar_url ? (
-                          <img
-                            src={participant.avatar_url}
-                            alt={`${participant.username} profile`}
-                            className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                            <span className="text-white text-sm font-medium">
-                              {participant.tiktok_display_name?.charAt(0) ||
-                                participant.username?.charAt(0) ||
-                                "U"}
-                            </span>
-                          </div>
-                        )}
-                        {/* Video Thumbnail with Play Button */}
-                        {participant.thumbnail && (
-                          <div
-                            className="relative flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-white/20 rounded-lg transition-all"
-                            onClick={() => handlePlayVideo(participant)}
-                            title="Play video"
-                          >
-                            <img
-                              src={participant.thumbnail}
-                              alt={`${participant.username} video thumbnail`}
-                              className="w-10 h-10 rounded-lg object-cover border border-white/10"
-                            />
-                            {/* Play icon overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100">
-                              <Play className="h-4 w-4 text-white drop-shadow-lg" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-medium text-white truncate">
-                          {participant.tiktok_display_name ||
-                            participant.username}
-                        </div>
-                        <div className="text-sm text-white/60 line-clamp-1">
-                          @{participant.username}
-                        </div>
-                        {participant.title && (
-                          <div className="text-xs text-white/40 line-clamp-1">
-                            {participant.title}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-span-2 text-right font-medium text-white">
-                      {formatNumber(participant.views)}
-                    </div>
-                    <div className="col-span-1 flex justify-center">
-                      {participant.thumbnail ? (
-                        <div
-                          className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
-                          onClick={() => handlePlayVideo(participant)}
-                          title="Play video"
-                        >
-                          <img
-                            src={participant.thumbnail}
-                            alt="Video preview"
-                            className="w-6 h-6 rounded object-cover opacity-60 hover:opacity-80"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Play className="h-2 w-2 text-white/80 drop-shadow" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-white/30 text-xs">No preview</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Join Competition Button */}
