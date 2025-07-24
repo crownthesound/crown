@@ -792,7 +792,10 @@ export function PublicLeaderboard() {
 
               {/* About Contest */}
               <div className="mb-6">
-                <h3 className="text-lg font-medium text-white mb-3">About this Contest</h3>
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center gap-2">
+                  <Star className="h-5 w-5 text-purple-400" />
+                  About this Contest
+                </h3>
                 <p className="text-white/80 leading-relaxed">{contest.description}</p>
               </div>
 
@@ -815,14 +818,14 @@ export function PublicLeaderboard() {
                       <div
                         key={index}
                         className={`
-                          p-4 rounded-lg border transition-all hover:scale-105
+                          p-4 rounded-lg border transition-all hover:scale-105 hover:shadow-lg
                           ${
                             index === 0
-                              ? "bg-yellow-500/10 border-yellow-500/30"
+                              ? "bg-yellow-500/10 border-yellow-500/30 shadow-yellow-500/20"
                               : index === 1
-                              ? "bg-gray-400/10 border-gray-400/30"
+                              ? "bg-gray-400/10 border-gray-400/30 shadow-gray-400/20"
                               : index === 2
-                              ? "bg-amber-600/10 border-amber-600/30"
+                              ? "bg-amber-600/10 border-amber-600/30 shadow-amber-600/20"
                               : "bg-white/5 border-white/10"
                           }
                         `}
@@ -837,7 +840,7 @@ export function PublicLeaderboard() {
                             {formatRank(index + 1)}
                           </span>
                         </div>
-                        <div className="text-sm font-medium text-white">
+                        <div className="text-sm font-medium text-white leading-tight">
                           {contest.prize_tier === "monetary"
                             ? `$${formatCurrency(
                                 contest.prize_per_winner * (1 - index * 0.2)
