@@ -876,7 +876,6 @@ export function PublicLeaderboard() {
                 )}
               </div>
             </div>
-          </div>
 
           {/* Resources Section */}
           {contest.resources && contest.resources.length > 0 && (
