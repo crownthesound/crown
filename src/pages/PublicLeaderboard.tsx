@@ -493,11 +493,6 @@ export function PublicLeaderboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 -mt-16 sm:-mt-24 relative z-10">
         <div className="text-center">
           <div className="mb-4 sm:mb-6">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border mb-4 ${getStatusColor(contestStatus)}`}>
-              <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">{getStatusLabel(contestStatus)}</span>
-            </div>
-            
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-4 tracking-tight leading-tight">
               {contest.name}
             </h1>
