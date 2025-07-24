@@ -926,6 +926,16 @@ export function PublicLeaderboard() {
             </div>
           )}
 
+          {/* About this Contest */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
+              About this Contest
+            </h2>
+            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+              {contest.description}
+            </p>
+          </div>
+
           {/* Prize Distribution */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
             <div className="flex items-center justify-between mb-2 sm:mb-4">
