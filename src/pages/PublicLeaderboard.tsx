@@ -801,31 +801,30 @@ export function PublicLeaderboard() {
               {participants.slice(0, 50).map((participant) => (
                 <div key={participant.video_id} className="p-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-bold text-sm ${getRankColor(participant.rank)}`}>
-                          #{participant.rank}
-                        </span>
-                        {getRankIcon(participant.rank)}
+                    {/* Rank and Icon */}
+                    <div className="flex items-center gap-2">
+                      <span className={`font-bold text-sm ${getRankColor(participant.rank)}`}>
+                        #{participant.rank}
+                      </span>
+                      {getRankIcon(participant.rank)}
+                    </div>
+                    
+                    {/* User Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white truncate text-sm">
+                        @{participant.tiktok_username}
                       </div>
-                      <div className="min-w-0">
-                        <div className="font-medium text-white truncate text-sm">
-                          @{participant.tiktok_username}
-                        </div>
-                        <div className="font-medium text-white truncate text-sm">
-                          @{participant.tiktok_username}
-                        </div>
-                        <div className="text-xs text-white/60">
-                          {formatNumber(participant.views)} views
-                        </div>
+                      <div className="text-xs text-white/60">
+                        {formatNumber(participant.views)} views
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2 ml-auto">
+                    {/* Right Side - Likes and Thumbnail */}
+                    <div className="flex items-center gap-2">
                       <div className="text-xs text-white/40 text-right">
                         {formatNumber(participant.likes)} ♥
                       </div>
-                      {/* Thumbnail */}
+                      {/* Thumbnail with Play Button Overlay */}
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 relative group cursor-pointer"
                         onClick={() => {
                           const video = {
@@ -849,7 +848,6 @@ export function PublicLeaderboard() {
                           alt={participant.video_title}
                           className="w-full h-full object-cover"
                         />
-                        {/* Play Button Overlay */}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
                           <div className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
                             <Play className="h-3 w-3 text-black ml-0.5" />
