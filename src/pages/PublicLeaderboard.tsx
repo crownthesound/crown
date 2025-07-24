@@ -989,6 +989,15 @@ export function PublicLeaderboard() {
           {/* Video Carousel */}
           {participants.length > 0 && (
             <div className="mb-8">
+              <div className="text-center mb-6">
+                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+                  Contest Submissions
+                </h2>
+                <p className="text-white/60 text-sm sm:text-base">
+                  Watch the top entries competing for the crown
+                </p>
+              </div>
+              
               <div className="relative max-w-7xl mx-auto w-full">
                 <div className="overflow-hidden w-full" ref={emblaRef}>
                   <div className="flex">
