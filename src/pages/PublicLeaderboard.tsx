@@ -704,15 +704,6 @@ export function PublicLeaderboard() {
 
   if (fetchError || !contest) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-black text-white mb-4">
-            {fetchError || "Contest not found"}
-          </h2>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
-          >
             <Home className="h-4 w-4" />
             <span>Return Home</span>
           </Link>
