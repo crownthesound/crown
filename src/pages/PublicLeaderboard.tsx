@@ -491,7 +491,7 @@ export function PublicLeaderboard() {
 
       {/* Contest Info Section - Moved Lower */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 -mt-16 sm:-mt-24 relative z-10">
-        <div className="text-center bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 p-8 sm:p-12 shadow-2xl">
+        <div className="text-center bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-8 sm:p-12 shadow-2xl">
           <div className="mb-4 sm:mb-6">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight drop-shadow-2xl">
               {contest.name}
@@ -503,7 +503,7 @@ export function PublicLeaderboard() {
 
             {timeRemaining && (
               <div className="mb-6 sm:mb-10">
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 shadow-lg">
                   <ContestCountdown contest={contest} className="justify-center text-lg sm:text-xl font-medium" />
                 </div>
               </div>
@@ -515,7 +515,7 @@ export function PublicLeaderboard() {
             {session && userSubmission ? (
               <button
                 onClick={() => navigate(`/contest-management/${contest.id}`)}
-                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
               >
                 <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                 Manage Entry
@@ -523,7 +523,7 @@ export function PublicLeaderboard() {
             ) : (
               <button
                 onClick={handleJoinContest}
-                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
               >
                 <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
                 {session ? "Join Contest" : "Sign Up to Join"}
@@ -532,7 +532,7 @@ export function PublicLeaderboard() {
             
             <button
               onClick={handleShare}
-              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
               Share Contest
