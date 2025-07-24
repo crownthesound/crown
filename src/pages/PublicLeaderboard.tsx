@@ -483,6 +483,9 @@ export function PublicLeaderboard() {
               )}
             </div>
           </div>
+          
+          {/* Bottom gradient overlay for better blending */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-transparent pointer-events-none"></div>
         </div>
       </div>
 
