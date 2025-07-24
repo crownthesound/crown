@@ -845,7 +845,7 @@ export function PublicLeaderboard() {
                             shares: participant.shares,
                             rank: participant.rank
                           };
-                          handleVideoClick(video, 0);
+                          handleVideoClick(video, participants.findIndex(p => p.video_id === participant.video_id));
                         }}
                         className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                       >
