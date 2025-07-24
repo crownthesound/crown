@@ -1145,77 +1145,78 @@ export function PublicLeaderboard() {
           </div>
         )}
       </div>
-        <div className="relative p-0">
-      {/* Modals */}
-      <TikTokSettingsModal
-        isOpen={showTikTokModal}
-        onClose={() => setShowTikTokModal(false)}
-      />
+      <div className="relative p-0">
+        {/* Modals */}
+        <TikTokSettingsModal
+          isOpen={showTikTokModal}
+          onClose={() => setShowTikTokModal(false)}
+        />
 
-      <TikTokSettingsModal
-        isOpen={showTikTokSettings}
-        onClose={() => setShowTikTokSettings(false)}
-      />
+        <TikTokSettingsModal
+          isOpen={showTikTokSettings}
+          onClose={() => setShowTikTokSettings(false)}
+        />
 
-      <ContestJoinModal
-        isOpen={showJoinModal}
-        onClose={() => setShowJoinModal(false)}
-        contest={contest}
-        onSuccess={handleContestJoined}
-      />
+        <ContestJoinModal
+          isOpen={showJoinModal}
+          onClose={() => setShowJoinModal(false)}
+          contest={contest}
+          onSuccess={handleContestJoined}
+        />
 
-      <ViewSubmissionModal
-        isOpen={showViewModal}
-        onClose={() => setShowViewModal(false)}
-        video={viewVideo}
-      />
+        <ViewSubmissionModal
+          isOpen={showViewModal}
+          onClose={() => setShowViewModal(false)}
+          video={viewVideo}
+        />
 
-      <MobileVideoModal
-        isOpen={showMobileVideoModal}
-        onClose={() => setShowMobileVideoModal(false)}
-        video={viewVideo}
-      />
+        <MobileVideoModal
+          isOpen={showMobileVideoModal}
+          onClose={() => setShowMobileVideoModal(false)}
+          video={viewVideo}
+        />
 
-      {/* Prize Modal */}
-      {selectedPrize && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-[#1A1A1A] rounded-2xl border border-white/10 shadow-2xl max-w-sm w-full">
-            <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {getRankIcon(selectedPrize.rank)}
-                <h3 className="text-lg font-semibold text-white">
-                  {formatRank(selectedPrize.rank)} Place
-                </h3>
+        {/* Prize Modal */}
+        {selectedPrize && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-[#1A1A1A] rounded-2xl border border-white/10 shadow-2xl max-w-sm w-full">
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {getRankIcon(selectedPrize.rank)}
+                  <h3 className="text-lg font-semibold text-white">
+                    {formatRank(selectedPrize.rank)} Place
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setSelectedPrize(null)}
+                  className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <X className="h-5 w-5 text-white/60" />
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedPrize(null)}
-                className="p-1 hover:bg-white/10 rounded-full transition-colors"
-              >
-                <X className="h-5 w-5 text-white/60" />
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="text-center">
-                {contest.prize_tier === "monetary" ? (
-                  <>
-                    <div className="text-3xl font-bold text-green-400 mb-2">
-                      ${formatNumber(selectedPrize.prize as number)}
-                    </div>
-                    <p className="text-white/60">Cash Prize</p>
-                  </>
-                ) : (
-                  <>
-                    <div className="text-2xl font-bold text-blue-400 mb-2">
-                      {selectedPrize.prize}
-                    </div>
-                    <p className="text-white/60">Achievement Title</p>
-                  </>
-                )}
+              <div className="p-6">
+                <div className="text-center">
+                  {contest.prize_tier === "monetary" ? (
+                    <>
+                      <div className="text-3xl font-bold text-green-400 mb-2">
+                        ${formatNumber(selectedPrize.prize as number)}
+                      </div>
+                      <p className="text-white/60">Cash Prize</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold text-blue-400 mb-2">
+                        {selectedPrize.prize}
+                      </div>
+                      <p className="text-white/60">Achievement Title</p>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
