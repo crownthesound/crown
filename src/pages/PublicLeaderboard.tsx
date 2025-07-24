@@ -27,6 +27,7 @@ import {
   Volume2,
   ChevronLeft,
   ChevronRight,
+  Info,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
 import { useAuth } from "../contexts/AuthContext";
@@ -646,6 +647,15 @@ export function PublicLeaderboard() {
     return num.toString();
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   const getStatusBadge = () => {
     if (!contest) return null;
 
@@ -703,57 +713,21 @@ export function PublicLeaderboard() {
   }
 
   if (fetchError || !contest) {
-        {/* Contest Info & Prizes */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 mb-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* About Contest */}
-            <div>
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Info className="h-5 w-5" />
-                About this Contest
-              </h2>
-              <p className="text-white/80 leading-relaxed">
-                {contest.description}
-              </p>
-            </div>
-
-            {/* Prize Distribution */}
-            <div>
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-yellow-400" />
-                Prizes
-                <span className="ml-auto text-sm text-white/60 font-normal">
-                  {contest.num_winners} Winners
-                </span>
-              </h2>
-              <div className="space-y-3">
-                {contest.prize_titles
-                  .slice(0, contest.num_winners || contest.prize_titles.length)
-                  .map((prize: any, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
-                    >
-                      <div className="flex items-center gap-3">
-                        {getRankIcon(index + 1)}
-                        <div>
-                          <div className={`font-medium ${getRankColor(index + 1)}`}>
-                            {index + 1}
-                            {index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"} Place
-                          </div>
-                          <div className="text-sm text-white/60">
-                            {contest.prize_tier === "monetary"
-                              ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
-                              : prize.title}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          </div>
-        </div>
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">😔</div>
+          <h1 className="text-2xl font-bold text-white mb-2">Contest Not Found</h1>
+          <p className="text-white/60 mb-6">
+            {fetchError || "This contest doesn't exist or is no longer available."}
+          </p>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors"
+          >
+            <Home className="h-4 w-4" />
+            Back to Home
+          </Link>
         </div>
       </div>
     );
