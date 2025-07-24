@@ -1515,7 +1515,6 @@ export function PublicLeaderboard() {
         )}
 
         <Footer className="pb-16 sm:pb-32" />
-      </div>
     </>
   );
 }
