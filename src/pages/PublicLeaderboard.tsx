@@ -639,29 +639,6 @@ export function PublicLeaderboard() {
                   >
                     <Share2 className="h-5 w-5" />
                   </button>
-                  {session && userSubmission ? (
-                    <button
-                      onClick={() => navigate(`/contest-management/${id}`)}
-                      className="px-4 sm:px-6 py-2 sm:py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors flex items-center gap-2 text-sm sm:text-base font-medium"
-                    >
-                      <Settings className="h-4 w-4" />
-                      <span className="hidden sm:inline">Manage Entry</span>
-                      <span className="sm:hidden">Manage</span>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleJoinContest}
-                      className="px-4 sm:px-6 py-2 sm:py-3 bg-white hover:bg-white/90 text-black rounded-xl transition-colors flex items-center gap-2 text-sm sm:text-base font-medium"
-                    >
-                      <UserPlus className="h-4 w-4" />
-                      <span className="hidden sm:inline">
-                        {session ? "Join Contest" : "Sign Up to Join"}
-                      </span>
-                      <span className="sm:hidden">
-                        {session ? "Join" : "Sign Up"}
-                      </span>
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
