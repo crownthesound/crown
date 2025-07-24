@@ -451,8 +451,8 @@ export function PublicLeaderboard() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 w-full">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-3">
-                <Crown className="h-6 w-6 sm:h-10 sm:w-10 text-white" />
-                <span className="text-xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
+                <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+                <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
               </Link>
               
               {session ? (
