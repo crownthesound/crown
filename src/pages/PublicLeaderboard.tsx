@@ -1365,18 +1365,22 @@ export function PublicLeaderboard() {
           </div>
         </div>
 
-        {/* Join Competition Button */}
-        {contest.status === "active" && (
-          <div className="fixed bottom-0 left-0 right-0 py-2 px-3 sm:py-2 sm:px-4 bg-black/95 backdrop-blur-lg border-t border-white/10 pb-safe-area-inset-bottom">
-            <div className="max-w-6xl mx-auto flex justify-center">
-              {userSubmission ? (
-                <div className="flex gap-2 sm:gap-4 w-full max-w-md">
-                  <div className="flex gap-2 sm:gap-3 w-full">
-                    <div className="flex-1">
-                      <button
-                        onClick={() =>
-                          navigate(`/contest-management/${id}`)
-                        }
+        {/* About this Contest & Prize Distribution */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 mb-6 space-y-6">
+          {/* About Section */}
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
+              About this Contest
+            </h2>
+            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+              {contest.description}
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-white/10"></div>
+
+          {/* Prize Section */}
                         className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
                       >
                         <Settings className="h-4 w-4" />
