@@ -25,9 +25,17 @@ import {
   UserPlus,
   VolumeX,
   Volume2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
 import { useAuth } from "../contexts/AuthContext";
+import { ContestCountdown } from "../components/ContestCountdown";
+import useEmblaCarousel from 'embla-carousel-react';
+import {
+  calculateContestStatus,
+  getStatusLabel,
+} from "../lib/contestUtils";
 import toast from "react-hot-toast";
 import { Helmet } from "react-helmet";
 import { Footer } from "../components/Footer";
@@ -37,7 +45,6 @@ import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import { MobileVideoModal } from "../components/MobileVideoModal";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { supabase as supa } from "../lib/supabase";
-import { calculateContestStatus } from "../lib/contestUtils";
 
 interface Participant {
   id: string;
@@ -94,6 +101,7 @@ export function PublicLeaderboard() {
     prize: string | number;
   } | null>(null);
   const [showAuth, setShowAuth] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -105,6 +113,19 @@ export function PublicLeaderboard() {
   const [mobileVideo, setMobileVideo] = useState<any>(null);
   const [userSubmission, setUserSubmission] = useState<any>(null);
   const [hasAutoOpenedModal, setHasAutoOpenedModal] = useState(false);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'center',
+    skipSnaps: false,
+    dragFree: false
+  });
+  const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
+  const [coverLoaded, setCoverLoaded] = useState<{[key: string]: boolean}>({});
+  const [videoLoaded, setVideoLoaded] = useState<{[key: string]: boolean}>({});
+  const [isMuted, setIsMuted] = useState(true);
+
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
   const {
     redirectToAuth,
@@ -238,6 +259,65 @@ export function PublicLeaderboard() {
       return () => clearInterval(timer);
     }
   }, [contest?.end_date]);
+
+  useEffect(() => {
+    fetchContestData();
+  }, [id]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    const onSelect = () => {
+      setSelectedVideoIndex(emblaApi.selectedScrollSnap());
+    };
+
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi]);
+
+  const fetchContestData = async () => {
+    try {
+      const { data: contestData, error: contestError } = await supabase
+        .from("contests")
+        .select("*")
+        .eq("id", id as string)
+        .single();
+
+      if (contestError || !contestData) {
+        setFetchError("Contest not found or unavailable");
+        setLoading(false);
+        return;
+      }
+
+      const contestWithStatus = {
+        ...contestData,
+        calculatedStatus: calculateContestStatus(contestData),
+      } as unknown as ContestDetails;
+
+      setContest(contestWithStatus);
+
+      // Fetch leaderboard
+      const res = await fetch(
+        `${backendUrl}/api/v1/contests/${id}/leaderboard?limit=200`
+      );
+      if (res.ok) {
+        const leaderboardData = await res.json();
+        if (leaderboardData.data?.leaderboard) {
+          setParticipants(leaderboardData.data.leaderboard);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching contest data:", error);
+      setFetchError("Failed to load contest data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch current user's submission
   useEffect(() => {
@@ -466,6 +546,44 @@ export function PublicLeaderboard() {
 
   // TikTokSettingsModal handles its own success/failure states
   // No need for handleTikTokConnected function
+
+  const handleCoverLoad = (videoId: string) => {
+    setCoverLoaded(prev => ({
+      ...prev,
+      [videoId]: true
+    }));
+  };
+
+  const handleVideoLoad = (videoId: string) => {
+    setVideoLoaded(prev => ({
+      ...prev,
+      [videoId]: true
+    }));
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    
+    // Handle muting for TikTok videos
+    const tiktokIframe = document.querySelector('iframe[src*="tiktok.com"]') as HTMLIFrameElement;
+    if (tiktokIframe) {
+      tiktokIframe.contentWindow?.postMessage(
+        JSON.stringify({
+          action: isMuted ? 'unmute' : 'mute'
+        }),
+        '*'
+      );
+    }
+
+    // Handle muting for uploaded videos
+    const videoElement = document.querySelector('video') as HTMLVideoElement;
+    if (videoElement) {
+      videoElement.muted = !isMuted;
+    }
+  };
+
+  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
+  const scrollNext = () => emblaApi && emblaApi.scrollNext();
 
   const getRankIcon = (rank: number, isWinner: boolean) => {
     if (!isWinner) {
@@ -736,6 +854,152 @@ export function PublicLeaderboard() {
         </div>
 
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 pb-20 sm:pb-32">
+          {/* Video Carousel */}
+          {participants.length > 0 && (
+            <div className="mb-8">
+              <div className="relative max-w-7xl mx-auto w-full">
+                <div className="overflow-hidden w-full" ref={emblaRef}>
+                  <div className="flex">
+                    {participants.slice(0, 10).map((entry, index) => {
+                      const isSelected = index === selectedVideoIndex;
+                      const scale = isSelected ? 1 : 0.85;
+                      const opacity = isSelected ? 1 : 0.3;
+
+                      return (
+                        <div 
+                          key={entry.id}
+                          className="flex-[0_0_100%] min-w-0 px-2 md:flex-[0_0_33.333%] lg:flex-[0_0_25%] flex items-center justify-center"
+                        >
+                          <div 
+                            className="relative transition-all duration-300 ease-out group will-change-transform"
+                            style={{
+                              transform: `scale(${scale})`,
+                              opacity,
+                              width: '280px',
+                              maxWidth: '100%'
+                            }}
+                          >
+                            <div 
+                              className="relative bg-black rounded-2xl overflow-hidden"
+                              style={{ aspectRatio: '9/16' }}
+                            >
+                              {/* Loading Placeholder */}
+                              {!coverLoaded[entry.id] && (
+                                <div className="absolute inset-0 bg-black flex items-center justify-center">
+                                  <Loader2 className="h-6 w-6 animate-spin text-white/60" />
+                                </div>
+                              )}
+
+                              {/* Thumbnail */}
+                              <img
+                                src={entry.thumbnail || 'https://images.pexels.com/photos/7500307/pexels-photo-7500307.jpeg'}
+                                alt={entry.title}
+                                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                                  isSelected && videoLoaded[entry.id] ? 'opacity-0' : 'opacity-100'
+                                }`}
+                                loading={isSelected ? 'eager' : 'lazy'}
+                                onLoad={() => handleCoverLoad(entry.id)}
+                              />
+
+                              {/* Video Content */}
+                              {isSelected && (
+                                <div className="absolute inset-0">
+                                  {entry.video_url ? (
+                                    <video
+                                      src={entry.video_url}
+                                      className={`w-full h-full object-cover rounded-2xl transition-opacity duration-700 ${
+                                        videoLoaded[entry.id] ? 'opacity-100' : 'opacity-0'
+                                      }`}
+                                      autoPlay
+                                      loop
+                                      muted={isMuted}
+                                      playsInline
+                                      controls={false}
+                                      onLoadedData={() => handleVideoLoad(entry.id)}
+                                    />
+                                  ) : (
+                                    <iframe
+                                      src={`https://www.tiktok.com/embed/v2/${entry.tiktok_video_id}`}
+                                      allow="encrypted-media; fullscreen"
+                                      scrolling="no"
+                                      frameBorder="0"
+                                      className="absolute inset-0 w-full h-full"
+                                      onLoad={() => handleVideoLoad(entry.id)}
+                                    />
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Gradient Overlay */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+
+                              {/* Video Info */}
+                              <div className="absolute bottom-0 left-0 right-0 p-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                      entry.rank === 1 ? 'bg-yellow-400/20 text-yellow-400' :
+                                      entry.rank === 2 ? 'bg-gray-300/20 text-gray-300' :
+                                      entry.rank === 3 ? 'bg-amber-600/20 text-amber-600' :
+                                      'bg-white/20 text-white'
+                                    }`}>
+                                      #{entry.rank}
+                                    </div>
+                                  </div>
+                                  <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1">
+                                    {entry.title}
+                                  </h3>
+                                  <div className="flex items-center gap-2 text-xs sm:text-sm text-white/60">
+                                    <span>@{entry.tiktok_display_name || entry.username}</span>
+                                    <span>•</span>
+                                    <span>{formatNumber(entry.views)} views</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Mute Button */}
+                              {isSelected && (
+                                <button
+                                  onClick={toggleMute}
+                                  className="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/60 transition-colors"
+                                >
+                                  {isMuted ? (
+                                    <VolumeX className="h-4 w-4" />
+                                  ) : (
+                                    <Volume2 className="h-4 w-4" />
+                                  )}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Navigation Arrows */}
+                {participants.length > 1 && (
+                  <>
+                    <button
+                      onClick={scrollPrev}
+                      className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
+                    >
+                      <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </button>
+
+                    <button
+                      onClick={scrollNext}
+                      className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
+                    >
+                      <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Contest Info */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
             <div className="space-y-2 sm:space-y-4">
