@@ -984,374 +984,373 @@ export function PublicLeaderboard() {
             </div>
           </div>
 
-          <div className="container bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-6">
-            <div className="mb-8">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2 mt-8 sm:mt-12">
-                  Featured Submissions
-                </h2>
-                <p className="text-white/60 text-sm sm:text-base">
-                  Watch the top contest entries from talented creators
-                </p>
-              </div>
-
-              {/* Video Carousel */}
-              {participants.length > 0 && (
-                <div className="mb-8">
-                  <div className="relative max-w-7xl mx-auto w-full">
-                    <div className="overflow-hidden w-full" ref={emblaRef}>
-                      <div className="flex">
-                        {participants.slice(0, 10).map((entry, index) => {
-                          const isSelected = index === selectedVideoIndex;
-                          const scale = isSelected ? 1 : 0.85;
-                          const opacity = isSelected ? 1 : 0.3;
-
-                          return (
-                            <div 
-                              key={entry.id}
-                              className="flex-[0_0_100%] min-w-0 px-2 md:flex-[0_0_33.333%] lg:flex-[0_0_25%] flex items-center justify-center"
-                            >
-                              <div 
-                                className="relative transition-all duration-300 ease-out group will-change-transform"
-                                style={{
-                                  transform: `scale(${scale})`,
-                                  opacity,
-                                  width: '280px',
-                                  maxWidth: '100%'
-                                }}
-                              >
-                                <div 
-                                  className="relative bg-black rounded-2xl overflow-hidden"
-                                  style={{ aspectRatio: '9/16' }}
-                                >
-                                  {/* Loading Placeholder */}
-                                  {!coverLoaded[entry.id] && (
-                                    <div className="absolute inset-0 bg-black flex items-center justify-center">
-                                      <Loader2 className="h-6 w-6 animate-spin text-white/60" />
-                                    </div>
-                                  )}
-
-                                  {/* Thumbnail */}
-                                  <img
-                                    src={entry.thumbnail || 'https://images.pexels.com/photos/7500307/pexels-photo-7500307.jpeg'}
-                                    alt={entry.title}
-                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-                                      isSelected && videoLoaded[entry.id] ? 'opacity-0' : 'opacity-100'
-                                    }`}
-                                    loading={isSelected ? 'eager' : 'lazy'}
-                                    onLoad={() => handleCoverLoad(entry.id)}
-                                  />
-
-                                  {/* Video Content */}
-                                  {isSelected && (
-                                    <div className="absolute inset-0">
-                                      {entry.video_url ? (
-                                        <video
-                                          src={entry.video_url}
-                                          className={`w-full h-full object-cover rounded-2xl transition-opacity duration-700 ${
-                                            videoLoaded[entry.id] ? 'opacity-100' : 'opacity-0'
-                                          }`}
-                                          autoPlay
-                                          loop
-                                          muted={isMuted}
-                                          playsInline
-                                          controls={false}
-                                          onLoadedData={() => handleVideoLoad(entry.id)}
-                                        />
-                                      ) : (
-                                        <iframe
-                                          src={`https://www.tiktok.com/embed/v2/${entry.tiktok_video_id}`}
-                                          allow="encrypted-media; fullscreen"
-                                          scrolling="no"
-                                          frameBorder="0"
-                                          className="absolute inset-0 w-full h-full"
-                                          onLoad={() => handleVideoLoad(entry.id)}
-                                        />
-                                      )}
-                                    </div>
-                                  )}
-
-                                  {/* Gradient Overlay */}
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
-
-                                  {/* Video Info */}
-                                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                                    <div className="space-y-1">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <div className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                          entry.rank === 1 ? 'bg-yellow-400/20 text-yellow-400' :
-                                          entry.rank === 2 ? 'bg-gray-300/20 text-gray-300' :
-                                          entry.rank === 3 ? 'bg-amber-600/20 text-amber-600' :
-                                          'bg-white/20 text-white'
-                                        }`}>
-                                          #{entry.rank}
-                                        </div>
-                                      </div>
-                                      <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1">
-                                        {entry.title}
-                                      </h3>
-                                      <div className="flex items-center gap-2 text-xs sm:text-sm text-white/60">
-                                        <span>@{entry.tiktok_display_name || entry.username}</span>
-                                        <span>•</span>
-                                        <span>{formatNumber(entry.views)} views</span>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* Mute Button */}
-                                  {isSelected && (
-                                    <button
-                                      onClick={toggleMute}
-                                      className="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/60 transition-colors"
-                                    >
-                                      {isMuted ? (
-                                        <VolumeX className="h-4 w-4" />
-                                      ) : (
-                                        <Volume2 className="h-4 w-4" />
-                                      )}
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Navigation Arrows */}
-                    {participants.length > 1 && (
-                      <>
-                        <button
-                          onClick={scrollPrev}
-                          className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
-                        >
-                          <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-                        </button>
-
-                        <button
-                          onClick={scrollNext}
-                          className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
-                        >
-                          <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
+          {/* Featured Submissions Section */}
+          <div className="mb-8">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2 mt-8 sm:mt-12">
+                Featured Submissions
+              </h2>
+              <p className="text-white/60 text-sm sm:text-base">
+                Watch the top contest entries from talented creators
+              </p>
             </div>
 
-            {/* Leaderboard */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-              <div className="px-3 sm:px-6 py-2 sm:py-4 border-b border-white/10">
-                <h2 className="text-base sm:text-lg font-semibold text-white">
-                  Current Rankings
-                </h2>
-              </div>
+          {/* Video Carousel */}
+          {participants.length > 0 && (
+            <div className="mb-8">
+              <div className="relative max-w-7xl mx-auto w-full">
+                <div className="overflow-hidden w-full" ref={emblaRef}>
+                  <div className="flex">
+                    {participants.slice(0, 10).map((entry, index) => {
+                      const isSelected = index === selectedVideoIndex;
+                      const scale = isSelected ? 1 : 0.85;
+                      const opacity = isSelected ? 1 : 0.3;
 
-              {/* Mobile View */}
-              <div className="sm:hidden">
-                <div className="max-h-[30vh] sm:max-h-[50vh] overflow-y-auto divide-y divide-white/10">
-                  {participants.map((participant) => (
-                    <div key={participant.id} className="p-1.5">
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
-                          <div className="flex items-center gap-0.5">
-                            <div
-                              className={`text-xs font-bold ${getRankColor(
-                                participant.rank
-                              )}`}
+                      return (
+                        <div 
+                          key={entry.id}
+                          className="flex-[0_0_100%] min-w-0 px-2 md:flex-[0_0_33.333%] lg:flex-[0_0_25%] flex items-center justify-center"
+                        >
+                          <div 
+                            className="relative transition-all duration-300 ease-out group will-change-transform"
+                            style={{
+                              transform: `scale(${scale})`,
+                              opacity,
+                              width: '280px',
+                              maxWidth: '100%'
+                            }}
+                          >
+                            <div 
+                              className="relative bg-black rounded-2xl overflow-hidden"
+                              style={{ aspectRatio: '9/16' }}
                             >
-                              #{participant.rank}
-                            </div>
-                            <div className="scale-75">
-                              {getRankIcon(
-                                participant.rank,
-                                participant.rank <= (contest.num_winners || 3)
+                              {/* Loading Placeholder */}
+                              {!coverLoaded[entry.id] && (
+                                <div className="absolute inset-0 bg-black flex items-center justify-center">
+                                  <Loader2 className="h-6 w-6 animate-spin text-white/60" />
+                                </div>
+                              )}
+
+                              {/* Thumbnail */}
+                              <img
+                                src={entry.thumbnail || 'https://images.pexels.com/photos/7500307/pexels-photo-7500307.jpeg'}
+                                alt={entry.title}
+                                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                                  isSelected && videoLoaded[entry.id] ? 'opacity-0' : 'opacity-100'
+                                }`}
+                                loading={isSelected ? 'eager' : 'lazy'}
+                                onLoad={() => handleCoverLoad(entry.id)}
+                              />
+
+                              {/* Video Content */}
+                              {isSelected && (
+                                <div className="absolute inset-0">
+                                  {entry.video_url ? (
+                                    <video
+                                      src={entry.video_url}
+                                      className={`w-full h-full object-cover rounded-2xl transition-opacity duration-700 ${
+                                        videoLoaded[entry.id] ? 'opacity-100' : 'opacity-0'
+                                      }`}
+                                      autoPlay
+                                      loop
+                                      muted={isMuted}
+                                      playsInline
+                                      controls={false}
+                                      onLoadedData={() => handleVideoLoad(entry.id)}
+                                    />
+                                  ) : (
+                                    <iframe
+                                      src={`https://www.tiktok.com/embed/v2/${entry.tiktok_video_id}`}
+                                      allow="encrypted-media; fullscreen"
+                                      scrolling="no"
+                                      frameBorder="0"
+                                      className="absolute inset-0 w-full h-full"
+                                      onLoad={() => handleVideoLoad(entry.id)}
+                                    />
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Gradient Overlay */}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+
+                              {/* Video Info */}
+                              <div className="absolute bottom-0 left-0 right-0 p-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                      entry.rank === 1 ? 'bg-yellow-400/20 text-yellow-400' :
+                                      entry.rank === 2 ? 'bg-gray-300/20 text-gray-300' :
+                                      entry.rank === 3 ? 'bg-amber-600/20 text-amber-600' :
+                                      'bg-white/20 text-white'
+                                    }`}>
+                                      #{entry.rank}
+                                    </div>
+                                  </div>
+                                  <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1">
+                                    {entry.title}
+                                  </h3>
+                                  <div className="flex items-center gap-2 text-xs sm:text-sm text-white/60">
+                                    <span>@{entry.tiktok_display_name || entry.username}</span>
+                                    <span>•</span>
+                                    <span>{formatNumber(entry.views)} views</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Mute Button */}
+                              {isSelected && (
+                                <button
+                                  onClick={toggleMute}
+                                  className="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/60 transition-colors"
+                                >
+                                  {isMuted ? (
+                                    <VolumeX className="h-4 w-4" />
+                                  ) : (
+                                    <Volume2 className="h-4 w-4" />
+                                  )}
+                                </button>
                               )}
                             </div>
                           </div>
-                          <div className="scale-[0.6]">
-                            {getRankChangeIcon(
-                              participant.rank,
-                              participant.previousRank
-                            )}
-                          </div>
                         </div>
-
-                        {/* Avatar */}
-                        {participant.avatar_url ? (
-                          <img
-                            src={participant.avatar_url}
-                            alt={`${participant.username} profile`}
-                            className="w-6 h-6 rounded-full object-cover border border-white/10 flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                            <span className="text-white text-xs font-medium">
-                              {participant.tiktok_display_name?.charAt(0) ||
-                                participant.username?.charAt(0) ||
-                                "U"}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Main Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <div className="min-w-0 flex-1">
-                              <div className="font-medium text-white text-xs truncate leading-none mb-0.5">
-                                {participant.tiktok_display_name ||
-                                  participant.username}
-                              </div>
-                              <div className="text-xs text-white/60 leading-none">
-                                {formatNumber(participant.views)} views
-                              </div>
-                            </div>
-
-                            {/* Video Thumbnail with Play Button */}
-                            {participant.thumbnail && (
-                              <div
-                                className="relative flex-shrink-0 cursor-pointer ml-2"
-                                onClick={() => handlePlayVideo(participant)}
-                                title="Play video"
-                              >
-                                <img
-                                  src={participant.thumbnail}
-                                  alt={`${participant.username} video thumbnail`}
-                                  className="w-16 h-16 object-cover rounded-lg"
-                                  loading="lazy"
-                                  decoding="async"
-                                  onLoad={(e) => {
-                                    const overlay = e.currentTarget.nextElementSibling as HTMLElement;
-                                    if (overlay) overlay.style.opacity = '0';
-                                  }}
-                                />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
-                                     style={{ transition: 'opacity 0.3s ease' }}>
-                                  <Play className="h-3 w-3 text-white drop-shadow-lg" />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Desktop View */}
-              <div className="hidden sm:block">
-                <div className="grid grid-cols-10 gap-4 px-6 py-3 bg-white/5 text-sm font-medium text-white/60">
-                  <div className="col-span-1">Rank</div>
-                  <div className="col-span-6">Participant</div>
-                  <div className="col-span-2 text-right">Views</div>
-                  <div className="col-span-1 text-center">Preview</div>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="divide-y divide-white/10">
-                  {participants.map((participant) => (
-                    <div
-                      key={participant.id}
-                      className="grid grid-cols-10 gap-4 px-6 py-4 items-center hover:bg-white/5"
+                {/* Navigation Arrows */}
+                {participants.length > 1 && (
+                  <>
+                    <button
+                      onClick={scrollPrev}
+                      className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
                     >
-                      <div className="col-span-1 flex items-center gap-2">
-                        {getRankIcon(
-                          participant.rank,
-                          participant.rank <= (contest.num_winners || 3)
-                        )}
-                        <span
-                          className={`text-sm font-medium ${getRankColor(
-                            participant.rank
-                          )}`}
-                        >
-                          #{participant.rank}
-                        </span>
-                        {getRankChangeIcon(
-                          participant.rank,
-                          participant.previousRank
-                        )}
-                      </div>
-                      <div className="col-span-6 flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          {/* Profile Avatar */}
-                          {participant.avatar_url ? (
-                            <img
-                              src={participant.avatar_url}
-                              alt={`${participant.username} profile`}
-                              className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                              <span className="text-white text-sm font-medium">
-                                {participant.tiktok_display_name?.charAt(0) ||
-                                  participant.username?.charAt(0) ||
-                                  "U"}
-                              </span>
-                            </div>
+                      <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </button>
+
+                    <button
+                      onClick={scrollNext}
+                      className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
+                    >
+                      <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+          {/* Leaderboard */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+            <div className="px-3 sm:px-6 py-2 sm:py-4 border-b border-white/10">
+              <h2 className="text-base sm:text-lg font-semibold text-white">
+                Current Rankings
+              </h2>
+            </div>
+
+            {/* Mobile View */}
+            <div className="sm:hidden">
+              <div className="max-h-[30vh] sm:max-h-[50vh] overflow-y-auto divide-y divide-white/10">
+                {participants.map((participant) => (
+                  <div key={participant.id} className="p-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
+                        <div className="flex items-center gap-0.5">
+                          <div
+                            className={`text-xs font-bold ${getRankColor(
+                              participant.rank
+                            )}`}
+                          >
+                            #{participant.rank}
+                          </div>
+                          <div className="scale-75">
+                            {getRankIcon(
+                              participant.rank,
+                              participant.rank <= (contest.num_winners || 3)
+                            )}
+                          </div>
+                        </div>
+                        <div className="scale-[0.6]">
+                          {getRankChangeIcon(
+                            participant.rank,
+                            participant.previousRank
                           )}
+                        </div>
+                      </div>
+
+                      {/* Avatar */}
+                      {participant.avatar_url ? (
+                        <img
+                          src={participant.avatar_url}
+                          alt={`${participant.username} profile`}
+                          className="w-6 h-6 rounded-full object-cover border border-white/10 flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                          <span className="text-white text-xs font-medium">
+                            {participant.tiktok_display_name?.charAt(0) ||
+                              participant.username?.charAt(0) ||
+                              "U"}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Main Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-white text-xs truncate leading-none mb-0.5">
+                              {participant.tiktok_display_name ||
+                                participant.username}
+                            </div>
+                            <div className="text-xs text-white/60 leading-none">
+                              {formatNumber(participant.views)} views
+                            </div>
+                          </div>
+
                           {/* Video Thumbnail with Play Button */}
                           {participant.thumbnail && (
                             <div
-                              className="relative flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-white/20 rounded-lg transition-all"
+                              className="relative flex-shrink-0 cursor-pointer ml-2"
                               onClick={() => handlePlayVideo(participant)}
                               title="Play video"
                             >
                               <img
                                 src={participant.thumbnail}
                                 alt={`${participant.username} video thumbnail`}
-                                className="w-10 h-10 rounded-lg object-cover border border-white/10"
+                                className="w-16 h-16 object-cover rounded-lg"
+                                loading="lazy"
+                                decoding="async"
+                                onLoad={(e) => {
+                                  const overlay = e.currentTarget.nextElementSibling as HTMLElement;
+                                  if (overlay) overlay.style.opacity = '0';
+                                }}
                               />
-                              {/* Play icon overlay */}
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100">
-                                <Play className="h-4 w-4 text-white drop-shadow-lg" />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
+                                   style={{ transition: 'opacity 0.3s ease' }}>
+                                <Play className="h-3 w-3 text-white drop-shadow-lg" />
                               </div>
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-medium text-white truncate">
-                            {participant.tiktok_display_name ||
-                              participant.username}
-                          </div>
-                          <div className="text-sm text-white/60 line-clamp-1">
-                            @{participant.username}
-                          </div>
-                          {participant.title && (
-                            <div className="text-xs text-white/40 line-clamp-1">
-                              {participant.title}
-                            </div>
-                          )}
-                        </div>
                       </div>
-                      <div className="col-span-2 text-right font-medium text-white">
-                        {formatNumber(participant.views)}
-                      </div>
-                      <div className="col-span-1 flex justify-center">
-                        {participant.thumbnail ? (
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden sm:block">
+              <div className="grid grid-cols-10 gap-4 px-6 py-3 bg-white/5 text-sm font-medium text-white/60">
+                <div className="col-span-1">Rank</div>
+                <div className="col-span-6">Participant</div>
+                <div className="col-span-2 text-right">Views</div>
+                <div className="col-span-1 text-center">Preview</div>
+              </div>
+
+              <div className="divide-y divide-white/10">
+                {participants.map((participant) => (
+                  <div
+                    key={participant.id}
+                    className="grid grid-cols-10 gap-4 px-6 py-4 items-center hover:bg-white/5"
+                  >
+                    <div className="col-span-1 flex items-center gap-2">
+                      {getRankIcon(
+                        participant.rank,
+                        participant.rank <= (contest.num_winners || 3)
+                      )}
+                      <span
+                        className={`text-sm font-medium ${getRankColor(
+                          participant.rank
+                        )}`}
+                      >
+                        #{participant.rank}
+                      </span>
+                      {getRankChangeIcon(
+                        participant.rank,
+                        participant.previousRank
+                      )}
+                    </div>
+                    <div className="col-span-6 flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        {/* Profile Avatar */}
+                        {participant.avatar_url ? (
+                          <img
+                            src={participant.avatar_url}
+                            alt={`${participant.username} profile`}
+                            className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
+                            <span className="text-white text-sm font-medium">
+                              {participant.tiktok_display_name?.charAt(0) ||
+                                participant.username?.charAt(0) ||
+                                "U"}
+                            </span>
+                          </div>
+                        )}
+                        {/* Video Thumbnail with Play Button */}
+                        {participant.thumbnail && (
                           <div
-                            className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
+                            className="relative flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-white/20 rounded-lg transition-all"
                             onClick={() => handlePlayVideo(participant)}
                             title="Play video"
                           >
                             <img
                               src={participant.thumbnail}
-                              alt="Video preview"
-                              className="w-6 h-6 rounded object-cover opacity-60 hover:opacity-80"
+                              alt={`${participant.username} video thumbnail`}
+                              className="w-10 h-10 rounded-lg object-cover border border-white/10"
                             />
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Play className="h-2 w-2 text-white/80 drop-shadow" />
+                            {/* Play icon overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100">
+                              <Play className="h-4 w-4 text-white drop-shadow-lg" />
                             </div>
                           </div>
-                        ) : (
-                          <div className="text-white/30 text-xs">No preview</div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-white truncate">
+                          {participant.tiktok_display_name ||
+                            participant.username}
+                        </div>
+                        <div className="text-sm text-white/60 line-clamp-1">
+                          @{participant.username}
+                        </div>
+                        {participant.title && (
+                          <div className="text-xs text-white/40 line-clamp-1">
+                            {participant.title}
+                          </div>
                         )}
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <div className="col-span-2 text-right font-medium text-white">
+                      {formatNumber(participant.views)}
+                    </div>
+                    <div className="col-span-1 flex justify-center">
+                      {participant.thumbnail ? (
+                        <div
+                          className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
+                          onClick={() => handlePlayVideo(participant)}
+                          title="Play video"
+                        >
+                          <img
+                            src={participant.thumbnail}
+                            alt="Video preview"
+                            className="w-6 h-6 rounded object-cover opacity-60 hover:opacity-80"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Play className="h-2 w-2 text-white/80 drop-shadow" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-white/30 text-xs">No preview</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
