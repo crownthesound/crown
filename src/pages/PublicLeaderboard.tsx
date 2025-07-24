@@ -1526,19 +1526,19 @@ export function PublicLeaderboard() {
         {mobileVideo && (
           <MobileVideoModal
             isOpen={!!mobileVideo}
-            onClose={() => {
-              setMobileVideo(null);
-              // Remove video parameter from URL when closing
-              const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.delete("video");
-              setSearchParams(newSearchParams);
-            }}
-            video={mobileVideo}
-          />
-        )}
-
-        <Footer className="pb-16 sm:pb-32" />
-      </div>
+      {mobileVideo && (
+        <MobileVideoModal
+          isOpen={!!mobileVideo}
+          onClose={() => {
+            setMobileVideo(null);
+            // Remove video parameter from URL when closing
+            const newSearchParams = new URLSearchParams(searchParams);
+            newSearchParams.delete("video");
+            setSearchParams(newSearchParams);
+          }}
+          video={mobileVideo}
+        />
+      )}
     </>
   );
 }
