@@ -1220,5 +1220,3 @@ export function PublicLeaderboard() {
       </div>
     </div>
   );
-    {/* Contest Header - Full Screen */}
-    <div className="relative bg-white/5 backdrop-blur-sm overflow-hidden mb-8">
