@@ -164,16 +164,16 @@ export const MobileVideoModal: React.FC<MobileVideoModalProps> = ({
                 ) : (
                   <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/20">
                     <span className="text-white text-xs font-medium">
-                      {video.username.charAt(0).toUpperCase()}
+                      {(video.username || 'U').charAt(0).toUpperCase()}
                     </span>
                   </div>
                 )}
                 <div>
                   <p className="text-white/90 text-sm font-medium">
-                    {video.tiktok_display_name || video.username}
+                    {video.tiktok_display_name || video.username || 'Unknown User'}
                   </p>
                   <p className="text-white/70 text-xs">
-                    @{video.username}
+                    @{video.username || 'unknown'}
                   </p>
                 </div>
               </div>
