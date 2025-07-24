@@ -703,19 +703,57 @@ export function PublicLeaderboard() {
   }
 
   if (fetchError || !contest) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-black text-white mb-4">
-            {fetchError || "Contest not found"}
-          </h2>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
-          >
-            <Home className="h-4 w-4" />
-            <span>Return Home</span>
-          </Link>
+        {/* Contest Info & Prizes */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 mb-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* About Contest */}
+            <div>
+              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                About this Contest
+              </h2>
+              <p className="text-white/80 leading-relaxed">
+                {contest.description}
+              </p>
+            </div>
+
+            {/* Prize Distribution */}
+            <div>
+              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-yellow-400" />
+                Prizes
+                <span className="ml-auto text-sm text-white/60 font-normal">
+                  {contest.num_winners} Winners
+                </span>
+              </h2>
+              <div className="space-y-3">
+                {contest.prize_titles
+                  .slice(0, contest.num_winners || contest.prize_titles.length)
+                  .map((prize: any, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10"
+                    >
+                      <div className="flex items-center gap-3">
+                        {getRankIcon(index + 1)}
+                        <div>
+                          <div className={`font-medium ${getRankColor(index + 1)}`}>
+                            {index + 1}
+                            {index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"} Place
+                          </div>
+                          <div className="text-sm text-white/60">
+                            {contest.prize_tier === "monetary"
+                              ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                              : prize.title}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
     );
