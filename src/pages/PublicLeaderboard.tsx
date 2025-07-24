@@ -987,7 +987,7 @@ export function PublicLeaderboard() {
           {/* Featured Submissions Section */}
           <div className="mb-8">
             <div className="text-center mb-6">
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2 mt-8 sm:mt-12">
                 Featured Submissions
               </h2>
               <p className="text-white/60 text-sm sm:text-base">
