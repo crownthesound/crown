@@ -1152,17 +1152,6 @@ export function PublicLeaderboard() {
               </div>
             </div>
           )}
-          {/* About this Contest */}
-          <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-white mb-3 flex items-center gap-2">
-              <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-              About this Contest
-            </h2>
-            <p className="text-white/80 leading-relaxed">
-              {contest.description}
-            </p>
-          </div>
-
 
           {/* Leaderboard */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
