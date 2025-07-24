@@ -800,7 +800,16 @@ export function PublicLeaderboard() {
             <div className="block sm:hidden divide-y divide-white/10">
               {participants.slice(0, 50).map((participant) => (
                 <div key={participant.video_id} className="p-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {/* Thumbnail */}
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                      <img
+                        src={participant.thumbnail}
+                        alt={participant.video_title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         <span className={`font-bold text-sm ${getRankColor(participant.rank)}`}>
@@ -817,10 +826,31 @@ export function PublicLeaderboard() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    
+                    <div className="flex items-center gap-2 ml-auto">
                       <div className="text-xs text-white/40 text-right">
                         {formatNumber(participant.likes)} ♥
                       </div>
+                      <button
+                        onClick={() => {
+                          const video = {
+                            id: participant.video_id,
+                            title: participant.video_title,
+                            url: participant.video_url,
+                            thumbnail: participant.thumbnail,
+                            username: participant.tiktok_username,
+                            views: participant.views,
+                            likes: participant.likes,
+                            comments: participant.comments,
+                            shares: participant.shares,
+                            rank: participant.rank
+                          };
+                          handleVideoClick(video, 0);
+                        }}
+                        className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                      >
+                        <Play className="h-3 w-3 text-white" />
+                      </button>
                     </div>
                   </div>
                 </div>
