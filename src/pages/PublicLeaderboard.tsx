@@ -605,7 +605,7 @@ export function PublicLeaderboard() {
               </div>
             )}
 
-            <div className="relative p-6 sm:p-8 max-w-7xl mx-auto">
+            <div className="relative p-30 sm:p-40 w-full">
               <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div className="flex-1">
                   <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(contestStatus)} mb-4`}>
