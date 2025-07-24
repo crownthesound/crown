@@ -602,13 +602,9 @@ export function PublicLeaderboard() {
 
     if (rank === 1) {
       return (
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-        >
-          <Home className="h-4 w-4" />
-          <span>Return Home</span>
-        </Link>
+        <div className="relative">
+          <Crown className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
+        </div>
       );
     }
 
@@ -707,14 +703,17 @@ export function PublicLeaderboard() {
 
   if (fetchError || !contest) {
     return (
-      <>
-      <Link
-        to="/"
-        className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-      >
-        <Home className="h-4 w-4" />
-        <span>Return Home</span>
-      </Link>
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Contest Not Found</h1>
+          <p className="text-white/60 mb-6">{fetchError || "This contest doesn't exist or is no longer available."}</p>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+          >
+            <Home className="h-4 w-4" />
+            <span>Return Home</span>
+          </Link>
         </div>
       </div>
     );
@@ -1526,19 +1525,17 @@ export function PublicLeaderboard() {
         {mobileVideo && (
           <MobileVideoModal
             isOpen={!!mobileVideo}
-      {mobileVideo && (
-        <MobileVideoModal
-          isOpen={!!mobileVideo}
-          onClose={() => {
-            setMobileVideo(null);
-            // Remove video parameter from URL when closing
-            const newSearchParams = new URLSearchParams(searchParams);
-            newSearchParams.delete("video");
-            setSearchParams(newSearchParams);
-          }}
-          video={mobileVideo}
-        />
-      )}
+            onClose={() => {
+              setMobileVideo(null);
+              // Remove video parameter from URL when closing
+              const newSearchParams = new URLSearchParams(searchParams);
+              newSearchParams.delete("video");
+              setSearchParams(newSearchParams);
+            }}
+            video={mobileVideo}
+          />
+        )}
+      </div>
     </>
   );
 }
