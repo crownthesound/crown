@@ -675,6 +675,15 @@ export function PublicLeaderboard() {
     );
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount).replace('$', '');
+  };
+
   if (loading || contestLoading || leaderboardLoading || authLoading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
@@ -1437,177 +1446,179 @@ export function PublicLeaderboard() {
               </button>
             </div>
           )}
-        {/* About this Contest */}
-        <div>
-          <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
-            About this Contest
-          </h2>
-          <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-            {contest.description}
-          </p>
-        </div>
 
-        {/* Prize Distribution */}
-        <div>
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-              <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" />
-              Prizes
+          {/* About this Contest */}
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
+              About this Contest
             </h2>
-            <span className="text-xs sm:text-sm text-white/60">
-              {contest.num_winners} Winners
-            </span>
+            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+              {contest.description}
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
-            {contest.prize_titles
-              .slice(0, contest.num_winners || contest.prize_titles.length)
-              .map((prize: any, index: number) => (
-                <div
-                  key={index}
-                  className={`
-                    p-2 sm:p-4 rounded-lg border transition-all hover:scale-105 cursor-pointer
-                    ${
-                      index === 0
-                        ? "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20"
-                        : index === 1
-                        ? "bg-gray-400/10 border-gray-400/30 hover:bg-gray-400/20"
-                        : index === 2
-                        ? "bg-amber-600/10 border-amber-600/30 hover:bg-amber-600/20"
-                        : "bg-white/5 border-white/20 hover:bg-white/10"
-                    }
-                  `}
-                >
-                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                    {getRankIcon(index + 1)}
-                    <span
-                      className={`text-xs sm:text-sm font-bold ${getRankColor(
-                        index + 1
-                      )}`}
-                    >
-                      {index + 1}
-                      {index === 0
-                        ? "st"
-                        : index === 1
-                        ? "nd"
-                        : index === 2
-                        ? "rd"
-                        : "th"}
-                    </span>
-                  </div>
-                  <div className="text-xs sm:text-sm font-medium text-white line-clamp-2">
-                    {contest.prize_tier === "monetary"
-                      ? `$${formatCurrency(
-                          (contest.prize_per_winner || 0) * (1 - index * 0.2)
-                        )}`
-                      : prize.title}
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
+          {/* Prize Distribution */}
+          <div>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" />
+                Prizes
+              </h2>
+              <span className="text-xs sm:text-sm text-white/60">
+                {contest.num_winners} Winners
+              </span>
+            </div>
 
-        {/* Prize Modal */}
-        {selectedPrize && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50">
-            <div className="bg-[#1A1A1A] rounded-xl border border-white/10 shadow-xl max-w-sm w-full mx-2">
-              <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {getRankIcon(selectedPrize.rank, true)}
-                  <h3 className="text-base sm:text-lg font-semibold text-white">
-                    {selectedPrize.rank}
-                    {selectedPrize.rank === 1
-                      ? "st"
-                      : selectedPrize.rank === 2
-                      ? "nd"
-                      : selectedPrize.rank === 3
-                      ? "rd"
-                      : "th"}{" "}
-                    Place
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setSelectedPrize(null)}
-                  className="p-2 hover:bg-white/10 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-                >
-                  <X className="h-5 w-5 text-white/60" />
-                </button>
-              </div>
-              <div className="p-4">
-                <div className="text-center">
-                  {contest.prize_tier === "monetary" ? (
-                    <div className="text-xl sm:text-2xl font-bold text-white">
-                      ${formatNumber(selectedPrize.prize as number)}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
+              {contest.prize_titles
+                .slice(0, contest.num_winners || contest.prize_titles.length)
+                .map((prize: any, index: number) => (
+                  <div
+                    key={index}
+                    className={`
+                      p-2 sm:p-4 rounded-lg border transition-all hover:scale-105 cursor-pointer
+                      ${
+                        index === 0
+                          ? "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20"
+                          : index === 1
+                          ? "bg-gray-400/10 border-gray-400/30 hover:bg-gray-400/20"
+                          : index === 2
+                          ? "bg-amber-600/10 border-amber-600/30 hover:bg-amber-600/20"
+                          : "bg-white/5 border-white/20 hover:bg-white/10"
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                      {getRankIcon(index + 1, true)}
+                      <span
+                        className={`text-xs sm:text-sm font-bold ${getRankColor(
+                          index + 1
+                        )}`}
+                      >
+                        {index + 1}
+                        {index === 0
+                          ? "st"
+                          : index === 1
+                          ? "nd"
+                          : index === 2
+                          ? "rd"
+                          : "th"}
+                      </span>
                     </div>
-                  ) : (
-                    <div className="text-lg font-medium text-white">
-                      {selectedPrize.prize}
+                    <div className="text-xs sm:text-sm font-medium text-white line-clamp-2">
+                      {contest.prize_tier === "monetary"
+                        ? `$${formatCurrency(
+                            (contest.prize_per_winner || 0) * (1 - index * 0.2)
+                          )}`
+                        : prize.title}
                     </div>
-                  )}
-                </div>
-              </div>
-              <div className="p-4 border-t border-white/10 bg-white/5">
-                <button
-                  onClick={() => setSelectedPrize(null)}
-                  className="w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
+                  </div>
+                ))}
             </div>
           </div>
-        )}
 
-        {/* Modals */}
-        <TikTokSettingsModal
-          isOpen={showTikTokModal}
-          onClose={() => setShowTikTokModal(false)}
-        />
+          {/* Prize Modal */}
+          {selectedPrize && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50">
+              <div className="bg-[#1A1A1A] rounded-xl border border-white/10 shadow-xl max-w-sm w-full mx-2">
+                <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {getRankIcon(selectedPrize.rank, true)}
+                    <h3 className="text-base sm:text-lg font-semibold text-white">
+                      {selectedPrize.rank}
+                      {selectedPrize.rank === 1
+                        ? "st"
+                        : selectedPrize.rank === 2
+                        ? "nd"
+                        : selectedPrize.rank === 3
+                        ? "rd"
+                        : "th"}{" "}
+                      Place
+                    </h3>
+                  </div>
+                  <button
+                    onClick={() => setSelectedPrize(null)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  >
+                    <X className="h-5 w-5 text-white/60" />
+                  </button>
+                </div>
+                <div className="p-4">
+                  <div className="text-center">
+                    {contest.prize_tier === "monetary" ? (
+                      <div className="text-xl sm:text-2xl font-bold text-white">
+                        ${formatNumber(selectedPrize.prize as number)}
+                      </div>
+                    ) : (
+                      <div className="text-lg font-medium text-white">
+                        {selectedPrize.prize}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="p-4 border-t border-white/10 bg-white/5">
+                  <button
+                    onClick={() => setSelectedPrize(null)}
+                    className="w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
-        <TikTokSettingsModal
-          isOpen={showTikTokSettings}
-          onClose={() => setShowTikTokSettings(false)}
-        />
-
-        {contest && (
-          <ContestJoinModal
-            isOpen={showJoinModal}
-            onClose={() => setShowJoinModal(false)}
-            contest={contest as any}
-            onSuccess={handleContestJoined}
+          {/* Modals */}
+          <TikTokSettingsModal
+            isOpen={showTikTokModal}
+            onClose={() => setShowTikTokModal(false)}
           />
-        )}
 
-        {viewVideo && (
-          <ViewSubmissionModal
-            isOpen={!!viewVideo}
-            onClose={() => {
-              setViewVideo(null);
-              // Remove video parameter from URL when closing
-              const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.delete("video");
-              setSearchParams(newSearchParams);
-            }}
-            video={viewVideo}
+          <TikTokSettingsModal
+            isOpen={showTikTokSettings}
+            onClose={() => setShowTikTokSettings(false)}
           />
-        )}
 
-        {/* Mobile full-screen video modal */}
-        {mobileVideo && (
-          <MobileVideoModal
-            isOpen={!!mobileVideo}
-            onClose={() => {
-              setMobileVideo(null);
-              // Remove video parameter from URL when closing
-              const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.delete("video");
-              setSearchParams(newSearchParams);
-            }}
-            video={mobileVideo}
-          />
-        )}
+          {contest && (
+            <ContestJoinModal
+              isOpen={showJoinModal}
+              onClose={() => setShowJoinModal(false)}
+              contest={contest as any}
+              onSuccess={handleContestJoined}
+            />
+          )}
 
-        <Footer className="pb-16 sm:pb-32" />
+          {viewVideo && (
+            <ViewSubmissionModal
+              isOpen={!!viewVideo}
+              onClose={() => {
+                setViewVideo(null);
+                // Remove video parameter from URL when closing
+                const newSearchParams = new URLSearchParams(searchParams);
+                newSearchParams.delete("video");
+                setSearchParams(newSearchParams);
+              }}
+              video={viewVideo}
+            />
+          )}
+
+          {/* Mobile full-screen video modal */}
+          {mobileVideo && (
+            <MobileVideoModal
+              isOpen={!!mobileVideo}
+              onClose={() => {
+                setMobileVideo(null);
+                // Remove video parameter from URL when closing
+                const newSearchParams = new URLSearchParams(searchParams);
+                newSearchParams.delete("video");
+                setSearchParams(newSearchParams);
+              }}
+              video={mobileVideo}
+            />
+          )}
+
+          <Footer className="pb-16 sm:pb-32" />
+        </div>
       </div>
     </>
   );
