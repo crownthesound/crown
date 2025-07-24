@@ -25,7 +25,6 @@ import {
   UserPlus,
   VolumeX,
   Volume2,
-  Loader2,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
 import { useAuth } from "../contexts/AuthContext";
