@@ -602,10 +602,13 @@ export function PublicLeaderboard() {
 
     if (rank === 1) {
       return (
-        <div className="relative">
-          <Crown className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
-          <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-yellow-300 animate-pulse" />
-        </div>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+        >
+          <Home className="h-4 w-4" />
+          <span>Return Home</span>
+        </Link>
       );
     }
 
