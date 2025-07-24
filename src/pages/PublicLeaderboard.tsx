@@ -1437,81 +1437,73 @@ export function PublicLeaderboard() {
               </button>
             </div>
           )}
+        {/* About this Contest */}
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
+            About this Contest
+          </h2>
+          <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+            {contest.description}
+          </p>
         </div>
 
-        {/* About this Contest & Prize Distribution */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-4 sm:p-6 mb-6 space-y-6">
-          {/* About Section */}
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">
-              About this Contest
+        {/* Prize Distribution */}
+        <div>
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+              <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" />
+              Prizes
             </h2>
-            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
-              {contest.description}
-            </p>
+            <span className="text-xs sm:text-sm text-white/60">
+              {contest.num_winners} Winners
+            </span>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-white/10"></div>
-
-          {/* Prize Section */}
-          <div>
-            <div className="flex items-center justify-between mb-2 sm:mb-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                <h2 className="text-base sm:text-lg font-semibold text-white">
-                  {contest.prize_tier === "monetary" ? "Prize Pool" : "Prizes"}
-                </h2>
-              </div>
-              <div className="text-xs sm:text-sm text-white/60">
-                {contest.prize_titles.length} Winners
-              </div>
-            </div>
-
-            <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
-              <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
-                {contest.prize_titles.map((prize, index) => (
-                  <button
-                    key={index}
-                    onClick={() =>
-                      setSelectedPrize({
-                        rank: index + 1,
-                        prize:
-                          contest.prize_tier === "monetary"
-                            ? contest.prize_per_winner * (1 - index * 0.2)
-                            : prize.title,
-                      })
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4">
+            {contest.prize_titles
+              .slice(0, contest.num_winners || contest.prize_titles.length)
+              .map((prize: any, index: number) => (
+                <div
+                  key={index}
+                  className={`
+                    p-2 sm:p-4 rounded-lg border transition-all hover:scale-105 cursor-pointer
+                    ${
+                      index === 0
+                        ? "bg-yellow-500/10 border-yellow-500/30 hover:bg-yellow-500/20"
+                        : index === 1
+                        ? "bg-gray-400/10 border-gray-400/30 hover:bg-gray-400/20"
+                        : index === 2
+                        ? "bg-amber-600/10 border-amber-600/30 hover:bg-amber-600/20"
+                        : "bg-white/5 border-white/20 hover:bg-white/10"
                     }
-                    className="p-3 rounded-lg border snap-center flex-shrink-0 w-[280px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
-                  >
-                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
-                      {getRankIcon(index + 1, true)}
-                      <span
-                        className={`text-xs sm:text-sm font-medium ${getRankColor(
-                          index + 1
-                        )}`}
-                      >
-                        {index + 1}
-                        {index === 0
-                          ? "st"
-                          : index === 1
-                          ? "nd"
-                          : index === 2
-                          ? "rd"
-                          : "th"}
-                      </span>
-                    </div>
-                    <div className="text-sm font-medium leading-tight text-white text-center">
-                      {contest.prize_tier === "monetary"
-                        ? `$${formatNumber(
-                            contest.prize_per_winner * (1 - index * 0.2)
-                          )}`
-                        : prize.title}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+                  `}
+                >
+                  <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                    {getRankIcon(index + 1)}
+                    <span
+                      className={`text-xs sm:text-sm font-bold ${getRankColor(
+                        index + 1
+                      )}`}
+                    >
+                      {index + 1}
+                      {index === 0
+                        ? "st"
+                        : index === 1
+                        ? "nd"
+                        : index === 2
+                        ? "rd"
+                        : "th"}
+                    </span>
+                  </div>
+                  <div className="text-xs sm:text-sm font-medium text-white line-clamp-2">
+                    {contest.prize_tier === "monetary"
+                      ? `$${formatCurrency(
+                          (contest.prize_per_winner || 0) * (1 - index * 0.2)
+                        )}`
+                      : prize.title}
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
 
