@@ -631,12 +631,6 @@ export function PublicLeaderboard() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleShare}
-                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-                  >
-                    <Share2 className="h-5 w-5" />
-                  </button>
                 </div>
               </div>
             </div>
