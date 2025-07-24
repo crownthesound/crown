@@ -1344,79 +1344,81 @@ export function PublicLeaderboard() {
               </div>
             </div>
           </div>
-        </div>
 
-                      <button
-                        onClick={() =>
-                          navigate(`/contest-management/${id}`)
-                        }
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="hidden xs:inline">Manage</span>
-                        <span className="xs:hidden">Edit</span>
-                      </button>
-                    </div>
-                    <div className="flex-1">
-                      <button
-                        onClick={() => navigate(`/share/${id}`)}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
-                      >
-                        <Share2 className="h-4 w-4" />
-                        <span>Share</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="w-full">
+          {/* Action Buttons */}
+          {session && userSubmission ? (
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <div className="flex-1">
                   <button
-                    onClick={handleJoinCompetition}
-                    disabled={contest?.calculatedStatus === "ended"}
-                    className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base flex items-center justify-center gap-1.5 ${
-                      contest?.calculatedStatus === "ended"
-                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                        : "bg-white text-black hover:bg-white/90"
-                    }`}
+                    onClick={() =>
+                      navigate(`/contest-management/${id}`)
+                    }
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
                   >
-                    <UserPlus className="h-4 w-4" />
-                    {contest?.calculatedStatus === "ended" ? (
-                      "Contest Ended"
-                    ) : (
-                      <>
-                        <span className="hidden xs:inline">Join Contest</span>
-                        <span className="xs:hidden">Join</span>
-                      </>
-                    )}
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden xs:inline">Manage</span>
+                    <span className="xs:hidden">Edit</span>
                   </button>
                 </div>
-              )}
-            </div>
-            {session && !userSubmission && (
-              <div className="max-w-6xl mx-auto mt-2 flex justify-center">
-                <button
-                  onClick={handleJoinCompetition}
-                  disabled={contest?.calculatedStatus === "ended"}
-                  className={`w-full max-w-md font-semibold py-2.5 sm:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base ${
-                    contest?.calculatedStatus === "ended"
-                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                      : "bg-white text-black hover:bg-white/90"
-                  }`}
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {contest?.calculatedStatus === "ended" ? (
-                    "Contest Ended"
-                  ) : (
-                    <>
-                      <span className="hidden xs:inline">Join Contest</span>
-                      <span className="xs:hidden">Join</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex-1">
+                  <button
+                    onClick={() => navigate(`/share/${id}`)}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    <span>Share</span>
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="w-full">
+              <button
+                onClick={handleJoinCompetition}
+                disabled={contest?.calculatedStatus === "ended"}
+                className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base flex items-center justify-center gap-1.5 ${
+                  contest?.calculatedStatus === "ended"
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-white text-black hover:bg-white/90"
+                }`}
+              >
+                <UserPlus className="h-4 w-4" />
+                {contest?.calculatedStatus === "ended" ? (
+                  "Contest Ended"
+                ) : (
+                  <>
+                    <span className="hidden xs:inline">Join Contest</span>
+                    <span className="xs:hidden">Join</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+          {session && !userSubmission && (
+            <div className="max-w-6xl mx-auto mt-2 flex justify-center">
+              <button
+                onClick={handleJoinCompetition}
+                disabled={contest?.calculatedStatus === "ended"}
+                className={`w-full max-w-md font-semibold py-2.5 sm:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base ${
+                  contest?.calculatedStatus === "ended"
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-white text-black hover:bg-white/90"
+                }`}
+              >
+                <UserPlus className="h-4 w-4" />
+                {contest?.calculatedStatus === "ended" ? (
+                  "Contest Ended"
+                ) : (
+                  <>
+                    <span className="hidden xs:inline">Join Contest</span>
+                    <span className="xs:hidden">Join</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Prize Modal */}
         {selectedPrize && (
