@@ -705,10 +705,13 @@ export function PublicLeaderboard() {
   if (fetchError || !contest) {
     return (
       <>
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+      >
         <Home className="h-4 w-4" />
         <span>Return Home</span>
-      </>
-          </Link>
+      </Link>
         </div>
       </div>
     );
