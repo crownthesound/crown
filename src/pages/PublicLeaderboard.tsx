@@ -1363,6 +1363,80 @@ export function PublicLeaderboard() {
               </div>
             </div>
           </div>
+
+          {/* Join Contest Button */}
+          {session && userSubmission ? (
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <div className="flex-1">
+                    <button
+                      onClick={() => setShowTikTokSettings(true)}
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden xs:inline">Manage</span>
+                      <span className="xs:hidden">Edit</span>
+                    </button>
+                  </div>
+                  <div className="flex-1">
+                    <button
+                      onClick={() => navigate(`/share/${id}`)}
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span>Share</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full">
+              <button
+                onClick={handleJoinCompetition}
+                disabled={contest?.calculatedStatus === "ended"}
+                className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base flex items-center justify-center gap-1.5 ${
+                  contest?.calculatedStatus === "ended"
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-white text-black hover:bg-white/90"
+                }`}
+              >
+                <UserPlus className="h-4 w-4" />
+                {contest?.calculatedStatus === "ended" ? (
+                  "Contest Ended"
+                ) : (
+                  <>
+                    <span className="hidden xs:inline">Join Contest</span>
+                    <span className="xs:hidden">Join</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+          {session && !userSubmission && (
+            <div className="max-w-6xl mx-auto mt-2 flex justify-center">
+              <button
+                onClick={handleJoinCompetition}
+                disabled={contest?.calculatedStatus === "ended"}
+                className={`w-full max-w-md font-semibold py-2.5 sm:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base ${
+                  contest?.calculatedStatus === "ended"
+                    ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    : "bg-white text-black hover:bg-white/90"
+                }`}
+              >
+                <UserPlus className="h-4 w-4" />
+                {contest?.calculatedStatus === "ended" ? (
+                  "Contest Ended"
+                ) : (
+                  <>
+                    <span className="hidden xs:inline">Join Contest</span>
+                    <span className="xs:hidden">Join</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* About this Contest & Prize Distribution */}
@@ -1381,73 +1455,65 @@ export function PublicLeaderboard() {
           <div className="border-t border-white/10"></div>
 
           {/* Prize Section */}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="hidden xs:inline">Manage</span>
-                        <span className="xs:hidden">Edit</span>
-                      </button>
-                    </div>
-                    <div className="flex-1">
-                      <button
-                        onClick={() => navigate(`/share/${id}`)}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
-                      >
-                        <Share2 className="h-4 w-4" />
-                        <span>Share</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="w-full">
-                  <button
-                    onClick={handleJoinCompetition}
-                    disabled={contest?.calculatedStatus === "ended"}
-                    className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base flex items-center justify-center gap-1.5 ${
-                      contest?.calculatedStatus === "ended"
-                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                        : "bg-white text-black hover:bg-white/90"
-                    }`}
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    {contest?.calculatedStatus === "ended" ? (
-                      "Contest Ended"
-                    ) : (
-                      <>
-                        <span className="hidden xs:inline">Join Contest</span>
-                        <span className="xs:hidden">Join</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
-            {session && !userSubmission && (
-              <div className="max-w-6xl mx-auto mt-2 flex justify-center">
-                <button
-                  onClick={handleJoinCompetition}
-                  disabled={contest?.calculatedStatus === "ended"}
-                  className={`w-full max-w-md font-semibold py-2.5 sm:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base ${
-                    contest?.calculatedStatus === "ended"
-                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                      : "bg-white text-black hover:bg-white/90"
-                  }`}
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {contest?.calculatedStatus === "ended" ? (
-                    "Contest Ended"
-                  ) : (
-                    <>
-                      <span className="hidden xs:inline">Join Contest</span>
-                      <span className="xs:hidden">Join</span>
-                    </>
-                  )}
-                </button>
+          <div>
+            <div className="flex items-center justify-between mb-2 sm:mb-4">
+              <div className="flex items-center gap-2">
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                <h2 className="text-base sm:text-lg font-semibold text-white">
+                  {contest.prize_tier === "monetary" ? "Prize Pool" : "Prizes"}
+                </h2>
               </div>
-            )}
+              <div className="text-xs sm:text-sm text-white/60">
+                {contest.prize_titles.length} Winners
+              </div>
+            </div>
+
+            <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
+              <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+                {contest.prize_titles.map((prize, index) => (
+                  <button
+                    key={index}
+                    onClick={() =>
+                      setSelectedPrize({
+                        rank: index + 1,
+                        prize:
+                          contest.prize_tier === "monetary"
+                            ? contest.prize_per_winner * (1 - index * 0.2)
+                            : prize.title,
+                      })
+                    }
+                    className="p-3 rounded-lg border snap-center flex-shrink-0 w-[280px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
+                  >
+                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
+                      {getRankIcon(index + 1, true)}
+                      <span
+                        className={`text-xs sm:text-sm font-medium ${getRankColor(
+                          index + 1
+                        )}`}
+                      >
+                        {index + 1}
+                        {index === 0
+                          ? "st"
+                          : index === 1
+                          ? "nd"
+                          : index === 2
+                          ? "rd"
+                          : "th"}
+                      </span>
+                    </div>
+                    <div className="text-sm font-medium leading-tight text-white text-center">
+                      {contest.prize_tier === "monetary"
+                        ? `$${formatNumber(
+                            contest.prize_per_winner * (1 - index * 0.2)
+                          )}`
+                        : prize.title}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
         {/* Prize Modal */}
         {selectedPrize && (
