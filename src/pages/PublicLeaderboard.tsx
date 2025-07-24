@@ -837,6 +837,7 @@ export function PublicLeaderboard() {
                             id: participant.video_id,
                             title: participant.video_title,
                             url: participant.video_url,
+                            video_url: participant.video_url,
                             thumbnail: participant.thumbnail,
                             username: participant.tiktok_username,
                             views: participant.views,
