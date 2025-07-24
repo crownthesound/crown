@@ -1311,6 +1311,19 @@ export function PublicLeaderboard() {
                             title="Play video"
                           >
                             <img
+                              src={contest.cover_image}
+                              alt={contest.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+                            <Music className="h-16 w-16 text-white/40" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Combined About & Prizes Section */}
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-white/10 to-white/5 border-b border-white/10 p-6 sm:p-8">
