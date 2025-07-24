@@ -485,7 +485,7 @@ export function PublicLeaderboard() {
           </div>
 
           {/* Contest Info */}
-          <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="flex-1 flex items-end justify-center px-4 sm:px-6 lg:px-8 pb-8 sm:pb-16">
             <div className="max-w-4xl mx-auto text-center">
               <div className="mb-4 sm:mb-6">
                 <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border mb-4 ${getStatusColor(contestStatus)}`}>
