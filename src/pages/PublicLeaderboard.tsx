@@ -434,9 +434,9 @@ export function PublicLeaderboard() {
   return (
     <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
       {/* Hero Section with Cover Image */}
-      <div className="relative">
+      <div className="relative mb-8 sm:mb-0">
         {contest.cover_image && (
-          <div className="absolute inset-0 h-[60vh] sm:h-[70vh]">
+          <div className="absolute inset-0 h-[50vh] sm:h-[70vh]">
             <img
               src={contest.cover_image}
               alt={contest.name}
@@ -446,22 +446,22 @@ export function PublicLeaderboard() {
           </div>
         )}
         
-        <div className="relative z-10 h-[60vh] sm:h-[70vh] flex flex-col">
+        <div className="relative z-10 h-[50vh] sm:h-[70vh] flex flex-col">
           {/* Header */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 w-full">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-2 sm:pb-4 w-full">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-3">
-                <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
-                <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
+                <Crown className="h-6 w-6 sm:h-10 sm:w-10 text-white" />
+                <span className="text-xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
               </Link>
               
               {session ? (
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setShowTikTokSettings(true)}
-                    className="flex items-center justify-center px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
+                    className="flex items-center justify-center px-2 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 rounded-lg sm:rounded-xl transition-colors text-white text-xs sm:text-base"
                   >
-                    <Settings className="h-4 w-4" />
+                    <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span className="hidden sm:inline ml-2">TikTok</span>
                   </button>
                 </div>
@@ -469,13 +469,13 @@ export function PublicLeaderboard() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => redirectToAuth("/signin")}
-                    className="px-3 sm:px-6 py-2 text-white hover:bg-white/5 rounded-xl transition-colors whitespace-nowrap text-sm sm:text-base"
+                    className="px-2 sm:px-6 py-1.5 sm:py-2 text-white hover:bg-white/5 rounded-lg sm:rounded-xl transition-colors whitespace-nowrap text-xs sm:text-base"
                   >
                     Login
                   </button>
                   <button
                     onClick={() => redirectToAuth("/signup")}
-                    className="bg-white text-[#1A1A1A] px-3 sm:px-6 py-2 rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-sm sm:text-base font-medium"
+                    className="bg-white text-[#1A1A1A] px-2 sm:px-6 py-1.5 sm:py-2 rounded-lg sm:rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-xs sm:text-base font-medium"
                   >
                     Sign Up
                   </button>
@@ -485,54 +485,54 @@ export function PublicLeaderboard() {
           </div>
 
           {/* Contest Info */}
-          <div className="flex-1 flex items-center justify-center">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <div className="mb-6">
+          <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="mb-4 sm:mb-6">
                 <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border mb-4 ${getStatusColor(contestStatus)}`}>
                   <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium">{getStatusLabel(contestStatus)}</span>
                 </div>
                 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight">
+                <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black text-white mb-2 sm:mb-4 tracking-tight leading-tight">
                   {contest.name}
                 </h1>
                 
-                <p className="text-lg sm:text-xl text-white/80 mb-6 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-sm sm:text-xl text-white/80 mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed px-4">
                   {contest.description}
                 </p>
 
                 {timeRemaining && (
-                  <div className="mb-8">
+                  <div className="mb-4 sm:mb-8">
                     <ContestCountdown contest={contest} className="justify-center text-lg" />
                   </div>
                 )}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
                 {session && userSubmission ? (
                   <button
                     onClick={() => navigate(`/contest-management/${contest.id}`)}
-                    className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-xl hover:bg-white/90 transition-all font-medium text-lg flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-lg sm:rounded-xl hover:bg-white/90 transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
                   >
-                    <Settings className="h-5 w-5" />
+                    <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                     Manage Entry
                   </button>
                 ) : (
                   <button
                     onClick={handleJoinContest}
-                    className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-xl hover:bg-white/90 transition-all font-medium text-lg flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-lg sm:rounded-xl hover:bg-white/90 transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
                   >
-                    <Trophy className="h-5 w-5" />
+                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
                     {session ? "Join Contest" : "Sign Up to Join"}
                   </button>
                 )}
                 
                 <button
                   onClick={handleShare}
-                  className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl transition-all font-medium text-lg flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg sm:rounded-xl transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
                 >
-                  <Share2 className="h-5 w-5" />
+                  <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
                   Share Contest
                 </button>
               </div>
@@ -542,13 +542,13 @@ export function PublicLeaderboard() {
       </div>
 
       {/* Prize Distribution Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 flex items-center justify-center gap-3">
-            <Trophy className="h-8 w-8 text-yellow-400" />
+          <h2 className="text-xl sm:text-3xl font-black text-white mb-2 sm:mb-4 flex items-center justify-center gap-2 sm:gap-3">
+            <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-400" />
             Prize Distribution
           </h2>
-          <p className="text-white/60">
+          <p className="text-sm sm:text-base text-white/60">
             {contest.num_winners || contest.prize_titles?.length || 3} winners will be selected
           </p>
         </div>
@@ -590,13 +590,13 @@ export function PublicLeaderboard() {
       </div>
 
       {/* Featured Submissions Video Player */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-8 sm:mt-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mt-8 sm:mt-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 flex items-center justify-center gap-3">
-            <Play className="h-8 w-8 text-blue-400" />
+          <h2 className="text-xl sm:text-3xl font-black text-white mb-2 sm:mb-4 flex items-center justify-center gap-2 sm:gap-3">
+            <Play className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400" />
             Featured Submissions
           </h2>
-          <p className="text-white/60">
+          <p className="text-sm sm:text-base text-white/60">
             Watch the top performing entries in this contest
           </p>
         </div>
@@ -752,44 +752,44 @@ export function PublicLeaderboard() {
       </div>
 
       {/* Contest Stats */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-            <Users className="h-8 w-8 text-blue-400 mx-auto mb-3" />
-            <div className="text-2xl font-bold text-white">{participants.length}</div>
-            <div className="text-sm text-white/60">Participants</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
+          <div className="text-center p-4 sm:p-6 bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10">
+            <Users className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400 mx-auto mb-2 sm:mb-3" />
+            <div className="text-lg sm:text-2xl font-bold text-white">{participants.length}</div>
+            <div className="text-xs sm:text-sm text-white/60">Participants</div>
           </div>
           
-          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-            <Trophy className="h-8 w-8 text-yellow-400 mx-auto mb-3" />
-            <div className="text-2xl font-bold text-white">{contest.num_winners || 3}</div>
-            <div className="text-sm text-white/60">Winners</div>
+          <div className="text-center p-4 sm:p-6 bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10">
+            <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-400 mx-auto mb-2 sm:mb-3" />
+            <div className="text-lg sm:text-2xl font-bold text-white">{contest.num_winners || 3}</div>
+            <div className="text-xs sm:text-sm text-white/60">Winners</div>
           </div>
           
-          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-            <Music className="h-8 w-8 text-purple-400 mx-auto mb-3" />
-            <div className="text-lg font-bold text-white">{contest.music_category || "All"}</div>
-            <div className="text-sm text-white/60">Category</div>
+          <div className="text-center p-4 sm:p-6 bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10">
+            <Music className="h-6 w-6 sm:h-8 sm:w-8 text-purple-400 mx-auto mb-2 sm:mb-3" />
+            <div className="text-sm sm:text-lg font-bold text-white">{contest.music_category || "All"}</div>
+            <div className="text-xs sm:text-sm text-white/60">Category</div>
           </div>
           
-          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-            <Gift className="h-8 w-8 text-green-400 mx-auto mb-3" />
-            <div className="text-lg font-bold text-white">
+          <div className="text-center p-4 sm:p-6 bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10">
+            <Gift className="h-6 w-6 sm:h-8 sm:w-8 text-green-400 mx-auto mb-2 sm:mb-3" />
+            <div className="text-sm sm:text-lg font-bold text-white">
               {contest.prize_per_winner ? `$${formatCurrency(contest.prize_per_winner)}` : "Titles"}
             </div>
-            <div className="text-sm text-white/60">Prize Type</div>
+            <div className="text-xs sm:text-sm text-white/60">Prize Type</div>
           </div>
         </div>
       </div>
 
       {/* Leaderboard */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 flex items-center justify-center gap-3">
-            <TrendingUp className="h-8 w-8 text-green-400" />
+          <h2 className="text-xl sm:text-3xl font-black text-white mb-2 sm:mb-4 flex items-center justify-center gap-2 sm:gap-3">
+            <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-400" />
             Live Leaderboard
           </h2>
-          <p className="text-white/60">
+          <p className="text-sm sm:text-base text-white/60">
             Rankings update in real-time based on video performance
           </p>
         </div>
@@ -799,26 +799,26 @@ export function PublicLeaderboard() {
             {/* Mobile View */}
             <div className="block sm:hidden divide-y divide-white/10">
               {participants.slice(0, 50).map((participant) => (
-                <div key={participant.video_id} className="p-4">
+                <div key={participant.video_id} className="p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
-                        <span className={`font-bold text-lg ${getRankColor(participant.rank)}`}>
+                        <span className={`font-bold text-sm ${getRankColor(participant.rank)}`}>
                           #{participant.rank}
                         </span>
                         {getRankIcon(participant.rank)}
                       </div>
                       <div className="min-w-0">
-                        <div className="font-medium text-white truncate">
+                        <div className="font-medium text-white truncate text-sm">
                           @{participant.tiktok_username}
                         </div>
-                        <div className="text-sm text-white/60">
+                        <div className="text-xs text-white/60">
                           {formatNumber(participant.views)} views
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="text-xs text-white/40">
+                      <div className="text-xs text-white/40 text-right">
                         {formatNumber(participant.likes)} ♥
                       </div>
                     </div>
@@ -913,42 +913,42 @@ export function PublicLeaderboard() {
       </div>
 
       {/* Contest Details */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Guidelines */}
           {contest.guidelines && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <CheckCircle className="h-6 w-6 text-green-400" />
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10 p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-400" />
                 Guidelines
               </h3>
-              <p className="text-white/80 leading-relaxed">{contest.guidelines}</p>
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed">{contest.guidelines}</p>
             </div>
           )}
 
           {/* Rules */}
           {contest.rules && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <AlertCircle className="h-6 w-6 text-blue-400" />
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10 p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
                 Rules
               </h3>
-              <p className="text-white/80 leading-relaxed">{contest.rules}</p>
+              <p className="text-sm sm:text-base text-white/80 leading-relaxed">{contest.rules}</p>
             </div>
           )}
 
           {/* Hashtags */}
           {contest.hashtags && contest.hashtags.length > 0 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 md:col-span-2">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <Zap className="h-6 w-6 text-purple-400" />
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10 p-4 sm:p-6 md:col-span-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+                <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
                 Required Hashtags
               </h3>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {contest.hashtags.map((hashtag, index) => (
                   <span
                     key={index}
-                    className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium border border-blue-500/30"
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-500/20 text-blue-300 rounded-full text-xs sm:text-sm font-medium border border-blue-500/30"
                   >
                     #{hashtag}
                   </span>
@@ -960,13 +960,13 @@ export function PublicLeaderboard() {
       </div>
 
       {/* Footer */}
-      <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-white/10">
+      <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 mt-8 sm:mt-12 border-t border-white/10">
         <div className="flex flex-col items-center justify-center gap-4">
           <div className="flex items-center gap-2">
-            <Crown className="h-6 w-6 text-white/40" />
+            <Crown className="h-5 w-5 sm:h-6 sm:w-6 text-white/40" />
             <span className="text-white/40 font-light tracking-wider">CROWN</span>
           </div>
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm">
             <Link to="/terms" className="text-white/60 hover:text-white transition-colors">
               Terms of Service
             </Link>
@@ -975,7 +975,7 @@ export function PublicLeaderboard() {
               Privacy Policy
             </Link>
           </div>
-          <p className="text-white/40 text-xs text-center">
+          <p className="text-white/40 text-xs sm:text-sm text-center">
             © {new Date().getFullYear()} Crown. All rights reserved.
           </p>
         </div>
