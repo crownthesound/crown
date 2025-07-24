@@ -1413,7 +1413,6 @@ export function PublicLeaderboard() {
               </button>
             </div>
           )}
-        </div>
 
         {/* Prize Modal */}
         {selectedPrize && (
