@@ -1346,14 +1346,6 @@ export function PublicLeaderboard() {
           </div>
         </div>
 
-        {/* Join Competition Button */}
-        {contest.status === "active" && (
-          <div className="fixed bottom-0 left-0 right-0 py-2 px-3 sm:py-2 sm:px-4 bg-black/95 backdrop-blur-lg border-t border-white/10 pb-safe-area-inset-bottom">
-            <div className="max-w-6xl mx-auto flex justify-center">
-              {userSubmission ? (
-                <div className="flex gap-2 sm:gap-4 w-full max-w-md">
-                  <div className="flex gap-2 sm:gap-3 w-full">
-                    <div className="flex-1">
                       <button
                         onClick={() =>
                           navigate(`/contest-management/${id}`)
