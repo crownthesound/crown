@@ -1452,22 +1452,26 @@ export function PublicLeaderboard() {
                   <X className="h-5 w-5 text-white/60" />
                 </button>
               </div>
-              <div className="p-4 sm:p-6">
+          <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 bg-gradient-to-t from-black/95 via-black/80 to-transparent">
                 <div className="text-center">
                   {contest.prize_tier === "monetary" ? (
-                    <>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  <span className="text-xs sm:text-sm text-white/80 font-medium tracking-wider uppercase">Live Contest</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3 leading-tight tracking-tight drop-shadow-lg">
                       <div className="text-xl sm:text-2xl font-bold text-white">
                         ${formatNumber(selectedPrize.prize as number)}
                       </div>
-                      <p className="text-sm text-white/60 mt-1">Cash Prize</p>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
                     </>
-                  ) : (
+                    <span className="text-sm font-medium">{formatTimeLeft(contest.end_date)}</span>
                     <>
-                      <div className="text-lg sm:text-2xl font-bold text-white line-clamp-2">
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
                         {selectedPrize.prize}
-                      </div>
+                    <span className="text-sm font-medium">{leaderboard.length} participants</span>
                       <p className="text-sm text-white/60 mt-1">
-                        Achievement Title
+                  <span className={`px-3 py-1.5 rounded-full text-sm font-bold backdrop-blur-sm border border-white/20 ${getStatusColor(calculateContestStatus(contest))}`}>
                       </p>
                     </>
                   )}
@@ -1476,9 +1480,9 @@ export function PublicLeaderboard() {
               <div className="p-4 border-t border-white/10 bg-white/5">
                 <button
                   onClick={() => setSelectedPrize(null)}
-                  className="w-full bg-white text-black py-2.5 rounded-lg hover:bg-white/90 transition-colors font-medium min-h-[48px]"
+                  className="p-3 sm:p-4 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all duration-300 backdrop-blur-sm border border-white/20 hover:scale-105 group"
                 >
-                  Close
+                  <Share2 className="h-4 w-4 sm:h-5 sm:w-5 group-hover:rotate-12 transition-transform duration-300" />
                 </button>
               </div>
             </div>
