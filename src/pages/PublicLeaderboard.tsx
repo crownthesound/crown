@@ -483,60 +483,60 @@ export function PublicLeaderboard() {
               )}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Contest Info */}
-          <div className="flex-1 flex items-end justify-center px-4 sm:px-6 lg:px-8 pb-8 sm:pb-16">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="mb-4 sm:mb-6">
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border mb-4 ${getStatusColor(contestStatus)}`}>
-                  <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium">{getStatusLabel(contestStatus)}</span>
-                </div>
-                
-                <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black text-white mb-2 sm:mb-4 tracking-tight leading-tight">
-                  {contest.name}
-                </h1>
-                
-                <p className="text-sm sm:text-xl text-white/80 mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed px-4">
-                  {contest.description}
-                </p>
-
-                {timeRemaining && (
-                  <div className="mb-4 sm:mb-8">
-                    <ContestCountdown contest={contest} className="justify-center text-lg" />
-                  </div>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-                {session && userSubmission ? (
-                  <button
-                    onClick={() => navigate(`/contest-management/${contest.id}`)}
-                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-lg sm:rounded-xl hover:bg-white/90 transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
-                  >
-                    <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-                    Manage Entry
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleJoinContest}
-                    className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-lg sm:rounded-xl hover:bg-white/90 transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
-                  >
-                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
-                    {session ? "Join Contest" : "Sign Up to Join"}
-                  </button>
-                )}
-                
-                <button
-                  onClick={handleShare}
-                  className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg sm:rounded-xl transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
-                >
-                  <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Share Contest
-                </button>
-              </div>
+      {/* Contest Info Section - Moved Lower */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="text-center">
+          <div className="mb-4 sm:mb-6">
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border mb-4 ${getStatusColor(contestStatus)}`}>
+              <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
+              <span className="text-sm font-medium">{getStatusLabel(contestStatus)}</span>
             </div>
+            
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-2 sm:mb-4 tracking-tight leading-tight">
+              {contest.name}
+            </h1>
+            
+            <p className="text-sm sm:text-lg text-white/80 mb-4 sm:mb-6 max-w-2xl mx-auto leading-relaxed">
+              {contest.description}
+            </p>
+
+            {timeRemaining && (
+              <div className="mb-4 sm:mb-8">
+                <ContestCountdown contest={contest} className="justify-center text-lg" />
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+            {session && userSubmission ? (
+              <button
+                onClick={() => navigate(`/contest-management/${contest.id}`)}
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-lg sm:rounded-xl hover:bg-white/90 transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
+              >
+                <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
+                Manage Entry
+              </button>
+            ) : (
+              <button
+                onClick={handleJoinContest}
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-lg sm:rounded-xl hover:bg-white/90 transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
+              >
+                <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
+                {session ? "Join Contest" : "Sign Up to Join"}
+              </button>
+            )}
+            
+            <button
+              onClick={handleShare}
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-lg sm:rounded-xl transition-all font-medium text-sm sm:text-lg flex items-center justify-center gap-2"
+            >
+              <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+              Share Contest
+            </button>
           </div>
         </div>
       </div>
