@@ -28,6 +28,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Info,
+  Music,
+  Gift,
 } from "lucide-react";
 import { Auth } from "../components/Auth";
 import { useAuth } from "../contexts/AuthContext";
@@ -85,6 +87,7 @@ interface ContestDetails {
     title: string;
   }>;
   top_participants?: Participant[];
+  music_category?: string;
 }
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
@@ -125,7 +128,7 @@ export function PublicLeaderboard() {
   const [videoLoaded, setVideoLoaded] = useState<{[key: string]: boolean}>({});
   const [isMuted, setIsMuted] = useState(true);
 
-  const backendUrl =
+  const backendUrl2 =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
   const {
@@ -1153,6 +1156,100 @@ export function PublicLeaderboard() {
             </div>
           )}
 
+          {/* Combined About & Prizes Section */}
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-white/10 to-white/5 border-b border-white/10 p-6 sm:p-8">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Trophy className="h-6 w-6 text-yellow-400" />
+                  </div>
+                  Contest Details
+                </h2>
+                <div className="flex items-center gap-2 text-sm text-white/60 bg-white/10 px-4 py-2 rounded-full border border-white/10">
+                  <Gift className="h-4 w-4 text-yellow-400" />
+                  <span>{contest.num_winners} Winners</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 sm:p-8">
+              <div className="grid lg:grid-cols-3 gap-8">
+                {/* About Section - Takes 2/3 width on large screens */}
+                <div className="lg:col-span-2">
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                    About this Contest
+                  </h3>
+                  <p className="text-white/80 leading-relaxed text-base">
+                    {contest.description}
+                  </p>
+                  
+                  {/* Contest Meta Info */}
+                  <div className="mt-6 grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                      <div className="text-sm text-white/60 mb-1">Category</div>
+                      <div className="text-white font-medium">{contest.music_category}</div>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                      <div className="text-sm text-white/60 mb-1">Status</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span className="text-white font-medium capitalize">{contest.status}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Prizes Section - Takes 1/3 width on large screens */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    Prize Distribution
+                  </h3>
+                  
+                  <div className="space-y-3">
+                    {contest.prize_titles
+                      .slice(0, contest.num_winners || contest.prize_titles.length)
+                      .map((prize: any, index: number) => (
+                        <div
+                          key={index}
+                          className={`p-4 rounded-lg border transition-all hover:scale-[1.02] ${
+                            index === 0
+                              ? "bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border-yellow-500/20"
+                              : index === 1
+                              ? "bg-gradient-to-r from-gray-400/10 to-gray-500/10 border-gray-400/20"
+                              : index === 2
+                              ? "bg-gradient-to-r from-amber-600/10 to-amber-700/10 border-amber-600/20"
+                              : "bg-white/5 border-white/10"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0">
+                              {getRankIcon(index + 1, true)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className={`text-sm font-bold mb-1 ${getRankColor(index + 1)}`}>
+                                {index + 1}
+                                {index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"} Place
+                              </div>
+                              <div className="text-white font-medium text-sm">
+                                {contest.prize_tier === "monetary"
+                                  ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                                  : prize.title}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Leaderboard */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
             <div className="px-3 sm:px-6 py-2 sm:py-4 border-b border-white/10">
@@ -1311,107 +1408,50 @@ export function PublicLeaderboard() {
                             title="Play video"
                           >
                             <img
-                              src={contest.cover_image}
-                              alt={contest.name}
-                              className="w-full h-full object-cover"
+                              src={participant.thumbnail}
+                              alt={`${participant.username} video thumbnail`}
+                              className="w-16 h-16 object-cover rounded-lg"
+                              loading="lazy"
+                              decoding="async"
+                              onLoad={(e) => {
+                                const overlay = e.currentTarget.nextElementSibling as HTMLElement;
+                                if (overlay) overlay.style.opacity = '0';
+                              }}
                             />
-                          </div>
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
-                            <Music className="h-16 w-16 text-white/40" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
+                                 style={{ transition: 'opacity 0.3s ease' }}>
+                              <Play className="h-4 w-4 text-white drop-shadow-lg" />
+                            </div>
                           </div>
                         )}
                       </div>
-
-                      {/* Combined About & Prizes Section */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-white/10 to-white/5 border-b border-white/10 p-6 sm:p-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                <div className="p-2 bg-white/10 rounded-lg">
-                  <Trophy className="h-6 w-6 text-yellow-400" />
-                </div>
-                Contest Details
-              </h2>
-              <div className="flex items-center gap-2 text-sm text-white/60 bg-white/10 px-4 py-2 rounded-full border border-white/10">
-                <Gift className="h-4 w-4 text-yellow-400" />
-                <span>{contest.num_winners} Winners</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6 sm:p-8">
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* About Section - Takes 2/3 width on large screens */}
-              <div className="lg:col-span-2">
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  About this Contest
-                </h3>
-                <p className="text-white/80 leading-relaxed text-base">
-                  {contest.description}
-                </p>
-                
-                {/* Contest Meta Info */}
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div className="text-sm text-white/60 mb-1">Category</div>
-                    <div className="text-white font-medium">{contest.music_category}</div>
-                  </div>
-                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div className="text-sm text-white/60 mb-1">Status</div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-white font-medium capitalize">{contest.status}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Prizes Section - Takes 1/3 width on large screens */}
-              <div>
-                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                  Prize Distribution
-                </h3>
-                
-                <div className="space-y-3">
-                  {contest.prize_titles
-                    .slice(0, contest.num_winners || contest.prize_titles.length)
-                    .map((prize: any, index: number) => (
-                      <div
-                        key={index}
-                        className={`p-4 rounded-lg border transition-all hover:scale-[1.02] ${
-                          index === 0
-                            ? "bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border-yellow-500/20"
-                            : index === 1
-                            ? "bg-gradient-to-r from-gray-400/10 to-gray-500/10 border-gray-400/20"
-                            : index === 2
-                            ? "bg-gradient-to-r from-amber-600/10 to-amber-700/10 border-amber-600/20"
-                            : "bg-white/5 border-white/10"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0">
-                            {getRankIcon(index + 1)}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className={`text-sm font-bold mb-1 ${getRankColor(index + 1)}`}>
-                              {index + 1}
-                              {index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"} Place
-                            </div>
-                            <div className="text-white font-medium text-sm">
-                              {contest.prize_tier === "monetary"
-                                ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
-                                : prize.title}
-                            </div>
-                          </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-white truncate">
+                          {participant.tiktok_display_name || participant.username}
+                        </div>
+                        <div className="text-sm text-white/60 truncate">
+                          {participant.title || "No title"}
                         </div>
                       </div>
-                    ))}
-                </div>
+                    </div>
+                    <div className="col-span-2 text-right">
+                      <div className="text-white font-medium">
+                        {formatNumber(participant.views)}
+                      </div>
+                    </div>
+                    <div className="col-span-1 text-center">
+                      {participant.thumbnail && (
+                        <button
+                          onClick={() => handlePlayVideo(participant)}
+                          className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                          title="Play video"
+                        >
+                          <Play className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
