@@ -812,6 +812,9 @@ export function PublicLeaderboard() {
                         <div className="font-medium text-white truncate text-sm">
                           @{participant.tiktok_username}
                         </div>
+                        <div className="font-medium text-white truncate text-sm">
+                          @{participant.tiktok_username}
+                        </div>
                         <div className="text-xs text-white/60">
                           {formatNumber(participant.views)} views
                         </div>
