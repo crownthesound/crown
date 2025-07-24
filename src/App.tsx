@@ -251,23 +251,13 @@ function App() {
   useEffect(() => {
     const fetchActiveContests = async () => {
       try {
-        // Check if we have network connectivity first
-        if (!navigator.onLine) {
-          console.warn("No internet connection detected");
-          setLoading(false);
-          return;
-        }
-
         const { data, error } = await supabase
           .from("contests")
           .select("*")
           .eq("status", "active")
           .order("created_at", { ascending: false });
 
-        if (error) {
-          console.error("Supabase error:", error);
-          throw error;
-        }
+        if (error) throw error;
 
         const contestsWithParticipants = (data || []).map((contest) => ({
           ...contest,
@@ -289,15 +279,7 @@ function App() {
         setActiveContests(activeContests);
       } catch (error) {
         console.error("Error fetching active contests:", error);
-        
-        // Provide more specific error messages based on error type
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.warn("Network connectivity issue - setting empty contests array");
-          // Don't show error toast for network issues, just log and continue
-          setActiveContests([]);
-        } else {
-          toast.error("Failed to load contests");
-        }
+        toast.error("Failed to load contests");
       } finally {
         setLoading(false);
       }
