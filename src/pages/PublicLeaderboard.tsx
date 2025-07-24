@@ -618,8 +618,6 @@ export function PublicLeaderboard() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm sm:text-base">
-                    <ContestCountdown contest={contest} />
-                    <span>•</span>
                     <div className="flex items-center gap-1.5">
                       <Music className="h-4 w-4" />
                       <span>{contest.music_category}</span>
