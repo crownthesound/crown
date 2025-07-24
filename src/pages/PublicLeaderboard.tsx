@@ -605,6 +605,43 @@ export function PublicLeaderboard() {
               </div>
             )}
 
+            <div className="relative p-6 sm:p-8 max-w-7xl mx-auto">
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white">
+                      {contest.name}
+                    </h1>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(contestStatus)}`}>
+                      {getStatusLabel(contestStatus)}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm sm:text-base">
+                    <ContestCountdown contest={contest} />
+                    <span>•</span>
+                    <div className="flex items-center gap-1.5">
+                      <Music className="h-4 w-4" />
+                      <span>{contest.music_category}</span>
+                    </div>
+                    <span>•</span>
+                    <div className="flex items-center gap-1.5">
+                      <Users className="h-4 w-4" />
+                      <span>{participants.length} participants</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleShare}
+                    className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  >
+                    <Share2 className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Prize Distribution */}
@@ -1156,45 +1193,6 @@ export function PublicLeaderboard() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Contest Information - Moved from Hero */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 sm:p-8 mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white">
-                  {contest.name}
-                </h1>
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(contestStatus)}`}>
-                  {getStatusLabel(contestStatus)}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 text-white/80 text-sm sm:text-base">
-                <ContestCountdown contest={contest} />
-                <span>•</span>
-                <div className="flex items-center gap-1.5">
-                  <Music className="h-4 w-4" />
-                  <span>{contest.music_category}</span>
-                </div>
-                <span>•</span>
-                <div className="flex items-center gap-1.5">
-                  <Users className="h-4 w-4" />
-                  <span>{participants.length} participants</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleShare}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              >
-                <Share2 className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
