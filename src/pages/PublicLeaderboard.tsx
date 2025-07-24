@@ -448,7 +448,7 @@ export function PublicLeaderboard() {
         
         <div className="relative z-10 h-[50vh] sm:h-[70vh] flex flex-col">
           {/* Header */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-2 sm:pb-4 w-full">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 w-full">
             <div className="flex items-center justify-between">
               <Link to="/" className="flex items-center gap-3">
                 <Crown className="h-6 w-6 sm:h-10 sm:w-10 text-white" />
