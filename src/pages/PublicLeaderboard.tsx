@@ -1311,57 +1311,94 @@ export function PublicLeaderboard() {
                             title="Play video"
                           >
                             <img
-                              src={participant.thumbnail}
-                              alt={`${participant.username} video thumbnail`}
-                              className="w-10 h-10 rounded-lg object-cover border border-white/10"
-                            />
-                            {/* Play icon overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100">
-                              <Play className="h-4 w-4 text-white drop-shadow-lg" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-medium text-white truncate">
-                          {participant.tiktok_display_name ||
-                            participant.username}
-                        </div>
-                        <div className="text-sm text-white/60 line-clamp-1">
-                          @{participant.username}
-                        </div>
-                        {participant.title && (
-                          <div className="text-xs text-white/40 line-clamp-1">
-                            {participant.title}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-span-2 text-right font-medium text-white">
-                      {formatNumber(participant.views)}
-                    </div>
-                    <div className="col-span-1 flex justify-center">
-                      {participant.thumbnail ? (
-                        <div
-                          className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
-                          onClick={() => handlePlayVideo(participant)}
-                          title="Play video"
-                        >
-                          <img
-                            src={participant.thumbnail}
-                            alt="Video preview"
-                            className="w-6 h-6 rounded object-cover opacity-60 hover:opacity-80"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Play className="h-2 w-2 text-white/80 drop-shadow" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-white/30 text-xs">No preview</div>
-                      )}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-white/10 to-white/5 border-b border-white/10 p-6 sm:p-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <div className="p-2 bg-white/10 rounded-lg">
+                  <Trophy className="h-6 w-6 text-yellow-400" />
+                </div>
+                Contest Details
+              </h2>
+              <div className="flex items-center gap-2 text-sm text-white/60 bg-white/10 px-4 py-2 rounded-full border border-white/10">
+                <Gift className="h-4 w-4 text-yellow-400" />
+                <span>{contest.num_winners} Winners</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 sm:p-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* About Section - Takes 2/3 width on large screens */}
+              <div className="lg:col-span-2">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  About this Contest
+                </h3>
+                <p className="text-white/80 leading-relaxed text-base">
+                  {contest.description}
+                </p>
+                
+                {/* Contest Meta Info */}
+                <div className="mt-6 grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                    <div className="text-sm text-white/60 mb-1">Category</div>
+                    <div className="text-white font-medium">{contest.music_category}</div>
+                  </div>
+                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                    <div className="text-sm text-white/60 mb-1">Status</div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-white font-medium capitalize">{contest.status}</span>
                     </div>
                   </div>
-                ))}
+                </div>
+              </div>
+
+              {/* Prizes Section - Takes 1/3 width on large screens */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                  Prize Distribution
+                </h3>
+                
+                <div className="space-y-3">
+                  {contest.prize_titles
+                    .slice(0, contest.num_winners || contest.prize_titles.length)
+                    .map((prize: any, index: number) => (
+                      <div
+                        key={index}
+                        className={`p-4 rounded-lg border transition-all hover:scale-[1.02] ${
+                          index === 0
+                            ? "bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border-yellow-500/20"
+                            : index === 1
+                            ? "bg-gradient-to-r from-gray-400/10 to-gray-500/10 border-gray-400/20"
+                            : index === 2
+                            ? "bg-gradient-to-r from-amber-600/10 to-amber-700/10 border-amber-600/20"
+                            : "bg-white/5 border-white/10"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0">
+                            {getRankIcon(index + 1)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className={`text-sm font-bold mb-1 ${getRankColor(index + 1)}`}>
+                              {index + 1}
+                              {index === 0 ? "st" : index === 1 ? "nd" : index === 2 ? "rd" : "th"} Place
+                            </div>
+                            <div className="text-white font-medium text-sm">
+                              {contest.prize_tier === "monetary"
+                                ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                                : prize.title}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
           </div>
