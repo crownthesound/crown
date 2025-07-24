@@ -1,274 +1,165 @@
-import { useEffect, useState } from "react";
-import {
-  useParams,
-  Link,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import {
   Crown,
-  Clock,
-  Trophy,
-  Play,
-  Share2,
-  X,
-  Loader2,
-  Home,
-  Sparkles,
+  Medal,
+  Star,
   ArrowUp,
   ArrowDown,
   Minus,
-  Link as LinkIcon,
-  Settings,
-  UserPlus,
-  VolumeX,
-  Volume2,
+  Clock,
+  Trophy,
+  Share2,
+  Play,
+  Home,
+  Users,
+  Gift,
+  Sparkles,
+  TrendingUp,
+  Eye,
+  Heart,
+  MessageCircle,
+  Share,
+  Calendar,
+  Music,
+  Award,
+  Target,
+  Zap,
   ChevronLeft,
   ChevronRight,
+  Volume2,
+  VolumeX,
+  Loader2,
+  UserPlus,
+  Settings,
+  ExternalLink,
+  Info,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
-import { Auth } from "../components/Auth";
-import { useAuth } from "../contexts/AuthContext";
-import { ContestCountdown } from "../components/ContestCountdown";
-import useEmblaCarousel from 'embla-carousel-react';
-import {
-  calculateContestStatus,
-  getStatusLabel,
-} from "../lib/contestUtils";
 import toast from "react-hot-toast";
-import { Helmet } from "react-helmet";
-import { Footer } from "../components/Footer";
-import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
+import { useAuth } from "../contexts/AuthContext";
 import { ContestJoinModal } from "../components/ContestJoinModal";
+import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import { MobileVideoModal } from "../components/MobileVideoModal";
+import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
-import { supabase as supa } from "../lib/supabase";
+import { 
+  calculateContestStatus, 
+  getStatusLabel, 
+  getStatusColor,
+  formatTimeRemaining,
+  getTimeRemaining 
+} from "../lib/contestUtils";
+import { ContestCountdown } from "../components/ContestCountdown";
+import useEmblaCarousel from 'embla-carousel-react';
 
-interface Participant {
-  id: string;
-  username: string;
-  full_name: string;
-  rank: number;
-  previousRank?: number;
-  views: number;
-  video_url?: string | null; // Our stored video URL from Supabase
-  url?: string; // Original TikTok URL
-  thumbnail?: string;
-  title?: string;
-  embed_code?: string | null;
-  tiktok_video_id?: string | null;
-  avatar_url?: string | null; // TikTok profile avatar
-  tiktok_display_name?: string | null; // TikTok display name
-}
-
-interface ContestDetails {
+interface Contest {
   id: string;
   name: string;
   description: string;
-  cover_image?: string;
+  cover_image: string | null;
   start_date: string;
   end_date: string;
-  prize_tier: "monetary" | "non-monetary";
-  prize_per_winner: number;
-  num_winners: number;
-  status: "draft" | "active" | "completed" | "hidden";
-  calculatedStatus?: "draft" | "active" | "ended" | "archived";
-  resources: Array<{
-    title: string;
-    description?: string;
-    url: string;
-  }>;
-  prize_titles: Array<{
-    title: string;
-  }>;
-  top_participants?: Participant[];
+  status: string | null;
+  music_category?: string | null;
+  prize_per_winner?: number | null;
+  prize_titles?: any | null;
+  num_winners?: number | null;
+  total_prize?: number | null;
+  guidelines?: string | null;
+  rules?: string | null;
+  hashtags?: string[] | null;
+  submission_deadline?: string | null;
+  max_participants?: number | null;
 }
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+interface VideoData {
+  id: string;
+  title: string;
+  url: string;
+  video_url?: string | null;
+  thumbnail: string;
+  username: string;
+  views: number | null;
+  likes: number | null;
+  comments: number | null;
+  shares: number | null;
+  avatar_url?: string | null;
+  tiktok_display_name?: string | null;
+  rank?: number | null;
+}
+
+interface Participant {
+  rank: number;
+  user_id: string;
+  full_name: string;
+  tiktok_username: string;
+  tiktok_display_name: string;
+  tiktok_account_name: string;
+  tiktok_account_id: string;
+  video_id: string;
+  video_title: string;
+  video_url: string;
+  thumbnail: string;
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  submission_date: string;
+}
 
 export function PublicLeaderboard() {
   const { id } = useParams<{ id: string }>();
+  const { session } = useAuth();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { session, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [contest, setContest] = useState<ContestDetails | null>(null);
-  const [timeLeft, setTimeLeft] = useState<string>("");
-  const [selectedPrize, setSelectedPrize] = useState<{
-    rank: number;
-    prize: string | number;
-  } | null>(null);
-  const [showAuth, setShowAuth] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const { redirectToAuth } = useAuthRedirect();
+  
+  const [contest, setContest] = useState<Contest | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const [fetchError, setFetchError] = useState<string | null>(null);
-  const [showTikTokModal, setShowTikTokModal] = useState(false);
-  const [showTikTokSettings, setShowTikTokSettings] = useState(false);
+  const [featuredVideos, setFeaturedVideos] = useState<VideoData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const [viewVideo, setViewVideo] = useState<any>(null);
-  const [mobileVideo, setMobileVideo] = useState<any>(null);
+  const [showTikTokModal, setShowTikTokModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
   const [userSubmission, setUserSubmission] = useState<any>(null);
-  const [hasAutoOpenedModal, setHasAutoOpenedModal] = useState(false);
+  const [showTikTokSettings, setShowTikTokSettings] = useState(false);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
+  const [videoLoaded, setVideoLoaded] = useState<{[key: string]: boolean}>({});
+  const [coverLoaded, setCoverLoaded] = useState<{[key: string]: boolean}>({});
+
+  const { isConnected: isTikTokConnected } = useTikTokConnection();
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
+  // Embla carousel for video player
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: 'center',
     skipSnaps: false,
     dragFree: false
   });
-  const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
-  const [coverLoaded, setCoverLoaded] = useState<{[key: string]: boolean}>({});
-  const [videoLoaded, setVideoLoaded] = useState<{[key: string]: boolean}>({});
-  const [isMuted, setIsMuted] = useState(true);
 
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-
-  const {
-    redirectToAuth,
-    hasRedirectUrl,
-    hasRedirectAction,
-    getRedirectAction,
-    clearRedirectUrl,
-  } = useAuthRedirect();
-  const queryClient = useQueryClient();
-
-  // Fetch contest details
-  const {
-    data: contestData,
-    isLoading: contestLoading,
-    error: contestError,
-  } = useQuery({
-    queryKey: ["contest", id],
-    enabled: !!id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contests")
-        .select("*")
-        .eq("id", id as string)
-        .single();
-      if (error || !data) {
-        throw new Error("Contest not found or unavailable");
+  useEffect(() => {
+    if (id) {
+      fetchContestData();
+      fetchLeaderboard();
+      fetchFeaturedVideos();
+      if (session) {
+        fetchUserSubmission();
       }
-      return data;
-    },
-  });
-
-  // Fetch leaderboard participants
-  const { data: leaderboardResp, isLoading: leaderboardLoading } = useQuery({
-    queryKey: ["leaderboard-public", id],
-    enabled: !!id,
-    refetchInterval: 30000,
-    queryFn: async () => {
-      const res = await fetch(
-        `${backendUrl}/api/v1/contests/${id}/leaderboard?limit=200`
-      );
-      if (!res.ok) throw new Error("Failed to load leaderboard");
-      return res.json();
-    },
-  });
-
-  useEffect(() => {
-    if (contestData) {
-      const contestWithStatus = {
-        ...contestData,
-        calculatedStatus: calculateContestStatus(contestData),
-      } as unknown as ContestDetails;
-      setContest(contestWithStatus);
     }
-  }, [contestData]);
-
-  useEffect(() => {
-    if (
-      leaderboardResp &&
-      leaderboardResp.data &&
-      leaderboardResp.data.leaderboard
-    ) {
-      // Debug logging to check if video_url and avatar_url are being received
-      console.group("📊 Leaderboard Data Debug");
-      console.log("Leaderboard response:", leaderboardResp.data.leaderboard);
-      console.log(
-        "First participant video_url:",
-        leaderboardResp.data.leaderboard[0]?.video_url
-      );
-      console.log(
-        "First participant avatar_url:",
-        leaderboardResp.data.leaderboard[0]?.avatar_url
-      );
-      console.log(
-        "First participant tiktok_display_name:",
-        leaderboardResp.data.leaderboard[0]?.tiktok_display_name
-      );
-      console.log(
-        "Participants with video_url:",
-        leaderboardResp.data.leaderboard.filter((p: any) => p.video_url).length
-      );
-      console.log(
-        "Participants with avatar_url:",
-        leaderboardResp.data.leaderboard.filter((p: any) => p.avatar_url).length
-      );
-      console.groupEnd();
-
-      setParticipants(leaderboardResp.data.leaderboard);
-    }
-  }, [leaderboardResp]);
-
-  useEffect(() => {
-    setLoading(contestLoading || leaderboardLoading);
-    if (contestError) {
-      setFetchError((contestError as Error).message);
-    }
-  }, [contestLoading, leaderboardLoading, contestError]);
-
-  useEffect(() => {
-    if (contest?.end_date) {
-      const timer = setInterval(() => {
-        const now = new Date().getTime();
-        const endDate = new Date(contest.end_date).getTime();
-        const distance = endDate - now;
-
-        if (distance < 0) {
-          setTimeLeft("Contest Ended");
-          clearInterval(timer);
-        } else {
-          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-          const hours = Math.floor(
-            (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-          );
-          const minutes = Math.floor(
-            (distance % (1000 * 60 * 60)) / (1000 * 60)
-          );
-          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-          const isMobile = window.innerWidth < 640;
-          if (isMobile) {
-            if (days > 0) {
-              setTimeLeft(`${days}d ${hours}h`);
-            } else {
-              setTimeLeft(`${hours}h ${minutes}m`);
-            }
-          } else {
-            setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-          }
-        }
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [contest?.end_date]);
-
-  useEffect(() => {
-    fetchContestData();
-  }, [id]);
+  }, [id, session]);
 
   useEffect(() => {
     if (!emblaApi) return;
 
     const onSelect = () => {
-      setSelectedVideoIndex(emblaApi.selectedScrollSnap());
+      setCurrentVideoIndex(emblaApi.selectedScrollSnap());
     };
 
     emblaApi.on('select', onSelect);
@@ -282,270 +173,126 @@ export function PublicLeaderboard() {
 
   const fetchContestData = async () => {
     try {
-      const { data: contestData, error: contestError } = await supabase
+      const { data, error } = await supabase
         .from("contests")
         .select("*")
-        .eq("id", id as string)
+        .eq("id", id)
         .single();
 
-      if (contestError || !contestData) {
-        setFetchError("Contest not found or unavailable");
-        setLoading(false);
-        return;
-      }
+      if (error) throw error;
+      setContest(data);
+    } catch (error) {
+      console.error("Error fetching contest:", error);
+      toast.error("Contest not found");
+      navigate("/");
+    }
+  };
 
-      const contestWithStatus = {
-        ...contestData,
-        calculatedStatus: calculateContestStatus(contestData),
-      } as unknown as ContestDetails;
-
-      setContest(contestWithStatus);
-
-      // Fetch leaderboard
-      const res = await fetch(
-        `${backendUrl}/api/v1/contests/${id}/leaderboard?limit=200`
-      );
-      if (res.ok) {
-        const leaderboardData = await res.json();
-        if (leaderboardData.data?.leaderboard) {
-          setParticipants(leaderboardData.data.leaderboard);
+  const fetchLeaderboard = async () => {
+    try {
+      if (backendUrl && backendUrl !== "http://localhost:3000") {
+        const response = await fetch(
+          `${backendUrl}/api/v1/contests/${id}/leaderboard?limit=100`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.data?.leaderboard) {
+            setParticipants(data.data.leaderboard);
+          }
         }
       }
     } catch (error) {
-      console.error("Error fetching contest data:", error);
-      setFetchError("Failed to load contest data");
+      console.warn('Could not fetch leaderboard:', error);
+    }
+  };
+
+  const fetchFeaturedVideos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("contest_links")
+        .select("*")
+        .eq("contest_id", id)
+        .eq("is_contest_submission", true)
+        .eq("active", true)
+        .order("views", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      const videosWithRank = (data || []).map((video, index) => ({
+        ...video,
+        rank: index + 1,
+      }));
+
+      setFeaturedVideos(videosWithRank);
+
+      // Initialize loading states
+      const initialLoadState = videosWithRank.reduce((acc, video) => ({
+        ...acc,
+        [video.id]: false
+      }), {});
+      setCoverLoaded(initialLoadState);
+      setVideoLoaded(initialLoadState);
+    } catch (error) {
+      console.error("Error fetching featured videos:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch current user's submission
-  useEffect(() => {
-    const fetchSubmission = async () => {
-      if (!session || !id) return;
-
-      const { data, error } = await supa
+  const fetchUserSubmission = async () => {
+    if (!session) return;
+    
+    try {
+      const { data, error } = await supabase
         .from("contest_links")
         .select("*")
-        .eq("contest_id", id as string)
+        .eq("contest_id", id)
         .eq("created_by", session.user.id)
         .eq("is_contest_submission", true)
         .single();
 
-      if (!error) {
-        setUserSubmission(data);
-      } else {
-        setUserSubmission(null);
-      }
-    };
-    fetchSubmission();
-  }, [session, id, leaderboardResp]);
-
-  // Auto-open ContestJoinModal after authentication redirect
-  useEffect(() => {
-    if (
-      session &&
-      contest &&
-      !userSubmission &&
-      contest.calculatedStatus === "active" &&
-      !hasAutoOpenedModal
-    ) {
-      // Check for action parameter in URL (fallback for older implementation)
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlAction = urlParams.get("action");
-
-      // Get action from redirect system (preferred method)
-      const redirectAction = getRedirectAction();
-
-      // Be more restrictive - only trigger if there's BOTH a redirect URL AND action
-      // This prevents triggering on normal page visits
-      const shouldOpenModal =
-        (hasRedirectUrl && hasRedirectAction) || urlAction === "join";
-      const actionToCheck = redirectAction || urlAction;
-
-      console.log("🔍 Auto-modal check:", {
-        hasSession: !!session,
-        hasContest: !!contest,
-        hasUserSubmission: !!userSubmission,
-        contestStatus: contest.calculatedStatus,
-        hasRedirectUrl,
-        hasRedirectAction,
-        urlAction,
-        redirectAction,
-        shouldOpenModal,
-        actionToCheck,
-        hasAutoOpenedModal,
-      });
-
-      if (shouldOpenModal && actionToCheck === "join") {
-        console.log("🎯 Opening join modal automatically");
-
-        // IMPORTANT: Clear redirect data IMMEDIATELY to prevent repeated triggers
-        clearRedirectUrl();
-
-        // Set flag to prevent repeated auto-opens
-        setHasAutoOpenedModal(true);
-
-        // Clean up the action parameter from URL if present
-        if (urlAction === "join") {
-          urlParams.delete("action");
-          const newUrl = urlParams.toString()
-            ? `${window.location.pathname}?${urlParams.toString()}`
-            : window.location.pathname;
-          window.history.replaceState({}, "", newUrl);
-        }
-
-        // Open the modal
-        setShowJoinModal(true);
-
-        // Show success toast for smoother UX
-        toast.success("Welcome! Let's get you set up to join this contest.", {
-          duration: 4000,
-          icon: "🎉",
-        });
-      }
-    }
-  }, [
-    session,
-    hasRedirectUrl,
-    hasRedirectAction,
-    getRedirectAction,
-    contest,
-    userSubmission,
-    clearRedirectUrl,
-    hasAutoOpenedModal,
-  ]);
-
-  // Handle video URL parameters for direct video access
-  useEffect(() => {
-    const videoId = searchParams.get("video");
-    if (videoId && participants.length > 0 && !viewVideo && !mobileVideo) {
-      const videoParticipant = participants.find((p) => p.id === videoId);
-      if (videoParticipant) {
-        const isMobile = window.innerWidth < 768;
-        if (isMobile && videoParticipant.video_url) {
-          setMobileVideo(videoParticipant);
-        } else {
-          setViewVideo(videoParticipant);
-        }
-      }
-    }
-  }, [searchParams, participants, viewVideo, mobileVideo]);
-
-  // Fallback mechanism - DISABLED to prevent annoying popup
-  // TODO: Re-enable after fixing the main auto-modal logic
-  /*
-  useEffect(() => {
-    if (session && contest && !userSubmission && !showJoinModal && contest.calculatedStatus === 'active') {
-      const redirectAction = getRedirectAction();
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlAction = urlParams.get('action');
-      
-      // If we have an action but modal didn't open, open it directly
-      if (redirectAction === 'join' || urlAction === 'join') {
-        const timer = setTimeout(() => {
-          if (!showJoinModal) {
-            console.log('🔄 Fallback: Opening join modal directly');
-            setShowJoinModal(true);
-            clearRedirectUrl(); // Clear to prevent repeated opens
-            
-            // Clean up the action parameter from URL if present
-            if (urlAction === 'join') {
-              urlParams.delete('action');
-              const newUrl = urlParams.toString() 
-                ? `${window.location.pathname}?${urlParams.toString()}`
-                : window.location.pathname;
-              window.history.replaceState({}, '', newUrl);
-            }
-            
-            toast.success('Welcome! Let\'s get you set up to join this contest.', {
-              duration: 4000,
-              icon: '🎉',
-            });
-          }
-        }, 500);
-        
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [session, contest, userSubmission, showJoinModal, getRedirectAction, clearRedirectUrl]);
-  */
-
-  const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: contest?.name || "Contest Details",
-        text: contest?.description || "Check out this contest!",
-        url: window.location.href,
-      });
+      if (error && error.code !== 'PGRST116') throw error;
+      setUserSubmission(data);
     } catch (error) {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Link copied to clipboard!");
+      console.error("Error fetching user submission:", error);
     }
   };
 
-  const handlePlayVideo = (video: Participant) => {
-    // Update URL with video parameter for shareable links
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set("video", video.id);
-    setSearchParams(newSearchParams);
-
-    // Check if we're on mobile and have a stored video
-    const isMobile = window.innerWidth < 768;
-
-    if (isMobile && video.video_url) {
-      // Mobile with stored video: Show full-screen modal directly
-      setMobileVideo(video);
-    } else {
-      // Desktop or TikTok iframe: Show regular modal with stats
-      setViewVideo(video);
-    }
-  };
-
-  const handleJoinCompetition = () => {
-    // Check if contest has ended
-    if (contest?.calculatedStatus === "ended") {
-      toast.error(
-        "This contest has ended and is no longer accepting participants."
-      );
-      return;
-    }
-
+  const handleJoinContest = () => {
     if (!session) {
-      // Show loading toast to indicate authentication is starting
-      toast.loading("Redirecting to sign in...", { duration: 2000 });
-
-      // Use the improved redirect system with action context
-      redirectToAuth("/signin", { action: "join" });
+      redirectToAuth("/signin");
       return;
     }
 
-    // Always show the ContestJoinModal - it handles TikTok connection internally
+    if (!isTikTokConnected) {
+      setShowTikTokModal(true);
+      return;
+    }
+
     setShowJoinModal(true);
   };
 
   const handleContestJoined = () => {
     setShowJoinModal(false);
+    fetchUserSubmission();
+    fetchLeaderboard();
     toast.success("Successfully joined contest!");
-    // refetch leaderboard after join
-    queryClient.invalidateQueries({ queryKey: ["leaderboard-public", id] });
-    // refresh user submission
-    setTimeout(async () => {
-      if (session && id) {
-        const { data } = await supa
-          .from("contest_links")
-          .select("*")
-          .eq("contest_id", id as string)
-          .eq("created_by", session.user.id)
-          .eq("is_contest_submission", true)
-          .single();
-        setUserSubmission(data);
-      }
-    }, 500);
   };
 
-  // TikTokSettingsModal handles its own success/failure states
-  // No need for handleTikTokConnected function
+  const handleVideoClick = (video: VideoData, index: number) => {
+    setSelectedVideo(video);
+    setCurrentVideoIndex(index);
+    
+    // Check if mobile
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      setShowMobileModal(true);
+    } else {
+      setShowViewModal(true);
+    }
+  };
 
   const handleCoverLoad = (videoId: string) => {
     setCoverLoaded(prev => ({
@@ -561,79 +308,8 @@ export function PublicLeaderboard() {
     }));
   };
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    
-    // Handle muting for TikTok videos
-    const tiktokIframe = document.querySelector('iframe[src*="tiktok.com"]') as HTMLIFrameElement;
-    if (tiktokIframe) {
-      tiktokIframe.contentWindow?.postMessage(
-        JSON.stringify({
-          action: isMuted ? 'unmute' : 'mute'
-        }),
-        '*'
-      );
-    }
-
-    // Handle muting for uploaded videos
-    const videoElement = document.querySelector('video') as HTMLVideoElement;
-    if (videoElement) {
-      videoElement.muted = !isMuted;
-    }
-  };
-
   const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
   const scrollNext = () => emblaApi && emblaApi.scrollNext();
-
-  const getRankIcon = (rank: number, isWinner: boolean) => {
-    if (!isWinner) {
-      return null;
-    }
-
-    const colors = {
-      1: "text-yellow-400",
-      2: "text-gray-400",
-      3: "text-amber-600",
-      4: "text-blue-400",
-      5: "text-green-400",
-    };
-
-    const color = colors[rank as keyof typeof colors] || "text-slate-400";
-
-    if (rank === 1) {
-      return (
-        <div className="relative">
-          <Crown className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
-        </div>
-      );
-    }
-
-    return (
-      <div className="relative">
-        <Crown className={`h-5 w-5 sm:h-6 sm:w-6 ${color}`} />
-      </div>
-    );
-  };
-
-  const getRankChangeIcon = (currentRank: number, previousRank?: number) => {
-    if (!previousRank) return <Minus className="h-4 w-4 text-gray-400" />;
-
-    if (currentRank < previousRank) {
-      return <ArrowUp className="h-4 w-4 text-green-500" />;
-    } else if (currentRank > previousRank) {
-      return <ArrowDown className="h-4 w-4 text-red-500" />;
-    }
-    return <Minus className="h-4 w-4 text-gray-400" />;
-  };
-
-  const getRankColor = (rank: number) => {
-    const colors = {
-      1: "text-yellow-400",
-      2: "text-gray-400",
-      3: "text-amber-600",
-    };
-    return colors[rank as keyof typeof colors] || "text-white";
-  };
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -645,68 +321,101 @@ export function PublicLeaderboard() {
     return num.toString();
   };
 
-  const getStatusBadge = () => {
-    if (!contest) return null;
-
-    const calculatedStatus = contest.calculatedStatus || "draft";
-    const statusColors = {
-      active: "bg-green-100 text-green-800 border-green-200",
-      ended: "bg-red-100 text-red-800 border-red-200",
-      draft: "bg-gray-100 text-gray-800 border-gray-200",
-      archived: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  const getRankIcon = (rank: number) => {
+    const colors = {
+      1: "text-yellow-400",
+      2: "text-gray-400", 
+      3: "text-amber-600",
+      4: "text-blue-400",
+      5: "text-green-400",
     };
 
-    const statusText = {
-      active: "Active",
-      ended: "Ended",
-      draft: "Draft",
-      archived: "Archived",
-    };
+    const color = colors[rank as keyof typeof colors] || "text-slate-400";
+
+    if (rank === 1) {
+      return (
+        <div className="relative">
+          <Crown className={`h-5 w-5 ${color}`} />
+          <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-yellow-300 animate-pulse" />
+        </div>
+      );
+    }
 
     return (
-      <div
-        className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-xs font-medium border min-h-[24px] ${
-          statusColors[calculatedStatus as keyof typeof statusColors]
-        }`}
-      >
-        {statusText[calculatedStatus as keyof typeof statusText]}
+      <div className="relative">
+        <Crown className={`h-5 w-5 ${color}`} />
       </div>
     );
   };
 
-  if (loading || contestLoading || leaderboardLoading || authLoading) {
+  const getRankChangeIcon = (currentRank: number, previousRank?: number) => {
+    if (!previousRank) return <Minus className="h-3 w-3 text-white/40" />;
+
+    if (currentRank < previousRank) {
+      return <ArrowUp className="h-3 w-3 text-green-500" />;
+    } else if (currentRank > previousRank) {
+      return <ArrowDown className="h-3 w-3 text-red-500" />;
+    }
+    return <Minus className="h-3 w-3 text-white/40" />;
+  };
+
+  const formatCurrency = (value: number) => {
+    const rounded = Math.round(value * 100) / 100;
+    if (rounded >= 1000) {
+      return formatNumber(rounded);
+    }
+    return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(1);
+  };
+
+  const formatRank = (rank: number) => {
+    const suffixes = ["st", "nd", "rd"];
+    return `${rank}${suffixes[rank - 1] || "th"}`;
+  };
+
+  const getRankColor = (rank: number) => {
+    const colors = {
+      1: "text-yellow-400",
+      2: "text-gray-400",
+      3: "text-amber-600",
+    };
+    return colors[rank as keyof typeof colors] || "text-white/60";
+  };
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    try {
+      await navigator.share({
+        title: contest?.name || "Contest",
+        text: contest?.description || "Check out this contest!",
+        url: shareUrl,
+      });
+    } catch (error) {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-white/60" />
-          <p className="mt-2 text-white/60">Loading contest...</p>
+          <div className="w-16 h-16 relative">
+            <div className="absolute inset-0 rounded-full border-2 border-white/20 animate-ping"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-t-white animate-spin"></div>
+          </div>
+          <p className="mt-6 text-white/60 font-light tracking-wider">LOADING</p>
         </div>
       </div>
     );
   }
 
-  if (showAuth) {
+  if (!contest) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] p-4">
-        <div className="max-w-md mx-auto">
-          <Auth isSignUp={isSignUp} setIsSignUp={setIsSignUp} />
-          <button
-            onClick={() => setShowAuth(false)}
-            className="mt-4 w-full text-center text-white/60 hover:text-white"
-          >
-            Back to Leaderboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (fetchError || !contest) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A] flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Contest Not Found</h1>
-          <p className="text-white/60 mb-6">{fetchError || "This contest doesn't exist or is no longer available."}</p>
+          <Trophy className="h-16 w-16 text-white/20 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">Contest Not Found</h2>
+          <p className="text-white/60 mb-6">This contest may have ended or been removed.</p>
           <Link
             to="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
@@ -719,823 +428,588 @@ export function PublicLeaderboard() {
     );
   }
 
+  const contestStatus = calculateContestStatus(contest);
+  const timeRemaining = getTimeRemaining(contest);
+
   return (
-    <>
-      <Helmet>
-        <title>{contest?.name || "Contest"} | Crown</title>
-        <meta
-          name="description"
-          content={
-            contest?.description ||
-            "Join Crown music leaderboard competitions. Get noticed, get rewarded."
-          }
-        />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta
-          property="og:title"
-          content={`${contest?.name || "Contest"} | Crown`}
-        />
-        <meta
-          property="og:description"
-          content={
-            contest?.description ||
-            "Join Crown music leaderboard competitions. Get noticed, get rewarded."
-          }
-        />
-        {contest?.cover_image && (
-          <meta property="og:image" content={contest.cover_image} />
+    <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
+      {/* Hero Section with Cover Image */}
+      <div className="relative">
+        {contest.cover_image && (
+          <div className="absolute inset-0 h-[60vh] sm:h-[70vh]">
+            <img
+              src={contest.cover_image}
+              alt={contest.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/90"></div>
+          </div>
         )}
-
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content={`${contest?.name || "Contest"} | Crown`}
-        />
-        <meta
-          name="twitter:description"
-          content={
-            contest?.description ||
-            "Join Crown music leaderboard competitions. Get noticed, get rewarded."
-          }
-        />
-        {contest?.cover_image && (
-          <meta name="twitter:image" content={contest.cover_image} />
-        )}
-      </Helmet>
-
-      <div className="min-h-screen bg-[#0A0A0A] bg-gradient-to-br from-[#0A0A0A] via-[#1A1A1A] to-[#2A2A2A]">
-        {/* Contest Header */}
-        <div className="relative">
-          {/* Logo */}
-          <div className="absolute top-0 left-0 right-0 z-10">
-            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
-              <Link to="/" className="flex items-center gap-2 sm:gap-3">
-                <Crown className="h-6 w-6 sm:h-8 sm:w-8 lg:h-10 lg:w-10 text-white drop-shadow-lg" />
-                <span className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight drop-shadow-lg">
-                  Crown
-                </span>
+        
+        <div className="relative z-10 h-[60vh] sm:h-[70vh] flex flex-col">
+          {/* Header */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4 w-full">
+            <div className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-3">
+                <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+                <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">Crown</span>
               </Link>
-            </div>
-          </div>
-
-          {contest?.cover_image ? (
-            <div className="relative h-[30vh] sm:h-[45vh] lg:h-[55vh] w-full">
-              <img
-                src={contest.cover_image}
-                alt={contest.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
-              {/* Title and Controls - Updated for better mobile display */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6">
-                <div className="max-w-7xl mx-auto">
-                  <div className="flex flex-col gap-2 sm:gap-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="space-y-2">
-                        <h1 className="text-lg xs:text-xl sm:text-3xl lg:text-4xl font-black text-white drop-shadow-sm line-clamp-2 pr-2">
-                          {contest?.name}
-                        </h1>
-                        {getStatusBadge()}
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-white/90 bg-black/40 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full backdrop-blur-sm">
-                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                          <span className="font-medium">{timeLeft}</span>
-                        </div>
-                        <button
-                          onClick={handleShare}
-                          className="p-2 sm:p-2 rounded-full bg-black/40 hover:bg-black/50 text-white/90 backdrop-blur-sm transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
-                          title="Share contest"
-                        >
-                          <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            // Fallback header when no cover image
-            <div className="relative bg-gradient-to-br from-[#1A1A1A] to-[#2A2A2A] border-b border-white/10">
-              <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-6 sm:pb-8">
-                <div className="flex flex-col gap-3 sm:gap-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-                    <div className="space-y-2 sm:space-y-3">
-                      <h1 className="text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-black text-white line-clamp-2 pr-2">
-                        {contest?.name}
-                      </h1>
-                      {getStatusBadge()}
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <div className="flex items-center gap-1.5 text-xs sm:text-sm text-white/90 bg-white/10 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full backdrop-blur-sm">
-                        <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                        <span className="font-medium">{timeLeft}</span>
-                      </div>
-                      <button
-                        onClick={handleShare}
-                        className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/90 backdrop-blur-sm transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
-                        title="Share contest"
-                      >
-                        <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-6 space-y-3 sm:space-y-6 pb-20 sm:pb-32">
-          {/* Contest Info */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
-            <div className="space-y-2 sm:space-y-4">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">
-                  About this Contest
-                </h3>
-                <div className="max-h-[25vh] sm:max-h-none overflow-y-auto">
-                  <p
-                    className={`text-sm sm:text-base text-white/80 leading-relaxed ${
-                      !showFullDescription && "line-clamp-4 sm:line-clamp-3"
-                    }`}
-                  >
-                    {contest.description}
-                  </p>
-                </div>
-                {contest.description.length > 150 && (
+              
+              {session ? (
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="text-white hover:text-white/90 text-sm mt-2 font-medium min-h-[44px] flex items-center"
+                    onClick={() => setShowTikTokSettings(true)}
+                    className="flex items-center justify-center px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
                   >
-                    {showFullDescription ? "Show less" : "Read more"}
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden sm:inline ml-2">TikTok</span>
                   </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Resources Section */}
-          {contest.resources && contest.resources.length > 0 && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
-              <div className="flex items-center gap-2 mb-2 sm:mb-4">
-                <LinkIcon className="h-4 w-4 text-white" />
-                <h2 className="text-base sm:text-lg font-semibold text-white">
-                  Helpful Resources
-                </h2>
-              </div>
-
-              <div className="max-h-[25vh] sm:max-h-none overflow-y-auto">
-                <div className="grid gap-2 sm:gap-3">
-                  {contest.resources.map((resource, index) => (
-                    <div
-                      key={index}
-                      className="group bg-white/5 rounded-lg p-2.5 sm:p-4 hover:bg-white/10 transition-colors"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1 mb-1">
-                            {resource.title}
-                          </h3>
-                          {resource.description && (
-                            <p className="text-xs sm:text-sm text-white/60 line-clamp-1 sm:line-clamp-2">
-                              {resource.description}
-                            </p>
-                          )}
-                        </div>
-                        <a
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-shrink-0 p-2 rounded-full text-white/60 hover:text-white transition-colors hover:bg-white/10 min-w-[40px] min-h-[40px] flex items-center justify-center"
-                        >
-                          <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Prize Distribution */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-3 sm:p-6">
-            <div className="flex items-center justify-between mb-2 sm:mb-4">
-              <div className="flex items-center gap-2">
-                <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-                <h2 className="text-base sm:text-lg font-semibold text-white">
-                  {contest.prize_tier === "monetary" ? "Prize Pool" : "Prizes"}
-                </h2>
-              </div>
-              <div className="text-xs sm:text-sm text-white/60">
-                {contest.prize_titles.length} Winners
-              </div>
-            </div>
-
-            <div className="max-h-[30vh] sm:max-h-none overflow-y-auto">
-              <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
-                {contest.prize_titles.map((prize, index) => (
-                  <button
-                    key={index}
-                    onClick={() =>
-                      setSelectedPrize({
-                        rank: index + 1,
-                        prize:
-                          contest.prize_tier === "monetary"
-                            ? contest.prize_per_winner * (1 - index * 0.2)
-                            : prize.title,
-                      })
-                    }
-                    className="p-3 rounded-lg border snap-center flex-shrink-0 w-[280px] bg-black/20 border-white/10 transition-all hover:bg-white/5"
-                  >
-                    <div className="flex items-center justify-center gap-0.5 sm:gap-1.5 mb-0.5 sm:mb-1.5">
-                      {getRankIcon(index + 1, true)}
-                      <span
-                        className={`text-xs sm:text-sm font-medium ${getRankColor(
-                          index + 1
-                        )}`}
-                      >
-                        {index + 1}
-                        {index === 0
-                          ? "st"
-                          : index === 1
-                          ? "nd"
-                          : index === 2
-                          ? "rd"
-                          : "th"}
-                      </span>
-                    </div>
-                    <div className="text-sm font-medium leading-tight text-white text-center">
-                      {contest.prize_tier === "monetary"
-                        ? `$${formatNumber(
-                            contest.prize_per_winner * (1 - index * 0.2)
-                          )}`
-                        : prize.title}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Featured Submissions Section */}
-          <div className="mb-8">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2 mt-8 sm:mt-12">
-                Featured Submissions
-              </h2>
-              <p className="text-white/60 text-sm sm:text-base">
-                Watch the top contest entries from talented creators
-              </p>
-            </div>
-
-          {/* Video Carousel */}
-          {participants.length > 0 && (
-            <div className="mb-8">
-              <div className="relative max-w-7xl mx-auto w-full">
-                <div className="overflow-hidden w-full" ref={emblaRef}>
-                  <div className="flex">
-                    {participants.slice(0, 10).map((entry, index) => {
-                      const isSelected = index === selectedVideoIndex;
-                      const scale = isSelected ? 1 : 0.85;
-                      const opacity = isSelected ? 1 : 0.3;
-
-                      return (
-                        <div 
-                          key={entry.id}
-                          className="flex-[0_0_100%] min-w-0 px-2 md:flex-[0_0_33.333%] lg:flex-[0_0_25%] flex items-center justify-center"
-                        >
-                          <div 
-                            className="relative transition-all duration-300 ease-out group will-change-transform"
-                            style={{
-                              transform: `scale(${scale})`,
-                              opacity,
-                              width: '280px',
-                              maxWidth: '100%'
-                            }}
-                          >
-                            <div 
-                              className="relative bg-black rounded-2xl overflow-hidden"
-                              style={{ aspectRatio: '9/16' }}
-                            >
-                              {/* Loading Placeholder */}
-                              {!coverLoaded[entry.id] && (
-                                <div className="absolute inset-0 bg-black flex items-center justify-center">
-                                  <Loader2 className="h-6 w-6 animate-spin text-white/60" />
-                                </div>
-                              )}
-
-                              {/* Thumbnail */}
-                              <img
-                                src={entry.thumbnail || 'https://images.pexels.com/photos/7500307/pexels-photo-7500307.jpeg'}
-                                alt={entry.title}
-                                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-                                  isSelected && videoLoaded[entry.id] ? 'opacity-0' : 'opacity-100'
-                                }`}
-                                loading={isSelected ? 'eager' : 'lazy'}
-                                onLoad={() => handleCoverLoad(entry.id)}
-                              />
-
-                              {/* Video Content */}
-                              {isSelected && (
-                                <div className="absolute inset-0">
-                                  {entry.video_url ? (
-                                    <video
-                                      src={entry.video_url}
-                                      className={`w-full h-full object-cover rounded-2xl transition-opacity duration-700 ${
-                                        videoLoaded[entry.id] ? 'opacity-100' : 'opacity-0'
-                                      }`}
-                                      autoPlay
-                                      loop
-                                      muted={isMuted}
-                                      playsInline
-                                      controls={false}
-                                      onLoadedData={() => handleVideoLoad(entry.id)}
-                                    />
-                                  ) : (
-                                    <iframe
-                                      src={`https://www.tiktok.com/embed/v2/${entry.tiktok_video_id}`}
-                                      allow="encrypted-media; fullscreen"
-                                      scrolling="no"
-                                      frameBorder="0"
-                                      className="absolute inset-0 w-full h-full"
-                                      onLoad={() => handleVideoLoad(entry.id)}
-                                    />
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Gradient Overlay */}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
-
-                              {/* Video Info */}
-                              <div className="absolute bottom-0 left-0 right-0 p-4">
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <div className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                      entry.rank === 1 ? 'bg-yellow-400/20 text-yellow-400' :
-                                      entry.rank === 2 ? 'bg-gray-300/20 text-gray-300' :
-                                      entry.rank === 3 ? 'bg-amber-600/20 text-amber-600' :
-                                      'bg-white/20 text-white'
-                                    }`}>
-                                      #{entry.rank}
-                                    </div>
-                                  </div>
-                                  <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1">
-                                    {entry.title}
-                                  </h3>
-                                  <div className="flex items-center gap-2 text-xs sm:text-sm text-white/60">
-                                    <span>@{entry.tiktok_display_name || entry.username}</span>
-                                    <span>•</span>
-                                    <span>{formatNumber(entry.views)} views</span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Mute Button */}
-                              {isSelected && (
-                                <button
-                                  onClick={toggleMute}
-                                  className="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/60 transition-colors"
-                                >
-                                  {isMuted ? (
-                                    <VolumeX className="h-4 w-4" />
-                                  ) : (
-                                    <Volume2 className="h-4 w-4" />
-                                  )}
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Navigation Arrows */}
-                {participants.length > 1 && (
-                  <>
-                    <button
-                      onClick={scrollPrev}
-                      className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
-                    >
-                      <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-                    </button>
-
-                    <button
-                      onClick={scrollNext}
-                      className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
-                    >
-                      <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-          {/* Leaderboard */}
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-            <div className="px-3 sm:px-6 py-2 sm:py-4 border-b border-white/10">
-              <h2 className="text-base sm:text-lg font-semibold text-white">
-                Current Rankings
-              </h2>
-            </div>
-
-            {/* Mobile View */}
-            <div className="sm:hidden">
-              <div className="max-h-[30vh] sm:max-h-[50vh] overflow-y-auto divide-y divide-white/10">
-                {participants.map((participant) => (
-                  <div key={participant.id} className="p-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <div className="flex flex-col items-center gap-0.5 min-w-[28px]">
-                        <div className="flex items-center gap-0.5">
-                          <div
-                            className={`text-xs font-bold ${getRankColor(
-                              participant.rank
-                            )}`}
-                          >
-                            #{participant.rank}
-                          </div>
-                          <div className="scale-75">
-                            {getRankIcon(
-                              participant.rank,
-                              participant.rank <= (contest.num_winners || 3)
-                            )}
-                          </div>
-                        </div>
-                        <div className="scale-[0.6]">
-                          {getRankChangeIcon(
-                            participant.rank,
-                            participant.previousRank
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Avatar */}
-                      {participant.avatar_url ? (
-                        <img
-                          src={participant.avatar_url}
-                          alt={`${participant.username} profile`}
-                          className="w-6 h-6 rounded-full object-cover border border-white/10 flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                          <span className="text-white text-xs font-medium">
-                            {participant.tiktok_display_name?.charAt(0) ||
-                              participant.username?.charAt(0) ||
-                              "U"}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Main Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <div className="min-w-0 flex-1">
-                            <div className="font-medium text-white text-xs truncate leading-none mb-0.5">
-                              {participant.tiktok_display_name ||
-                                participant.username}
-                            </div>
-                            <div className="text-xs text-white/60 leading-none">
-                              {formatNumber(participant.views)} views
-                            </div>
-                          </div>
-
-                          {/* Video Thumbnail with Play Button */}
-                          {participant.thumbnail && (
-                            <div
-                              className="relative flex-shrink-0 cursor-pointer ml-2"
-                              onClick={() => handlePlayVideo(participant)}
-                              title="Play video"
-                            >
-                              <img
-                                src={participant.thumbnail}
-                                alt={`${participant.username} video thumbnail`}
-                                className="w-16 h-16 object-cover rounded-lg"
-                                loading="lazy"
-                                decoding="async"
-                                onLoad={(e) => {
-                                  const overlay = e.currentTarget.nextElementSibling as HTMLElement;
-                                  if (overlay) overlay.style.opacity = '0';
-                                }}
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100"
-                                   style={{ transition: 'opacity 0.3s ease' }}>
-                                <Play className="h-3 w-3 text-white drop-shadow-lg" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Desktop View */}
-            <div className="hidden sm:block">
-              <div className="grid grid-cols-10 gap-4 px-6 py-3 bg-white/5 text-sm font-medium text-white/60">
-                <div className="col-span-1">Rank</div>
-                <div className="col-span-6">Participant</div>
-                <div className="col-span-2 text-right">Views</div>
-                <div className="col-span-1 text-center">Preview</div>
-              </div>
-
-              <div className="divide-y divide-white/10">
-                {participants.map((participant) => (
-                  <div
-                    key={participant.id}
-                    className="grid grid-cols-10 gap-4 px-6 py-4 items-center hover:bg-white/5"
-                  >
-                    <div className="col-span-1 flex items-center gap-2">
-                      {getRankIcon(
-                        participant.rank,
-                        participant.rank <= (contest.num_winners || 3)
-                      )}
-                      <span
-                        className={`text-sm font-medium ${getRankColor(
-                          participant.rank
-                        )}`}
-                      >
-                        #{participant.rank}
-                      </span>
-                      {getRankChangeIcon(
-                        participant.rank,
-                        participant.previousRank
-                      )}
-                    </div>
-                    <div className="col-span-6 flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        {/* Profile Avatar */}
-                        {participant.avatar_url ? (
-                          <img
-                            src={participant.avatar_url}
-                            alt={`${participant.username} profile`}
-                            className="w-10 h-10 rounded-full object-cover border border-white/10 flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center border border-white/10 flex-shrink-0">
-                            <span className="text-white text-sm font-medium">
-                              {participant.tiktok_display_name?.charAt(0) ||
-                                participant.username?.charAt(0) ||
-                                "U"}
-                            </span>
-                          </div>
-                        )}
-                        {/* Video Thumbnail with Play Button */}
-                        {participant.thumbnail && (
-                          <div
-                            className="relative flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-white/20 rounded-lg transition-all"
-                            onClick={() => handlePlayVideo(participant)}
-                            title="Play video"
-                          >
-                            <img
-                              src={participant.thumbnail}
-                              alt={`${participant.username} video thumbnail`}
-                              className="w-10 h-10 rounded-lg object-cover border border-white/10"
-                            />
-                            {/* Play icon overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 hover:bg-black/50 rounded-lg transition-all opacity-80 hover:opacity-100">
-                              <Play className="h-4 w-4 text-white drop-shadow-lg" />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-medium text-white truncate">
-                          {participant.tiktok_display_name ||
-                            participant.username}
-                        </div>
-                        <div className="text-sm text-white/60 line-clamp-1">
-                          @{participant.username}
-                        </div>
-                        {participant.title && (
-                          <div className="text-xs text-white/40 line-clamp-1">
-                            {participant.title}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="col-span-2 text-right font-medium text-white">
-                      {formatNumber(participant.views)}
-                    </div>
-                    <div className="col-span-1 flex justify-center">
-                      {participant.thumbnail ? (
-                        <div
-                          className="relative cursor-pointer hover:ring-1 hover:ring-white/30 rounded transition-all"
-                          onClick={() => handlePlayVideo(participant)}
-                          title="Play video"
-                        >
-                          <img
-                            src={participant.thumbnail}
-                            alt="Video preview"
-                            className="w-6 h-6 rounded object-cover opacity-60 hover:opacity-80"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Play className="h-2 w-2 text-white/80 drop-shadow" />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-white/30 text-xs">No preview</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Join Competition Button */}
-        {contest.status === "active" && (
-          <div className="fixed bottom-0 left-0 right-0 py-2 px-3 sm:py-2 sm:px-4 bg-black/95 backdrop-blur-lg border-t border-white/10 pb-safe-area-inset-bottom">
-            <div className="max-w-6xl mx-auto flex justify-center">
-              {userSubmission ? (
-                <div className="flex gap-2 sm:gap-4 w-full max-w-md">
-                  <div className="flex gap-2 sm:gap-3 w-full">
-                    <div className="flex-1">
-                      <button
-                        onClick={() =>
-                          navigate(`/contest-management/${id}`)
-                        }
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white/10 text-white font-medium rounded-lg hover:bg-white/20 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
-                      >
-                        <Settings className="h-4 w-4" />
-                        <span className="hidden xs:inline">Manage</span>
-                        <span className="xs:hidden">Edit</span>
-                      </button>
-                    </div>
-                    <div className="flex-1">
-                      <button
-                        onClick={() => navigate(`/share/${id}`)}
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 bg-white text-black font-medium rounded-lg hover:bg-white/90 transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base"
-                      >
-                        <Share2 className="h-4 w-4" />
-                        <span>Share</span>
-                      </button>
-                    </div>
-                  </div>
                 </div>
               ) : (
-                <div className="w-full">
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={handleJoinCompetition}
-                    disabled={contest?.calculatedStatus === "ended"}
-                    className={`w-full font-semibold py-3 sm:py-3 rounded-lg transition-colors min-h-[48px] text-sm sm:text-base flex items-center justify-center gap-1.5 ${
-                      contest?.calculatedStatus === "ended"
-                        ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                        : "bg-white text-black hover:bg-white/90"
-                    }`}
+                    onClick={() => redirectToAuth("/signin")}
+                    className="px-3 sm:px-6 py-2 text-white hover:bg-white/5 rounded-xl transition-colors whitespace-nowrap text-sm sm:text-base"
                   >
-                    <UserPlus className="h-4 w-4" />
-                    {contest?.calculatedStatus === "ended" ? (
-                      "Contest Ended"
-                    ) : (
-                      <>
-                        <span className="hidden xs:inline">Join Contest</span>
-                        <span className="xs:hidden">Join</span>
-                      </>
-                    )}
+                    Login
+                  </button>
+                  <button
+                    onClick={() => redirectToAuth("/signup")}
+                    className="bg-white text-[#1A1A1A] px-3 sm:px-6 py-2 rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-sm sm:text-base font-medium"
+                  >
+                    Sign Up
                   </button>
                 </div>
               )}
             </div>
-            {session && !userSubmission && (
-              <div className="max-w-6xl mx-auto mt-2 flex justify-center">
-                <button
-                  onClick={handleJoinCompetition}
-                  disabled={contest?.calculatedStatus === "ended"}
-                  className={`w-full max-w-md font-semibold py-2.5 sm:py-2.5 rounded-lg transition-colors flex items-center justify-center gap-1.5 min-h-[48px] text-sm sm:text-base ${
-                    contest?.calculatedStatus === "ended"
-                      ? "bg-gray-400 text-gray-600 cursor-not-allowed"
-                      : "bg-white text-black hover:bg-white/90"
-                  }`}
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {contest?.calculatedStatus === "ended" ? (
-                    "Contest Ended"
-                  ) : (
-                    <>
-                      <span className="hidden xs:inline">Join Contest</span>
-                      <span className="xs:hidden">Join</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
           </div>
-        )}
 
-        {/* Prize Modal */}
-        {selectedPrize && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50">
-            <div className="bg-[#1A1A1A] rounded-xl border border-white/10 shadow-xl max-w-sm w-full mx-2">
-              <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {getRankIcon(selectedPrize.rank, true)}
-                  <h3 className="text-base sm:text-lg font-semibold text-white">
-                    {selectedPrize.rank}
-                    {selectedPrize.rank === 1
-                      ? "st"
-                      : selectedPrize.rank === 2
-                      ? "nd"
-                      : selectedPrize.rank === 3
-                      ? "rd"
-                      : "th"}{" "}
-                    Place
-                  </h3>
+          {/* Contest Info */}
+          <div className="flex-1 flex items-center justify-center">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <div className="mb-6">
+                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-sm border mb-4 ${getStatusColor(contestStatus)}`}>
+                  <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium">{getStatusLabel(contestStatus)}</span>
                 </div>
-                <button
-                  onClick={() => setSelectedPrize(null)}
-                  className="p-2 hover:bg-white/10 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-                >
-                  <X className="h-5 w-5 text-white/60" />
-                </button>
+                
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight">
+                  {contest.name}
+                </h1>
+                
+                <p className="text-lg sm:text-xl text-white/80 mb-6 max-w-2xl mx-auto leading-relaxed">
+                  {contest.description}
+                </p>
+
+                {timeRemaining && (
+                  <div className="mb-8">
+                    <ContestCountdown contest={contest} className="justify-center text-lg" />
+                  </div>
+                )}
               </div>
-              <div className="p-4">
-                <div className="text-center">
-                  {contest.prize_tier === "monetary" ? (
-                    <div className="text-xl sm:text-2xl font-bold text-white">
-                      ${formatNumber(selectedPrize.prize as number)}
-                    </div>
-                  ) : (
-                    <div className="text-lg font-medium text-white">
-                      {selectedPrize.prize}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="p-4 border-t border-white/10 bg-white/5">
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                {session && userSubmission ? (
+                  <button
+                    onClick={() => navigate(`/contest-management/${contest.id}`)}
+                    className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-xl hover:bg-white/90 transition-all font-medium text-lg flex items-center justify-center gap-2"
+                  >
+                    <Settings className="h-5 w-5" />
+                    Manage Entry
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleJoinContest}
+                    className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-xl hover:bg-white/90 transition-all font-medium text-lg flex items-center justify-center gap-2"
+                  >
+                    <Trophy className="h-5 w-5" />
+                    {session ? "Join Contest" : "Sign Up to Join"}
+                  </button>
+                )}
+                
                 <button
-                  onClick={() => setSelectedPrize(null)}
-                  className="w-full px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                  onClick={handleShare}
+                  className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl transition-all font-medium text-lg flex items-center justify-center gap-2"
                 >
-                  Close
+                  <Share2 className="h-5 w-5" />
+                  Share Contest
                 </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      </div>
 
-        {/* Modals */}
-        <TikTokSettingsModal
-          isOpen={showTikTokModal}
-          onClose={() => setShowTikTokModal(false)}
-        />
+      {/* Prize Distribution Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 flex items-center justify-center gap-3">
+            <Trophy className="h-8 w-8 text-yellow-400" />
+            Prize Distribution
+          </h2>
+          <p className="text-white/60">
+            {contest.num_winners || contest.prize_titles?.length || 3} winners will be selected
+          </p>
+        </div>
 
-        <TikTokSettingsModal
-          isOpen={showTikTokSettings}
-          onClose={() => setShowTikTokSettings(false)}
-        />
+        {/* Horizontal Prize Scroll */}
+        <div className="relative">
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+            {(contest.prize_titles || [
+              { rank: 1, title: "First Place" },
+              { rank: 2, title: "Second Place" },
+              { rank: 3, title: "Third Place" },
+            ])
+              .slice(0, contest.num_winners || contest.prize_titles?.length || 3)
+              .map((prize: any, index: number) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300"
+                >
+                  <div className="text-center">
+                    <div className="flex items-center justify-center mb-4">
+                      {getRankIcon(index + 1)}
+                    </div>
+                    <div className={`text-2xl font-bold mb-2 ${getRankColor(index + 1)}`}>
+                      {formatRank(index + 1)} Place
+                    </div>
+                    <div className="text-lg font-medium text-white mb-2">
+                      {contest.prize_per_winner
+                        ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                        : prize.title}
+                    </div>
+                    <div className="text-sm text-white/60">
+                      {contest.prize_per_winner ? "Cash Prize" : "Achievement Title"}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
 
-        {contest && (
-          <ContestJoinModal
-            isOpen={showJoinModal}
-            onClose={() => setShowJoinModal(false)}
-            contest={contest as any}
-            onSuccess={handleContestJoined}
-          />
-        )}
+      {/* Featured Submissions Video Player */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-8 sm:mt-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 flex items-center justify-center gap-3">
+            <Play className="h-8 w-8 text-blue-400" />
+            Featured Submissions
+          </h2>
+          <p className="text-white/60">
+            Watch the top performing entries in this contest
+          </p>
+        </div>
 
-        {viewVideo && (
-          <ViewSubmissionModal
-            isOpen={!!viewVideo}
-            onClose={() => {
-              setViewVideo(null);
-              // Remove video parameter from URL when closing
-              const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.delete("video");
-              setSearchParams(newSearchParams);
-            }}
-            video={viewVideo}
-          />
-        )}
+        {featuredVideos.length > 0 ? (
+          <div className="relative max-w-7xl mx-auto w-full">
+            <div className="overflow-hidden w-full" ref={emblaRef}>
+              <div className="flex">
+                {featuredVideos.map((video, index) => {
+                  const isSelected = index === currentVideoIndex;
+                  const scale = isSelected ? 1 : 0.85;
+                  const opacity = isSelected ? 1 : 0.3;
 
-        {/* Mobile full-screen video modal */}
-        {mobileVideo && (
-          <MobileVideoModal
-            isOpen={!!mobileVideo}
-            onClose={() => {
-              setMobileVideo(null);
-              // Remove video parameter from URL when closing
-              const newSearchParams = new URLSearchParams(searchParams);
-              newSearchParams.delete("video");
-              setSearchParams(newSearchParams);
-            }}
-            video={mobileVideo}
-          />
+                  return (
+                    <div 
+                      key={video.id}
+                      className="flex-[0_0_100%] min-w-0 px-2 md:flex-[0_0_33.333%] lg:flex-[0_0_25%] flex items-center justify-center"
+                    >
+                      <div 
+                        className="relative transition-all duration-300 ease-out group will-change-transform cursor-pointer"
+                        style={{
+                          transform: `scale(${scale})`,
+                          opacity,
+                          width: '280px',
+                          maxWidth: '100%'
+                        }}
+                        onClick={() => handleVideoClick(video, index)}
+                      >
+                        <div 
+                          className="relative bg-black rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all"
+                          style={{ aspectRatio: '9/16' }}
+                        >
+                          {/* Loading Placeholder */}
+                          {!coverLoaded[video.id] && (
+                            <div className="absolute inset-0 bg-black flex items-center justify-center">
+                              <Loader2 className="h-6 w-6 animate-spin text-white/60" />
+                            </div>
+                          )}
+
+                          {/* Thumbnail */}
+                          <img
+                            src={video.thumbnail}
+                            alt={video.title}
+                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+                              isSelected && videoLoaded[video.id] ? 'opacity-0' : 'opacity-100'
+                            }`}
+                            loading={isSelected ? 'eager' : 'lazy'}
+                            onLoad={() => handleCoverLoad(video.id)}
+                          />
+
+                          {/* Video Content */}
+                          {isSelected && (
+                            <div className="absolute inset-0">
+                              {video.video_url ? (
+                                <video
+                                  src={video.video_url}
+                                  className={`w-full h-full object-cover rounded-2xl transition-opacity duration-700 ${
+                                    videoLoaded[video.id] ? 'opacity-100' : 'opacity-0'
+                                  }`}
+                                  autoPlay
+                                  loop
+                                  muted={isMuted}
+                                  playsInline
+                                  controls={false}
+                                  onLoadedData={() => handleVideoLoad(video.id)}
+                                />
+                              ) : null}
+                            </div>
+                          )}
+
+                          {/* Gradient Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+
+                          {/* Rank Badge */}
+                          {video.rank && (
+                            <div className="absolute top-4 left-4">
+                              <div className={`px-3 py-1 rounded-full text-sm font-bold backdrop-blur-sm border ${
+                                video.rank === 1 ? 'bg-yellow-400/20 text-yellow-400 border-yellow-400/30' :
+                                video.rank === 2 ? 'bg-gray-300/20 text-gray-300 border-gray-300/30' :
+                                video.rank === 3 ? 'bg-amber-600/20 text-amber-600 border-amber-600/30' :
+                                video.rank <= 10 ? 'bg-blue-400/20 text-blue-400 border-blue-400/30' :
+                                'bg-white/20 text-white border-white/30'
+                              }`}>
+                                #{video.rank}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Video Info */}
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <div className="space-y-2">
+                              <h3 className="text-sm sm:text-base font-medium text-white line-clamp-1">
+                                {video.title}
+                              </h3>
+                              <div className="flex items-center gap-2 text-xs sm:text-sm text-white/60">
+                                <span>@{video.username}</span>
+                                <span>•</span>
+                                <span>{formatNumber(video.views || 0)} views</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Mute Button */}
+                          {isSelected && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMuted(!isMuted);
+                              }}
+                              className="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full text-white hover:bg-black/60 transition-colors"
+                            >
+                              {isMuted ? (
+                                <VolumeX className="h-4 w-4" />
+                              ) : (
+                                <Volume2 className="h-4 w-4" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Navigation Arrows */}
+            {featuredVideos.length > 1 && (
+              <>
+                <button
+                  onClick={scrollPrev}
+                  className="absolute left-2 sm:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
+                >
+                  <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+                </button>
+
+                <button
+                  onClick={scrollNext}
+                  className="absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors z-30"
+                >
+                  <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+                </button>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <Music className="h-16 w-16 text-white/20 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">No Submissions Yet</h3>
+            <p className="text-white/60">Be the first to submit your entry!</p>
+          </div>
         )}
       </div>
-    </>
+
+      {/* Contest Stats */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+            <Users className="h-8 w-8 text-blue-400 mx-auto mb-3" />
+            <div className="text-2xl font-bold text-white">{participants.length}</div>
+            <div className="text-sm text-white/60">Participants</div>
+          </div>
+          
+          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+            <Trophy className="h-8 w-8 text-yellow-400 mx-auto mb-3" />
+            <div className="text-2xl font-bold text-white">{contest.num_winners || 3}</div>
+            <div className="text-sm text-white/60">Winners</div>
+          </div>
+          
+          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+            <Music className="h-8 w-8 text-purple-400 mx-auto mb-3" />
+            <div className="text-lg font-bold text-white">{contest.music_category || "All"}</div>
+            <div className="text-sm text-white/60">Category</div>
+          </div>
+          
+          <div className="text-center p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+            <Gift className="h-8 w-8 text-green-400 mx-auto mb-3" />
+            <div className="text-lg font-bold text-white">
+              {contest.prize_per_winner ? `$${formatCurrency(contest.prize_per_winner)}` : "Titles"}
+            </div>
+            <div className="text-sm text-white/60">Prize Type</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Leaderboard */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-4 flex items-center justify-center gap-3">
+            <TrendingUp className="h-8 w-8 text-green-400" />
+            Live Leaderboard
+          </h2>
+          <p className="text-white/60">
+            Rankings update in real-time based on video performance
+          </p>
+        </div>
+
+        {participants.length > 0 ? (
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+            {/* Mobile View */}
+            <div className="block sm:hidden divide-y divide-white/10">
+              {participants.slice(0, 50).map((participant) => (
+                <div key={participant.video_id} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-bold text-lg ${getRankColor(participant.rank)}`}>
+                          #{participant.rank}
+                        </span>
+                        {getRankIcon(participant.rank)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-white truncate">
+                          @{participant.tiktok_username}
+                        </div>
+                        <div className="text-sm text-white/60">
+                          {formatNumber(participant.views)} views
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs text-white/40">
+                        {formatNumber(participant.likes)} ♥
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop View */}
+            <div className="hidden sm:block">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/10 bg-white/5">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                      Rank
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                      Participant
+                    </th>
+                    <th className="px-6 py-4 text-right text-xs font-medium text-white/60 uppercase tracking-wider">
+                      Views
+                    </th>
+                    <th className="px-6 py-4 text-right text-xs font-medium text-white/60 uppercase tracking-wider">
+                      Engagement
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {participants.slice(0, 50).map((participant) => (
+                    <tr key={participant.video_id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          {getRankIcon(participant.rank)}
+                          <span className={`font-bold text-lg ${getRankColor(participant.rank)}`}>
+                            #{participant.rank}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <span className="text-white text-sm font-medium">
+                              {participant.tiktok_display_name?.charAt(0) || participant.tiktok_username?.charAt(0) || 'U'}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="font-medium text-white">
+                              {participant.tiktok_display_name || participant.tiktok_username}
+                            </div>
+                            <div className="text-sm text-white/60">
+                              @{participant.tiktok_username}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="text-lg font-bold text-white">
+                          {formatNumber(participant.views)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-4 text-sm text-white/60">
+                          <div className="flex items-center gap-1">
+                            <Heart className="h-4 w-4 text-red-400" />
+                            <span>{formatNumber(participant.likes)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MessageCircle className="h-4 w-4 text-blue-400" />
+                            <span>{formatNumber(participant.comments)}</span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+            <Target className="h-16 w-16 text-white/20 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">No Participants Yet</h3>
+            <p className="text-white/60 mb-6">Be the first to join this contest!</p>
+            <button
+              onClick={handleJoinContest}
+              className="px-6 py-3 bg-white text-black rounded-lg hover:bg-white/90 transition-colors font-medium"
+            >
+              Join Contest
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Contest Details */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Guidelines */}
+          {contest.guidelines && (
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <CheckCircle className="h-6 w-6 text-green-400" />
+                Guidelines
+              </h3>
+              <p className="text-white/80 leading-relaxed">{contest.guidelines}</p>
+            </div>
+          )}
+
+          {/* Rules */}
+          {contest.rules && (
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <AlertCircle className="h-6 w-6 text-blue-400" />
+                Rules
+              </h3>
+              <p className="text-white/80 leading-relaxed">{contest.rules}</p>
+            </div>
+          )}
+
+          {/* Hashtags */}
+          {contest.hashtags && contest.hashtags.length > 0 && (
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 md:col-span-2">
+              <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <Zap className="h-6 w-6 text-purple-400" />
+                Required Hashtags
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {contest.hashtags.map((hashtag, index) => (
+                  <span
+                    key={index}
+                    className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium border border-blue-500/30"
+                  >
+                    #{hashtag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-white/10">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div className="flex items-center gap-2">
+            <Crown className="h-6 w-6 text-white/40" />
+            <span className="text-white/40 font-light tracking-wider">CROWN</span>
+          </div>
+          <div className="flex items-center gap-4 text-sm">
+            <Link to="/terms" className="text-white/60 hover:text-white transition-colors">
+              Terms of Service
+            </Link>
+            <span className="text-white/20">•</span>
+            <Link to="/privacy" className="text-white/60 hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+          </div>
+          <p className="text-white/40 text-xs text-center">
+            © {new Date().getFullYear()} Crown. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
+      {/* Modals */}
+      <TikTokSettingsModal
+        isOpen={showTikTokModal}
+        onClose={() => setShowTikTokModal(false)}
+      />
+
+      <TikTokSettingsModal
+        isOpen={showTikTokSettings}
+        onClose={() => setShowTikTokSettings(false)}
+      />
+
+      <ContestJoinModal
+        isOpen={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+        contest={contest}
+        onSuccess={handleContestJoined}
+      />
+
+      <ViewSubmissionModal
+        isOpen={showViewModal}
+        onClose={() => setShowViewModal(false)}
+        video={selectedVideo}
+      />
+
+      <MobileVideoModal
+        isOpen={showMobileModal}
+        onClose={() => setShowMobileModal(false)}
+        video={selectedVideo}
+      />
+    </div>
   );
 }
