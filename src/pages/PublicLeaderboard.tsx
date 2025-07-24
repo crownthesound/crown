@@ -704,8 +704,10 @@ export function PublicLeaderboard() {
 
   if (fetchError || !contest) {
     return (
-            <Home className="h-4 w-4" />
-            <span>Return Home</span>
+      <>
+        <Home className="h-4 w-4" />
+        <span>Return Home</span>
+      </>
           </Link>
         </div>
       </div>
