@@ -469,13 +469,13 @@ export function PublicLeaderboard() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => redirectToAuth("/signin")}
-                    className="px-2 sm:px-6 py-1.5 sm:py-2 text-white hover:bg-white/5 rounded-lg sm:rounded-xl transition-colors whitespace-nowrap text-xs sm:text-base"
+                    className="px-3 sm:px-6 py-2 text-white hover:bg-white/5 rounded-xl transition-colors whitespace-nowrap text-sm sm:text-base"
                   >
                     Login
                   </button>
                   <button
                     onClick={() => redirectToAuth("/signup")}
-                    className="bg-white text-[#1A1A1A] px-2 sm:px-6 py-1.5 sm:py-2 rounded-lg sm:rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-xs sm:text-base font-medium"
+                    className="bg-white text-[#1A1A1A] px-3 sm:px-6 py-2 rounded-xl hover:bg-white/90 transition-colors transform hover:scale-105 duration-200 text-sm sm:text-base font-medium"
                   >
                     Sign Up
                   </button>
