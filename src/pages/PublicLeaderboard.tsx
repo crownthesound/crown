@@ -823,14 +823,7 @@ export function PublicLeaderboard() {
                         {formatNumber(participant.likes)} ♥
                       </div>
                       {/* Thumbnail */}
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-                        <img
-                          src={participant.thumbnail}
-                          alt={participant.video_title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <button
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0 relative group cursor-pointer"
                         onClick={() => {
                           const video = {
                             id: participant.video_id,
@@ -847,10 +840,19 @@ export function PublicLeaderboard() {
                           };
                           handleVideoClick(video, participants.findIndex(p => p.video_id === participant.video_id));
                         }}
-                        className="p-1.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
                       >
-                        <Play className="h-3 w-3 text-white" />
-                      </button>
+                        <img
+                          src={participant.thumbnail}
+                          alt={participant.video_title}
+                          className="w-full h-full object-cover"
+                        />
+                        {/* Play Button Overlay */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                          <div className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
+                            <Play className="h-3 w-3 text-black ml-0.5" />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
