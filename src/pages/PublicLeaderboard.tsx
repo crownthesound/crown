@@ -986,6 +986,17 @@ export function PublicLeaderboard() {
             </div>
           </div>
 
+          {/* Featured Submissions Section */}
+          <div className="mb-8">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+                Featured Submissions
+              </h2>
+              <p className="text-white/60 text-sm sm:text-base">
+                Watch the top contest entries from talented creators
+              </p>
+            </div>
+
           {/* Video Carousel */}
           {participants.length > 0 && (
             <div className="mb-8">
@@ -1131,6 +1142,7 @@ export function PublicLeaderboard() {
               </div>
             </div>
           )}
+        </div>
 
           {/* Leaderboard */}
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
