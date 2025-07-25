@@ -499,6 +499,7 @@ export function PublicLeaderboard() {
           <div className="mb-4 sm:mb-6">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent mb-6 sm:mb-8 tracking-tight leading-tight drop-shadow-2xl -mt-20 sm:-mt-24 relative z-20 bg-gradient-to-b from-transparent via-black/30 via-black/70 via-black/95 to-[#0A0A0A] pt-16 pb-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 text-center">
               <span className="inline-block transform hover:scale-105 transition-transform duration-300 ease-out">
+              <span className="inline-block transform hover:scale-105 transition-transform duration-300 ease-out">
                 {contest.name}
               </span>
             </h1>
