@@ -1074,18 +1074,18 @@ export function PublicLeaderboard() {
 
           {/* Hashtags */}
           {contest.hashtags && contest.hashtags.length > 0 && (
-                     <div className={`text-lg font-bold mb-2 ${getRankColor(index + 1)}`}>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl border border-white/10 p-4 sm:p-6">
               <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
                 <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
-                     <div className="text-sm font-medium text-white mb-1">
+                Hashtags
               </h3>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {contest.hashtags.map((hashtag, index) => (
                   <span
                     key={index}
-                   className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300"
+                    className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm font-medium border border-purple-500/30"
                   >
-                   <div className="text-center py-1">
+                    #{hashtag}
                   </span>
                 ))}
               </div>
