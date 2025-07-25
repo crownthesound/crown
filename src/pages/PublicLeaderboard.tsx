@@ -636,19 +636,19 @@ export function PublicLeaderboard() {
                   key={index}
                   className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300"
                 >
-                  <div className="text-center">
+                  <div className="text-center py-2">
                     <div className="flex items-center justify-center mb-4">
                       {getRankIcon(index + 1)}
                     </div>
-                    <div className={`text-2xl font-bold mb-2 ${getRankColor(index + 1)}`}>
+                    <div className={`text-xl font-bold mb-2 ${getRankColor(index + 1)}`}>
                       {formatRank(index + 1)} Place
                     </div>
-                    <div className="text-lg font-medium text-white mb-2">
+                    <div className="text-base font-medium text-white mb-1">
                       {contest.prize_per_winner
                         ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
                         : prize.title}
                     </div>
-                    <div className="text-sm text-white/60">
+                    <div className="text-xs text-white/60">
                       {contest.prize_per_winner ? "Cash Prize" : "Achievement Title"}
                     </div>
                   </div>
