@@ -503,12 +503,14 @@ export function PublicLeaderboard() {
               </span>
             </h1>
             
-            <p className="text-base sm:text-xl text-white/90 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed font-light">
+            <div className="mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
                 {contest.name}
               </h2>
-              <span className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto block">{contest.description}</span>
-            </p>
+              <p className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+                {contest.description}
+              </p>
+            </div>
 
             {timeRemaining && (
               <div className="mb-6 sm:mb-10">
