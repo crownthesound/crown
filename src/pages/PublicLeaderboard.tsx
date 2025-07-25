@@ -525,7 +525,7 @@ export function PublicLeaderboard() {
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                 {/* Step 1: Submit Entry */}
-                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl font-bold text-blue-400">1</span>
@@ -538,7 +538,7 @@ export function PublicLeaderboard() {
                 </div>
 
                 {/* Step 2: Get Views */}
-                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl font-bold text-green-400">2</span>
@@ -551,7 +551,7 @@ export function PublicLeaderboard() {
                 </div>
 
                 {/* Step 3: Climb Rankings */}
-                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl font-bold text-purple-400">3</span>
@@ -564,7 +564,7 @@ export function PublicLeaderboard() {
                 </div>
 
                 {/* Step 4: Win Prizes */}
-                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl font-bold text-yellow-400">4</span>
