@@ -506,7 +506,6 @@ export function PublicLeaderboard() {
                 Contest Description
               </h2>
               <span className="text-sm sm:text-base">{contest.description}</span>
-              <span className="text-sm sm:text-base text-white/60">{contest.description}</span>
             </p>
 
             {timeRemaining && (
