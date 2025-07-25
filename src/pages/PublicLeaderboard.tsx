@@ -236,6 +236,10 @@ export function PublicLeaderboard() {
       setVideoLoaded(initialLoadState);
     } catch (error) {
       console.error("Error fetching featured videos:", error);
+      // Set empty array to prevent UI issues
+      setFeaturedVideos([]);
+      setCoverLoaded({});
+      setVideoLoaded({});
     } finally {
       setLoading(false);
     }
