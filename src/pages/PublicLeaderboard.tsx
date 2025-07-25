@@ -495,58 +495,127 @@ export function PublicLeaderboard() {
 
       {/* Contest Info Section - Moved Lower */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 -mt-16 sm:-mt-24 relative z-10">
-        <div className="text-center">
-          <div className="mb-4 sm:mb-6">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-white mb-4 sm:mb-8 tracking-tight leading-tight sm:leading-[0.9] -mt-16 sm:-mt-24 relative z-20 bg-gradient-to-b from-transparent via-black/30 via-black/70 via-black/95 to-[#0A0A0A] pt-12 sm:pt-16 pb-8 sm:pb-12 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-16 lg:px-16 xl:-mx-24 xl:px-24 2xl:-mx-32 2xl:px-32">
+        <div className="space-y-12 sm:space-y-16">
+          {/* Section 1: Contest Title */}
+          <div className="text-center">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-white tracking-tight leading-tight sm:leading-[0.9] -mt-16 sm:-mt-24 relative z-20 bg-gradient-to-b from-transparent via-black/30 via-black/70 via-black/95 to-[#0A0A0A] pt-12 sm:pt-16 pb-8 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-16 lg:px-16 xl:-mx-24 xl:px-24 2xl:-mx-32 2xl:px-32">
               <span className="bg-gradient-to-r from-white via-white to-gray-100 bg-clip-text text-transparent drop-shadow-2xl filter text-shadow-lg">
                 {contest.name}
               </span>
             </h1>
-            
-            <p className="text-base sm:text-xl text-white/90 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed font-light">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-                Contest Description
-              </h2>
-              <span className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto block">{contest.description}</span>
-            </p>
+          </div>
 
-            {timeRemaining && (
-              <div className="mb-6 sm:mb-10">
-                <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 shadow-lg">
-                  <ContestCountdown contest={contest} className="justify-center text-lg sm:text-xl font-medium" />
+          {/* Section 2: Contest Description */}
+          <div className="text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+              Contest Description
+            </h2>
+            <p className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
+              {contest.description}
+            </p>
+          </div>
+
+          {/* Section 3: How It Works */}
+          <div className="text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+              How It Works
+            </h2>
+            
+            {/* Horizontal Scroll Implementation */}
+            <div className="relative">
+              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                {/* Step 1: Submit Entry */}
+                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-bold text-blue-400">1</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Submit Your Entry</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Create and submit your festival-level original mix or set following the contest guidelines.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2: Get Views */}
+                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-bold text-green-400">2</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Share & Promote</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Share your entry across social media to gain views, likes, and engagement from the community.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3: Climb Rankings */}
+                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-bold text-purple-400">3</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Climb the Leaderboard</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Watch your ranking rise as you gain more views and engagement from the community.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4: Win Prizes */}
+                <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-2xl font-bold text-yellow-400">4</span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Win Amazing Prizes</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Top performers win cash prizes and recognition in the electronic music community.
+                    </p>
+                  </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-lg mx-auto">
-            {session && userSubmission ? (
-              <button
-                onClick={() => navigate(`/contest-management/${contest.id}`)}
-                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
-              >
-                <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-                Manage Entry
-              </button>
-            ) : (
-              <button
-                onClick={handleJoinContest}
-                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
-              >
-                <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
-                {session ? "Join Contest" : "Sign Up to Join"}
-              </button>
-            )}
-            
+          {/* Countdown Timer */}
+          {timeRemaining && (
+            <div className="text-center">
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 shadow-lg">
+                <ContestCountdown contest={contest} className="justify-center text-lg sm:text-xl font-medium" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-lg mx-auto">
+          {session && userSubmission ? (
             <button
-              onClick={handleShare}
-              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
+              onClick={() => navigate(`/contest-management/${contest.id}`)}
+              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
             >
-              <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
-              Share Contest
+              <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
+              Manage Entry
             </button>
-          </div>
+          ) : (
+            <button
+              onClick={handleJoinContest}
+              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
+            >
+              <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
+              {session ? "Join Contest" : "Sign Up to Join"}
+            </button>
+          )}
+          
+          <button
+            onClick={handleShare}
+            className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+            Share Contest
+          </button>
         </div>
       </div>
 
