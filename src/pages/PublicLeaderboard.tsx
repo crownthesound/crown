@@ -505,55 +505,6 @@ export function PublicLeaderboard() {
             
             <p className="text-base sm:text-xl text-white/90 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed font-light">
               <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-                Contest Title
-              </h2>
-              <div className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto block mb-8">
-                <div className="relative">
-                  <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-                    <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                      <h3 className="text-lg font-semibold text-white mb-3">Container Setup</h3>
-                      <code className="text-sm text-green-400 block mb-2">&lt;div className="relative"&gt;</code>
-                      <code className="text-sm text-green-400 block">&lt;div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"&gt;</code>
-                    </div>
-                    <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                      <h3 className="text-lg font-semibold text-white mb-3">Key CSS Classes</h3>
-                      <ul className="text-sm text-white/70 space-y-1">
-                        <li><code className="text-blue-400">flex</code> - Horizontal flexbox layout</li>
-                        <li><code className="text-blue-400">gap-4</code> - 1rem spacing between cards</li>
-                        <li><code className="text-blue-400">overflow-x-auto</code> - Horizontal scrolling</li>
-                        <li><code className="text-blue-400">snap-x</code> - Smooth scroll snapping</li>
-                      </ul>
-                    </div>
-                    <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                      <h3 className="text-lg font-semibold text-white mb-3">Prize Cards</h3>
-                      <ul className="text-sm text-white/70 space-y-1">
-                        <li><code className="text-blue-400">flex-shrink-0</code> - No shrinking</li>
-                        <li><code className="text-blue-400">w-64</code> - Fixed 256px width</li>
-                        <li><code className="text-blue-400">snap-start</code> - Snap points</li>
-                      </ul>
-                    </div>
-                    <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                      <h3 className="text-lg font-semibold text-white mb-3">Scrollbar Hiding</h3>
-                      <div className="text-sm text-white/70">
-                        <p className="mb-2">CSS implementation:</p>
-                        <code className="text-green-400 text-xs block">{'.scrollbar-hide::-webkit-scrollbar { display: none; }'}</code>
-                      </div>
-                    </div>
-                    <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                      <h3 className="text-lg font-semibold text-white mb-3">How It Works</h3>
-                      <ul className="text-sm text-white/70 space-y-1">
-                        <li>• Horizontal row of cards</li>
-                        <li>• Scrolling when overflow</li>
-                        <li>• Fixed width cards</li>
-                        <li>• Smooth snap alignment</li>
-                        <li>• Hidden scrollbar</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
                 Contest Description
               </h2>
               <span className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto block">{contest.description}</span>
