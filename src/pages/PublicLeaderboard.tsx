@@ -489,7 +489,7 @@ export function PublicLeaderboard() {
           </div>
           
           {/* Bottom gradient overlay for better blending */}
-          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 via-[#0A0A0A]/40 via-[#0A0A0A]/10 to-transparent pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0A0A0A] from-0% via-[#0A0A0A]/90 via-30% via-[#0A0A0A]/60 via-50% via-[#0A0A0A]/30 via-70% via-[#0A0A0A]/10 via-85% to-transparent to-100% pointer-events-none"></div>
         </div>
       </div>
 
