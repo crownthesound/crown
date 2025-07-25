@@ -572,7 +572,10 @@ export function PublicLeaderboard() {
                   <p className="mb-2">HTML structure:</p>
                   <div className="text-green-400 text-xs bg-black/20 p-2 rounded mb-2 font-mono">
                     &lt;div className="relative"&gt;<br />
-                    &nbsp;&nbsp;&lt;div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"&gt;
+                    &nbsp;&nbsp;&lt;div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"&gt;<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;{/* Cards go here */}<br />
+                    &nbsp;&nbsp;&lt;/div&gt;<br />
+                    &lt;/div&gt;
                   </div>
                   <p className="mt-2 text-xs">The outer div provides positioning context while the inner div creates the scrollable container.</p>
                 </div>
@@ -602,7 +605,9 @@ export function PublicLeaderboard() {
                 <h3 className="text-lg font-bold text-white mb-4">Individual Cards</h3>
                 <div className="text-sm text-white/70 text-left space-y-1">
                   <div className="text-purple-400 text-xs bg-black/20 p-2 rounded mb-2 font-mono">
-                    &lt;div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300"&gt;
+                    &lt;div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300"&gt;<br />
+                    &nbsp;&nbsp;{/* Card content */}<br />
+                    &lt;/div&gt;
                   </div>
                   <div className="space-y-1">
                     <p><span className="text-purple-400 text-xs font-mono">flex-shrink-0</span> - Prevents shrinking when space is limited</p>
@@ -620,13 +625,13 @@ export function PublicLeaderboard() {
                 <div className="text-sm text-white/70">
                   <p className="mb-2">CSS implementation:</p>
                   <div className="text-green-400 text-xs bg-black/20 p-2 rounded font-mono">
-                    .scrollbar-hide::-webkit-scrollbar {'{'}
-                    <br />&nbsp;&nbsp;display: none;
-                    <br />{'}'}<br /><br />
-                    .scrollbar-hide {'{'}
-                    <br />&nbsp;&nbsp;-ms-overflow-style: none;
-                    <br />&nbsp;&nbsp;scrollbar-width: none;
-                    <br />{'}'}
+                    .scrollbar-hide::-webkit-scrollbar {'{'}<br />
+                    &nbsp;&nbsp;display: none;<br />
+                    {'}'}<br /><br />
+                    .scrollbar-hide {'{'}<br />
+                    &nbsp;&nbsp;-ms-overflow-style: none;<br />
+                    &nbsp;&nbsp;scrollbar-width: none;<br />
+                    {'}'}
                   </div>
                   <p className="mt-2 text-xs">This CSS hides scrollbars across all browsers while maintaining scroll functionality.</p>
                 </div>
@@ -639,10 +644,10 @@ export function PublicLeaderboard() {
                 <h3 className="text-lg font-bold text-white mb-4">How It Works</h3>
                 <div className="text-sm text-white/70 text-left space-y-2">
                   <div className="space-y-2">
-                    <p>• The flex container creates a horizontal row of prize cards</p>
+                    <p>• The flex container creates a horizontal row of cards</p>
                     <p>• When total width exceeds container, <span className="text-blue-400 text-xs font-mono">overflow-x-auto</span> allows horizontal scrolling</p>
                     <p>• Each card has fixed width (<span className="text-blue-400 text-xs font-mono">w-64</span>) and won't shrink</p>
-                    <p>• Users can scroll horizontally to see all prizes</p>
+                    <p>• Users can scroll horizontally to see all content</p>
                     <p>• Scroll snapping makes it feel smooth and card-aligned</p>
                     <p>• Hidden scrollbar creates a cleaner aesthetic</p>
                   </div>
