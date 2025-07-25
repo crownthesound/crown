@@ -162,6 +162,11 @@ export function PublicLeaderboard() {
       tip: "Even if you don't win first place, being in the top rankings can lead to valuable networking opportunities."
     }
   ];
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'center',
+    skipSnaps: false,
     dragFree: false
   });
 
