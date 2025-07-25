@@ -137,7 +137,7 @@ export function PublicLeaderboard() {
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentHowItWorksSlide, setCurrentHowItWorksSlide] = useState(0);
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
   const howItWorksSteps = [
     {
       icon: UserPlus,
