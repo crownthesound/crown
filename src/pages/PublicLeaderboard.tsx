@@ -535,8 +535,8 @@ export function PublicLeaderboard() {
                 onClick={handleShare}
                 className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
-                Share Contest
+                <Info className="h-4 w-4 sm:h-5 sm:w-5" />
+                How It Works
               </button>
             </div>
           </div>
