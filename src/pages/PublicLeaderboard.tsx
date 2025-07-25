@@ -172,6 +172,9 @@ export function PublicLeaderboard() {
     dragFree: false
   });
 
+  const { isTikTokConnected } = useTikTokConnection();
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
   useEffect(() => {
     if (id) {
       fetchContestData();
@@ -633,7 +636,7 @@ export function PublicLeaderboard() {
             </div>
           </div>
         </div>
-
+      </div>
 
       {/* Featured Submissions Video Player */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mt-8 sm:mt-12">
@@ -1150,6 +1153,46 @@ export function PublicLeaderboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modals */}
+      {showJoinModal && (
+        <ContestJoinModal
+          contest={contest}
+          onClose={() => setShowJoinModal(false)}
+          onSuccess={handleContestJoined}
+        />
+      )}
+
+      {showTikTokModal && (
+        <TikTokSettingsModal
+          onClose={() => setShowTikTokModal(false)}
+          onSuccess={() => {
+            setShowTikTokModal(false);
+            setShowJoinModal(true);
+          }}
+        />
+      )}
+
+      {showViewModal && selectedVideo && (
+        <ViewSubmissionModal
+          video={selectedVideo}
+          onClose={() => setShowViewModal(false)}
+        />
+      )}
+
+      {showMobileModal && selectedVideo && (
+        <MobileVideoModal
+          video={selectedVideo}
+          onClose={() => setShowMobileModal(false)}
+        />
+      )}
+
+      {showTikTokSettings && (
+        <TikTokSettingsModal
+          onClose={() => setShowTikTokSettings(false)}
+          onSuccess={() => setShowTikTokSettings(false)}
+        />
       )}
     </div>
   );
