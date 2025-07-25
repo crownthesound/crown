@@ -509,6 +509,8 @@ export function PublicLeaderboard() {
                 {contest.description}
               </span>
             </h1>
+          </div>
+
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
               Contest Description
