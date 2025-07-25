@@ -507,9 +507,6 @@ export function PublicLeaderboard() {
               </span>
             </h1>
             <div className="mt-4 sm:mt-6">
-              <p className="text-base sm:text-lg lg:text-xl text-white/80 leading-relaxed max-w-3xl mx-auto px-4">
-                {contest.description}
-              </p>
             </div>
           </div>
 
