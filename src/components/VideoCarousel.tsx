@@ -41,27 +41,6 @@ export function VideoCarousel() {
     try {
       setError(null);
       
-      // Check if Supabase URL is available
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        throw new Error("Supabase configuration is missing");
-      }
-
-      // Test network connectivity to Supabase
-      try {
-        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/`, {
-          method: 'HEAD',
-          headers: {
-            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY
-          }
-        });
-        if (!response.ok) {
-          throw new Error(`Supabase connection failed: ${response.status}`);
-        }
-      } catch (networkError) {
-        console.error("Network connectivity test failed:", networkError);
-        throw new Error("Unable to connect to database. Please check your internet connection.");
-      }
-
       const { data, error: supabaseError } = await supabase
         .from('video_links')
         .select('*')
@@ -97,10 +76,7 @@ export function VideoCarousel() {
       console.error('Error fetching videos:', error);
       setError(errorMessage);
       
-      // Only show toast for unexpected errors, not connectivity issues
-      if (!errorMessage.includes("internet connection") && !errorMessage.includes("Supabase configuration")) {
-        toast.error(errorMessage);
-      }
+      toast.error(errorMessage);
       
       setVideos([]); // Set empty array on error
     } finally {
