@@ -505,10 +505,10 @@ export function PublicLeaderboard() {
               <span className="block mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-white/80 font-light tracking-wide leading-relaxed max-w-3xl mx-auto">
                 {contest.description}
               </span>
+              <span className="block mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-white/80 font-light tracking-wide leading-relaxed max-w-3xl mx-auto">
+                {contest.description}
+              </span>
             </h1>
-          </div>
-
-          {/* Section 2: Contest Description */}
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
               Contest Description
