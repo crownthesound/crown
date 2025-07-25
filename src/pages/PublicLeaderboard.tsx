@@ -578,15 +578,6 @@ export function PublicLeaderboard() {
               </div>
             </div>
           </div>
-
-          {/* Countdown Timer */}
-          {timeRemaining && (
-            <div className="text-center">
-              <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 shadow-lg">
-                <ContestCountdown contest={contest} className="justify-center text-lg sm:text-xl font-medium" />
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Action Buttons */}
