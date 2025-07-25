@@ -634,55 +634,6 @@ export function PublicLeaderboard() {
           </div>
         </div>
 
-      </div>
-
-      {/* Prize Distribution Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-xl sm:text-3xl font-black text-white mb-2 sm:mb-4 flex items-center justify-center gap-2 sm:gap-3">
-            <Trophy className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-400" />
-            Prize Distribution
-          </h2>
-          <p className="text-sm sm:text-base text-white/60">
-            {contest.num_winners || contest.prize_titles?.length || 3} winners will be selected
-          </p>
-        </div>
-
-        {/* Horizontal Prize Scroll */}
-        <div className="relative">
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-            {(contest.prize_titles || [
-              { rank: 1, title: "First Place" },
-              { rank: 2, title: "Second Place" },
-              { rank: 3, title: "Third Place" },
-            ])
-              .slice(0, contest.num_winners || contest.prize_titles?.length || 3)
-              .map((prize: any, index: number) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300"
-                >
-                  <div className="text-center py-2">
-                    <div className="flex items-center justify-center mb-4">
-                      {getRankIcon(index + 1)}
-                    </div>
-                    <div className={`text-xl font-bold mb-2 ${getRankColor(index + 1)}`}>
-                      {formatRank(index + 1)} Place
-                    </div>
-                    <div className="text-base font-medium text-white mb-1">
-                      {contest.prize_per_winner
-                        ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
-                        : prize.title}
-                    </div>
-                    <div className="text-xs text-white/60">
-                      {contest.prize_per_winner ? "Cash Prize" : "Achievement Title"}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      </div>
 
       {/* Featured Submissions Video Player */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mt-8 sm:mt-12">
