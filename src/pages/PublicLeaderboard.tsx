@@ -568,12 +568,13 @@ export function PublicLeaderboard() {
             <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
               <div className="text-center">
                 <h3 className="text-lg font-bold text-white mb-4">Container Setup</h3>
-                <div className="text-sm text-white/70">
+                <div className="text-sm text-white/70 text-left">
                   <p className="mb-2">HTML structure:</p>
-                  <code className="text-green-400 text-xs block bg-black/20 p-2 rounded">
-                    {`<div className="relative">
+                  <code className="text-green-400 text-xs block bg-black/20 p-2 rounded whitespace-pre-wrap">
+{`<div className="relative">
   <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">`}
                   </code>
+                  <p className="mt-2 text-xs">The outer div provides positioning context while the inner div creates the scrollable container.</p>
                 </div>
               </div>
             </div>
@@ -583,23 +584,31 @@ export function PublicLeaderboard() {
               <div className="text-center">
                 <h3 className="text-lg font-bold text-white mb-4">Key CSS Classes</h3>
                 <div className="text-sm text-white/70 text-left space-y-1">
-                  <p><code className="text-blue-400">flex</code> - Horizontal flexbox layout</p>
-                  <p><code className="text-blue-400">gap-4</code> - 1rem spacing between cards</p>
-                  <p><code className="text-blue-400">overflow-x-auto</code> - Enables horizontal scrolling</p>
-                  <p><code className="text-blue-400">snap-x snap-mandatory</code> - Smooth scroll snapping</p>
-                  <p><code className="text-blue-400">scrollbar-hide</code> - Hides scrollbar</p>
+                  <div className="space-y-2">
+                    <p><code className="text-blue-400 text-xs">flex</code> - Creates horizontal flexbox layout</p>
+                    <p><code className="text-blue-400 text-xs">gap-4</code> - Adds 1rem spacing between cards</p>
+                    <p><code className="text-blue-400 text-xs">overflow-x-auto</code> - Enables horizontal scrolling when content overflows</p>
+                    <p><code className="text-blue-400 text-xs">pb-4</code> - Bottom padding for scrollbar space</p>
+                    <p><code className="text-blue-400 text-xs">snap-x snap-mandatory</code> - Smooth scroll snapping horizontally</p>
+                    <p><code className="text-blue-400 text-xs">scrollbar-hide</code> - Hides scrollbar for clean look</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Individual Prize Cards */}
+            {/* Prize Cards Implementation */}
             <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
               <div className="text-center">
-                <h3 className="text-lg font-bold text-white mb-4">Prize Cards</h3>
+                <h3 className="text-lg font-bold text-white mb-4">Individual Cards</h3>
                 <div className="text-sm text-white/70 text-left space-y-1">
-                  <p><code className="text-purple-400">flex-shrink-0</code> - Prevents shrinking</p>
-                  <p><code className="text-purple-400">w-64</code> - Fixed 256px width</p>
-                  <p><code className="text-purple-400">snap-start</code> - Snap point for scrolling</p>
+                  <code className="text-purple-400 text-xs block bg-black/20 p-2 rounded mb-2 whitespace-pre-wrap">
+{`<div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">`}
+                  </code>
+                  <div className="space-y-1">
+                    <p><code className="text-purple-400 text-xs">flex-shrink-0</code> - Prevents shrinking when space is limited</p>
+                    <p><code className="text-purple-400 text-xs">w-64</code> - Fixed width of 16rem (256px)</p>
+                    <p><code className="text-purple-400 text-xs">snap-start</code> - Makes each card a snap point</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -610,9 +619,17 @@ export function PublicLeaderboard() {
                 <h3 className="text-lg font-bold text-white mb-4">Scrollbar Hiding</h3>
                 <div className="text-sm text-white/70">
                   <p className="mb-2">CSS implementation:</p>
-                  <code className="text-green-400 text-xs block bg-black/20 p-2 rounded">
-                    {`.scrollbar-hide::-webkit-scrollbar { display: none; }`}
+                  <code className="text-green-400 text-xs block bg-black/20 p-2 rounded whitespace-pre-wrap">
+{`.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}`}
                   </code>
+                  <p className="mt-2 text-xs">This CSS hides scrollbars across all browsers while maintaining scroll functionality.</p>
                 </div>
               </div>
             </div>
@@ -622,11 +639,14 @@ export function PublicLeaderboard() {
               <div className="text-center">
                 <h3 className="text-lg font-bold text-white mb-4">How It Works</h3>
                 <div className="text-sm text-white/70 text-left space-y-2">
-                  <p>• Flex container creates horizontal row</p>
-                  <p>• Fixed width cards prevent shrinking</p>
-                  <p>• Overflow enables scrolling</p>
-                  <p>• Snap points create smooth alignment</p>
-                  <p>• Hidden scrollbar for clean aesthetic</p>
+                  <div className="space-y-2">
+                    <p>• The flex container creates a horizontal row of prize cards</p>
+                    <p>• When total width exceeds container, <code className="text-blue-400 text-xs">overflow-x-auto</code> allows horizontal scrolling</p>
+                    <p>• Each card has fixed width (<code className="text-blue-400 text-xs">w-64</code>) and won't shrink</p>
+                    <p>• Users can scroll horizontally to see all prizes</p>
+                    <p>• Scroll snapping makes it feel smooth and card-aligned</p>
+                    <p>• Hidden scrollbar creates a cleaner aesthetic</p>
+                  </div>
                 </div>
               </div>
             </div>
