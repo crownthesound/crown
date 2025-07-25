@@ -536,7 +536,7 @@ export function PublicLeaderboard() {
                       <h3 className="text-lg font-semibold text-white mb-3">Scrollbar Hiding</h3>
                       <div className="text-sm text-white/70">
                         <p className="mb-2">CSS implementation:</p>
-                        <code className="text-green-400 text-xs block">.scrollbar-hide::-webkit-scrollbar { display: none; }</code>
+                        <code className="text-green-400 text-xs block">{'.scrollbar-hide::-webkit-scrollbar { display: none; }'}</code>
                       </div>
                     </div>
                     <div className="flex-shrink-0 w-64 p-6 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
