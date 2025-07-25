@@ -493,37 +493,6 @@ export function PublicLeaderboard() {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-lg mx-auto">
-          {session && userSubmission ? (
-            <button
-              onClick={() => navigate(`/contest-management/${contest.id}`)}
-              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
-            >
-              <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
-              Manage Entry
-            </button>
-          ) : (
-            <button
-              onClick={handleJoinContest}
-              className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
-            >
-              <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
-              {session ? "Join Contest" : "Sign Up to Join"}
-            </button>
-          )}
-          
-          <button
-            onClick={handleShare}
-            className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
-            Share Contest
-          </button>
-        </div>
-      </div>
-
       {/* Contest Info Section - Moved Lower */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 -mt-16 sm:-mt-24 relative z-10">
         <div className="space-y-12 sm:space-y-16">
@@ -538,6 +507,37 @@ export function PublicLeaderboard() {
               </span>
             </h1>
             <div className="mt-4 sm:mt-6">
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="text-center">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-lg mx-auto">
+              {session && userSubmission ? (
+                <button
+                  onClick={() => navigate(`/contest-management/${contest.id}`)}
+                  className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
+                >
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
+                  Manage Entry
+                </button>
+              ) : (
+                <button
+                  onClick={handleJoinContest}
+                  className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white text-black rounded-xl sm:rounded-2xl hover:bg-white/90 transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl transform hover:scale-105 border border-white/20"
+                >
+                  <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
+                  {session ? "Join Contest" : "Sign Up to Join"}
+                </button>
+              )}
+              
+              <button
+                onClick={handleShare}
+                className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                Share Contest
+              </button>
             </div>
           </div>
 
