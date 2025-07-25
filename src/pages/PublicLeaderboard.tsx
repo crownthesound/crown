@@ -502,6 +502,9 @@ export function PublicLeaderboard() {
               <span className="bg-gradient-to-r from-white via-white to-gray-100 bg-clip-text text-transparent drop-shadow-2xl filter text-shadow-lg transform-gpu hover:scale-105 transition-transform duration-300 block animate-pulse-subtle">
                 {contest.name}
               </span>
+              <span className="block mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-white/80 font-light tracking-wide leading-relaxed max-w-3xl mx-auto">
+                {contest.description}
+              </span>
             </h1>
           </div>
 
