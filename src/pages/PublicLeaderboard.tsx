@@ -497,7 +497,6 @@ export function PublicLeaderboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 -mt-16 sm:-mt-24 relative z-10">
         <div className="text-center">
           <div className="mb-4 sm:mb-6">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight drop-shadow-2xl -mt-16 sm:-mt-20 relative z-20 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/60 via-[#0A0A0A]/20 to-transparent pt-12 pb-32 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-4 sm:mb-6 tracking-tight leading-tight drop-shadow-2xl -mt-16 sm:-mt-20 relative z-20 bg-gradient-to-b from-transparent via-black/40 via-black/70 to-[#0A0A0A] pt-12 pb-32 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
               {contest.name}
             </h1>
