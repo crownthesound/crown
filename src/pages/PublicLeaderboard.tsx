@@ -508,11 +508,65 @@ export function PublicLeaderboard() {
           {/* Section 2: Contest Description */}
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              Contest Description
+              Contest Overview
             </h2>
-            <p className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-              {contest.description}
-            </p>
+            
+            {/* Horizontal Scroll Implementation */}
+            <div className="relative">
+              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                {/* Contest Title Card - Blue themed */}
+                <div className="flex-shrink-0 w-64 p-6 bg-blue-500/10 backdrop-blur-sm rounded-2xl border border-blue-500/20 snap-start hover:bg-blue-500/20 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Crown className="h-6 w-6 text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Contest Title</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      {contest.name} - A premier music competition showcasing the best talent.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Contest Description Card - Green themed */}
+                <div className="flex-shrink-0 w-64 p-6 bg-green-500/10 backdrop-blur-sm rounded-2xl border border-green-500/20 snap-start hover:bg-green-500/20 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Info className="h-6 w-6 text-green-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Contest Description</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      {contest.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* How It Works Card - Purple themed */}
+                <div className="flex-shrink-0 w-64 p-6 bg-purple-500/10 backdrop-blur-sm rounded-2xl border border-purple-500/20 snap-start hover:bg-purple-500/20 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Target className="h-6 w-6 text-purple-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">How It Works</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Submit your entry, gain views and engagement, climb the leaderboard to win prizes.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Join Now Card - Yellow themed */}
+                <div className="flex-shrink-0 w-64 p-6 bg-yellow-500/10 backdrop-blur-sm rounded-2xl border border-yellow-500/20 snap-start hover:bg-yellow-500/20 transition-all duration-300">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <UserPlus className="h-6 w-6 text-yellow-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-3">Join Now</h3>
+                    <p className="text-sm text-white/70 leading-relaxed">
+                      Ready to compete? Join the contest and showcase your talent to win amazing prizes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Section 3: How It Works */}
