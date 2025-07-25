@@ -525,12 +525,12 @@ export function PublicLeaderboard() {
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                 {/* Step 1: Submit Entry */}
-                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-blue-400">1</span>
+                    <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-xl font-bold text-blue-400">1</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Submit Your Entry</h3>
+                    <h3 className="text-base font-semibold text-white mb-2">Submit Your Entry</h3>
                     <p className="text-sm text-white/70 leading-relaxed">
                       Create and submit your festival-level original mix or set following the contest guidelines.
                     </p>
@@ -538,12 +538,12 @@ export function PublicLeaderboard() {
                 </div>
 
                 {/* Step 2: Get Views */}
-                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-green-400">2</span>
+                    <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-xl font-bold text-green-400">2</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Share & Promote</h3>
+                    <h3 className="text-base font-semibold text-white mb-2">Share & Promote</h3>
                     <p className="text-sm text-white/70 leading-relaxed">
                       Share your entry across social media to gain views, likes, and engagement from the community.
                     </p>
@@ -551,12 +551,12 @@ export function PublicLeaderboard() {
                 </div>
 
                 {/* Step 3: Climb Rankings */}
-                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-purple-400">3</span>
+                    <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-xl font-bold text-purple-400">3</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Climb the Leaderboard</h3>
+                    <h3 className="text-base font-semibold text-white mb-2">Climb the Leaderboard</h3>
                     <p className="text-sm text-white/70 leading-relaxed">
                       Watch your ranking rise as you gain more views and engagement from the community.
                     </p>
@@ -564,12 +564,12 @@ export function PublicLeaderboard() {
                 </div>
 
                 {/* Step 4: Win Prizes */}
-                <div className="flex-shrink-0 w-48 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="text-2xl font-bold text-yellow-400">4</span>
+                    <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-xl font-bold text-yellow-400">4</span>
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-3">Win Amazing Prizes</h3>
+                    <h3 className="text-base font-semibold text-white mb-2">Win Amazing Prizes</h3>
                     <p className="text-sm text-white/70 leading-relaxed">
                       Top performers win cash prizes and recognition in the electronic music community.
                     </p>
