@@ -502,41 +502,6 @@ export function PublicLeaderboard() {
               <span className="bg-gradient-to-r from-white via-white to-gray-100 bg-clip-text text-transparent drop-shadow-2xl filter text-shadow-lg transform-gpu hover:scale-105 transition-transform duration-300 block animate-pulse-subtle">
                 {contest.name}
               </span>
-              
-              {/* Contest Details */}
-              <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4 max-w-2xl mx-auto">
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-white/80">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" />
-                    <span className="text-sm sm:text-base font-medium">
-                      {contest.num_winners || 3} Winners
-                    </span>
-                  </div>
-                  <span className="hidden sm:inline text-white/40">•</span>
-                  <div className="flex items-center gap-2">
-                    <Gift className="h-4 w-4 sm:h-5 sm:w-5 text-green-400" />
-                    <span className="text-sm sm:text-base font-medium">
-                      {contest.prize_per_winner ? `$${formatCurrency(contest.prize_per_winner)} Prizes` : "Title Rewards"}
-                    </span>
-                  </div>
-                  <span className="hidden sm:inline text-white/40">•</span>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
-                    <span className="text-sm sm:text-base font-medium">
-                      {participants.length} Participants
-                    </span>
-                  </div>
-                </div>
-                
-                {contest.music_category && (
-                  <div className="flex items-center justify-center gap-2">
-                    <Music className="h-4 w-4 sm:h-5 sm:w-5 text-purple-400" />
-                    <span className="text-sm sm:text-base text-white/70 font-medium">
-                      {contest.music_category} Category
-                    </span>
-                  </div>
-                )}
-              </div>
             </h1>
           </div>
 
