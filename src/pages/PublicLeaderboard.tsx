@@ -503,20 +503,15 @@ export function PublicLeaderboard() {
                 {contest.name}
               </span>
             </h1>
-          </div>
-
-          {/* Section 2: Contest Description */}
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              Contest Description
-            </h2>
-            <p className="text-base sm:text-lg text-white/80 leading-relaxed max-w-2xl mx-auto">
-              {contest.description}
-            </p>
+            <div className="mt-4 sm:mt-6">
+              <p className="text-base sm:text-lg lg:text-xl text-white/80 leading-relaxed max-w-3xl mx-auto px-4">
+                {contest.description}
+              </p>
+            </div>
           </div>
 
           {/* Section 3: How It Works */}
-          <div className="text-center">
+          <div className="text-center mt-12 sm:mt-16">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
               How It Works
             </h2>
