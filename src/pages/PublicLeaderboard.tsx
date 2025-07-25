@@ -502,6 +502,9 @@ export function PublicLeaderboard() {
             </h1>
             
             <p className="text-base sm:text-xl text-white/90 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed font-light">
+              <h2 className="text-xl sm:text-2xl font-semibold text-white mb-4 tracking-tight">
+                Contest Description
+              </h2>
               {contest.description}
             </p>
 
