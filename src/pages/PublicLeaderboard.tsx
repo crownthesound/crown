@@ -35,6 +35,7 @@ import {
   Settings,
   ExternalLink,
   Info,
+  X,
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
