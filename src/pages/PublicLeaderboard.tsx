@@ -499,7 +499,7 @@ export function PublicLeaderboard() {
           {/* Section 1: Contest Title */}
           <div className="text-center">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-white tracking-tight leading-tight sm:leading-[0.9] -mt-32 sm:-mt-40 relative z-20 bg-gradient-to-b from-transparent via-black/30 via-black/70 via-black/95 to-[#0A0A0A] pt-24 sm:pt-32 pb-8 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-16 lg:px-16 xl:-mx-24 xl:px-24 2xl:-mx-32 2xl:px-32 flex items-center justify-center min-h-[40vh] sm:min-h-[50vh]">
-              <span className="bg-gradient-to-r from-white via-white to-gray-100 bg-clip-text text-transparent drop-shadow-2xl filter text-shadow-lg transform-gpu hover:scale-105 transition-transform duration-300 block animate-pulse-subtle">
+              <span className="bg-gradient-to-r from-white via-white to-gray-100 bg-clip-text text-transparent drop-shadow-2xl filter text-shadow-lg transform-gpu hover:scale-105 transition-transform duration-300 block animate-pulse-subtle text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl">
                 {contest.name}
               </span>
             </h1>
