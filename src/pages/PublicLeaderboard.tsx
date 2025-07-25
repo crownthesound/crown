@@ -717,15 +717,12 @@ export function PublicLeaderboard() {
                               {video.video_url ? (
                                 <video
                                   src={video.video_url}
-                                  className={`w-full h-full object-cover rounded-2xl transition-opacity duration-700 ${
-                                    videoLoaded[video.id] ? 'opacity-100' : 'opacity-0'
-                                  }`}
+                                  className="w-full h-full object-cover rounded-2xl opacity-100"
                                   autoPlay
                                   loop
                                   muted={isMuted}
                                   playsInline
                                   controls={false}
-                                  onLoadedData={() => handleVideoLoad(video.id)}
                                 />
                               ) : null}
                             </div>
