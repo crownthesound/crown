@@ -132,6 +132,8 @@ export function PublicLeaderboard() {
   const [isMuted, setIsMuted] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState<{[key: string]: boolean}>({});
   const [coverLoaded, setCoverLoaded] = useState<{[key: string]: boolean}>({});
+  const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const { isConnected: isTikTokConnected } = useTikTokConnection();
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
@@ -532,7 +534,7 @@ export function PublicLeaderboard() {
               )}
               
               <button
-                onClick={handleShare}
+                onClick={() => setShowHowItWorksModal(true)}
                 className="w-full sm:w-auto px-8 sm:px-10 py-4 sm:py-5 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl sm:rounded-2xl transition-all duration-300 font-semibold text-base sm:text-lg flex items-center justify-center gap-3 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Info className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -1140,6 +1142,134 @@ export function PublicLeaderboard() {
         onClose={() => setShowMobileModal(false)}
         video={selectedVideo}
       />
+
+      {/* How It Works Modal */}
+      {showHowItWorksModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1A1A1A] rounded-2xl border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
+              <h2 className="text-2xl font-bold text-white">How It Works</h2>
+              <button
+                onClick={() => {
+                  setShowHowItWorksModal(false);
+                  setCurrentSlide(0);
+                }}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="h-6 w-6 text-white/60" />
+              </button>
+            </div>
+
+            <div className="relative">
+              {/* Slide 1: Submit Entry */}
+              {currentSlide === 0 && (
+                <div className="p-8 text-center">
+                  <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <UserPlus className="h-10 w-10 text-blue-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Step 1: Submit Your Entry</h3>
+                  <p className="text-white/80 text-lg leading-relaxed mb-6">
+                    Create and submit your festival-level original mix or set following the contest guidelines. Make sure your content is original and follows all contest rules.
+                  </p>
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                    <p className="text-blue-300 text-sm">
+                      💡 <strong>Tip:</strong> High-quality audio and engaging visuals will help your entry stand out from the competition.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Slide 2: Share & Promote */}
+              {currentSlide === 1 && (
+                <div className="p-8 text-center">
+                  <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Share2 className="h-10 w-10 text-green-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Step 2: Share & Promote</h3>
+                  <p className="text-white/80 text-lg leading-relaxed mb-6">
+                    Share your entry across social media platforms to gain views, likes, and engagement. The more people who see and interact with your content, the higher you'll rank.
+                  </p>
+                  <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                    <p className="text-green-300 text-sm">
+                      💡 <strong>Tip:</strong> Use relevant hashtags and engage with your audience to maximize reach and engagement.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Slide 3: Climb Rankings */}
+              {currentSlide === 2 && (
+                <div className="p-8 text-center">
+                  <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <TrendingUp className="h-10 w-10 text-purple-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Step 3: Climb the Leaderboard</h3>
+                  <p className="text-white/80 text-lg leading-relaxed mb-6">
+                    Watch your ranking rise as you gain more views and engagement. Rankings are updated in real-time based on your video's performance metrics.
+                  </p>
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
+                    <p className="text-purple-300 text-sm">
+                      💡 <strong>Tip:</strong> Consistent promotion and community engagement will help maintain your position on the leaderboard.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Slide 4: Win Prizes */}
+              {currentSlide === 3 && (
+                <div className="p-8 text-center">
+                  <div className="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Trophy className="h-10 w-10 text-yellow-400" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Step 4: Win Amazing Prizes</h3>
+                  <p className="text-white/80 text-lg leading-relaxed mb-6">
+                    Top performers win cash prizes and recognition in the electronic music community. Winners are determined at the end of the contest period.
+                  </p>
+                  <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+                    <p className="text-yellow-300 text-sm">
+                      🏆 <strong>Prize Pool:</strong> {contest.prize_per_winner ? `$${formatCurrency(contest.prize_per_winner)} per winner` : 'Achievement titles and recognition'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between p-6 border-t border-white/10">
+                <button
+                  onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+                  disabled={currentSlide === 0}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </button>
+
+                {/* Slide Indicators */}
+                <div className="flex items-center gap-2">
+                  {[0, 1, 2, 3].map((slide) => (
+                    <button
+                      key={slide}
+                      onClick={() => setCurrentSlide(slide)}
+                      className={`w-3 h-3 rounded-full transition-colors ${
+                        currentSlide === slide ? 'bg-white' : 'bg-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setCurrentSlide(Math.min(3, currentSlide + 1))}
+                  disabled={currentSlide === 3}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
