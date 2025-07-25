@@ -498,7 +498,7 @@ export function PublicLeaderboard() {
         <div className="text-center">
           <div className="mb-4 sm:mb-6">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black text-white mb-6 sm:mb-8 tracking-tight leading-[0.9] -mt-20 sm:-mt-24 relative z-20 bg-gradient-to-b from-transparent via-black/30 via-black/70 via-black/95 to-[#0A0A0A] pt-16 pb-20 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-              <span className="bg-gradient-to-r from-white via-white to-gray-200 bg-clip-text text-transparent drop-shadow-2xl filter">
+              <span className="bg-gradient-to-r from-white via-white to-gray-100 bg-clip-text text-transparent drop-shadow-2xl filter text-shadow-lg">
                 {contest.name}
               </span>
             </h1>
