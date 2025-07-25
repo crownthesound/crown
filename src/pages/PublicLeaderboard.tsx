@@ -573,10 +573,6 @@ export function PublicLeaderboard() {
 
           {/* Section 3: How It Works */}
           <div className="text-center mt-12 sm:mt-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              How It Works
-            </h2>
-            
             {/* Horizontal Scroll Implementation */}
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
