@@ -571,6 +571,61 @@ export function PublicLeaderboard() {
             </div>
           </div>
 
+          {/* Prizes Section */}
+          <div className="text-center mt-12 sm:mt-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight mb-8 sm:mb-12">
+              Prizes
+            </h2>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {contest?.prize_titles?.slice(0, contest.num_winners || 3).map((prize: any, index: number) => (
+                  <div
+                    key={index}
+                    className={`group bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 sm:p-8 hover:bg-white/10 transition-all duration-300 hover:scale-105 ${
+                      index === 0 ? 'ring-2 ring-yellow-400/30' : 
+                      index === 1 ? 'ring-2 ring-gray-400/30' : 
+                      index === 2 ? 'ring-2 ring-amber-600/30' : ''
+                    }`}
+                  >
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-4 sm:mb-6 mx-auto ${
+                      index === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                      index === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-500' :
+                      index === 2 ? 'bg-gradient-to-r from-amber-600 to-amber-800' :
+                      'bg-gradient-to-r from-blue-500 to-blue-600'
+                    }`}>
+                      {index === 0 ? (
+                        <Crown className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                      ) : index === 1 ? (
+                        <Medal className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                      ) : index === 2 ? (
+                        <Medal className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                      ) : (
+                        <Star className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                      )}
+                    </div>
+                    <h3 className={`text-lg sm:text-xl font-bold mb-3 sm:mb-4 ${
+                      index === 0 ? 'text-yellow-400' :
+                      index === 1 ? 'text-gray-300' :
+                      index === 2 ? 'text-amber-600' :
+                      'text-blue-400'
+                    }`}>
+                      {index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'} Place
+                    </h3>
+                    <div className="text-white text-xl sm:text-2xl font-bold mb-2">
+                      {contest?.prize_tier === 'monetary' ? 
+                        `$${formatNumber((contest?.prize_per_winner || 0) * (1 - index * 0.2))}` :
+                        prize.title
+                      }
+                    </div>
+                    <p className="text-white/70 text-sm">
+                      {contest?.prize_tier === 'monetary' ? 'Cash Prize' : 'Achievement Title'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Section 3: How It Works */}
           <div className="text-center mt-12 sm:mt-16">
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
