@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import useEmblaCarousel from 'embla-carousel-react';
 import { supabase } from "../lib/supabase";
 import {
   Crown,
@@ -128,6 +129,17 @@ export function PublicLeaderboard() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
+  // Embla carousel setup
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'center',
+    skipSnaps: false,
+    dragFree: false
+  });
+
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
   const handlePlayVideo = (participant: LeaderboardEntry) => {
     console.log('Playing video for participant:', participant);
     
