@@ -46,6 +46,7 @@ import { ContestJoinModal } from "../components/ContestJoinModal";
 import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import { MobileVideoModal } from "../components/MobileVideoModal";
+import toast from "react-hot-toast";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { 
@@ -128,6 +129,35 @@ export function PublicLeaderboard() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
+  const handlePlayVideo = (participant: LeaderboardEntry) => {
+    console.log('Playing video for participant:', participant);
+    
+    // Create video object from participant data
+    const videoData = {
+      id: participant.video_id,
+      title: participant.video_title || `Video by @${participant.tiktok_username}`,
+      url: participant.video_url || '',
+      video_url: participant.video_url,
+      thumbnail: participant.thumbnail || '',
+      username: participant.tiktok_username || 'unknown',
+      views: participant.views || 0,
+      likes: participant.likes || 0,
+      comments: participant.comments || 0,
+      shares: participant.shares || 0,
+      avatar_url: null, // Not available in leaderboard data
+      tiktok_display_name: participant.tiktok_display_name,
+      rank: participant.rank
+    };
+    
+    if (!videoData.video_url && !videoData.url) {
+      toast.error('Video not available');
+      return;
+    }
+    
+    setSelectedVideo(videoData);
+    setShowViewModal(true);
+  };
+
   const [userSubmission, setUserSubmission] = useState<any>(null);
   const [showTikTokSettings, setShowTikTokSettings] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -725,6 +755,7 @@ export function PublicLeaderboard() {
                               ) : (
                                <div 
                                  className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                                onClick={() => handlePlayVideo(participant)}
                                  onClick={() => handlePlayVideo(participant)}
                                >
                                   <Play className="h-12 w-12 text-white/60" />
@@ -768,6 +799,7 @@ export function PublicLeaderboard() {
                           {/* Mute Button */}
                           {isSelected && (
                             <button
+                              onClick={() => handlePlayVideo(participant)}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setIsMuted(!isMuted);
@@ -1214,6 +1246,14 @@ export function PublicLeaderboard() {
           onSuccess={() => setShowTikTokSettings(false)}
         />
       )}
+      <ViewSubmissionModal
+        isOpen={showViewModal}
+        onClose={() => {
+          setShowViewModal(false);
+          setSelectedVideo(null);
+        }}
+        video={selectedVideo}
+      />
     </div>
   );
 }
