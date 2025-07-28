@@ -478,3 +478,71 @@ export function PublicLeaderboard() {
             />
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/90"></div>
           </div>
+        )}
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-3">
+              <Crown className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              <span className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                Crown
+              </span>
+            </Link>
+            {session && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowTikTokSettings(true)}
+                  className="flex items-center justify-center px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors text-white text-sm sm:text-base"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline ml-2">TikTok</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Contest Prizes Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 flex items-center justify-center gap-3">
+            <Trophy className="h-8 w-8 text-yellow-400" />
+            Contest Prizes
+          </h2>
+          <p className="text-white/60">
+            {contest.num_winners || contest.prize_titles?.length || 3} Winners
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
+          {(contest.prize_titles || []).slice(0, contest.num_winners || 3).map((prize: any, index: number) => (
+            <div
+              key={index}
+              className={`p-4 rounded-xl border transition-all hover:scale-105 ${
+                index === 0
+                  ? "bg-gradient-to-br from-yellow-400/20 to-yellow-600/20 border-yellow-400/30"
+                  : index === 1
+                  ? "bg-gradient-to-br from-gray-300/20 to-gray-500/20 border-gray-300/30"
+                  : index === 2
+                  ? "bg-gradient-to-br from-amber-600/20 to-amber-800/20 border-amber-600/30"
+                  : "bg-white/5 border-white/10"
+              }`}
+            >
+              <div className="flex items-center justify-center mb-3">
+                {getRankIcon(index + 1)}
+              </div>
+              <div className="text-center">
+                <div className={`text-lg font-bold mb-1 ${getRankColor(index + 1)}`}>
+                  {formatRank(index + 1)} Place
+                </div>
+                <div className="text-sm font-medium text-white">
+                  {contest.prize_tier === "monetary"
+                    ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                    : prize.title}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
