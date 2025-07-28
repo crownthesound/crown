@@ -46,7 +46,6 @@ import { ContestJoinModal } from "../components/ContestJoinModal";
 import { TikTokSettingsModal } from "../components/TikTokSettingsModal";
 import { ViewSubmissionModal } from "../components/ViewSubmissionModal";
 import { MobileVideoModal } from "../components/MobileVideoModal";
-import toast from "react-hot-toast";
 import { useTikTokConnection } from "../hooks/useTikTokConnection";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import { 
