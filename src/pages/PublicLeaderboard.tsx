@@ -364,33 +364,6 @@ export function PublicLeaderboard() {
     }));
   };
 
-  const handleVideoLoad = (videoId: string) => {
-    setVideoLoaded(prev => ({
-      ...prev,
-      [videoId]: true
-    }));
-  };
-
-  const handlePlayVideo = (participant: any) => {
-    const video = {
-      id: participant.video_id,
-      title: participant.video_title,
-      url: participant.video_url,
-      video_url: participant.video_url,
-      thumbnail: participant.thumbnail,
-      username: participant.tiktok_username,
-      views: participant.views,
-      likes: participant.likes,
-      comments: participant.comments,
-      shares: participant.shares,
-      rank: participant.rank
-    };
-    handleVideoClick(video, participants.findIndex(p => p.video_id === participant.video_id));
-  };
-
-  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
-  const scrollNext = () => emblaApi && emblaApi.scrollNext();
-
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M`;
