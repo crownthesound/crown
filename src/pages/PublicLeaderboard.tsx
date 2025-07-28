@@ -625,6 +625,7 @@ export function PublicLeaderboard() {
               </div>
             </div>
           </div>
+        </div>
         {/* Prizes */}
         <div className="mb-12">
           <div className="text-center mb-8">
@@ -659,7 +660,7 @@ export function PublicLeaderboard() {
                     if (rank <= 10) return "text-blue-400 bg-blue-400/20 border-blue-400/30";
                     return "text-white/80 bg-white/10 border-white/20";
                   };
-              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+
                   return (
                     <div
                       key={index}
@@ -694,56 +695,56 @@ export function PublicLeaderboard() {
 
       {/* Leaderboard Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                  <div className="text-center">
-                    <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-xl font-bold text-blue-400">1</span>
-                    </div>
-                    <h3 className="text-base font-semibold text-white mb-2">Submit Your Entry</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">
-                      Create and submit your festival-level original mix or set following the contest guidelines.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 2: Get Views */}
-                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                  <div className="text-center">
-                    <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-xl font-bold text-green-400">2</span>
-                    </div>
-                    <h3 className="text-base font-semibold text-white mb-2">Share & Promote</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">
-                      Share your entry across social media to gain views, likes, and engagement from the community.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3: Climb Rankings */}
-                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                  <div className="text-center">
-                    <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-xl font-bold text-purple-400">3</span>
-                    </div>
-                    <h3 className="text-base font-semibold text-white mb-2">Climb the Leaderboard</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">
-                      Watch your ranking rise as you gain more views and engagement from the community.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 4: Win Prizes */}
-                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
-                  <div className="text-center">
-                    <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-xl font-bold text-yellow-400">4</span>
-                    </div>
-                    <h3 className="text-base font-semibold text-white mb-2">Win Amazing Prizes</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">
-                      Top performers win cash prizes and recognition in the electronic music community.
-                    </p>
-                  </div>
-                </div>
+        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+          {/* Step 1: Submit Entry */}
+          <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+            <div className="text-center">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-xl font-bold text-blue-400">1</span>
               </div>
+              <h3 className="text-base font-semibold text-white mb-2">Submit Your Entry</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Create and submit your festival-level original mix or set following the contest guidelines.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 2: Get Views */}
+          <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+            <div className="text-center">
+              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-xl font-bold text-green-400">2</span>
+              </div>
+              <h3 className="text-base font-semibold text-white mb-2">Share & Promote</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Share your entry across social media to gain views, likes, and engagement from the community.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3: Climb Rankings */}
+          <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+            <div className="text-center">
+              <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-xl font-bold text-purple-400">3</span>
+              </div>
+              <h3 className="text-base font-semibold text-white mb-2">Climb the Leaderboard</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Watch your ranking rise as you gain more views and engagement from the community.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 4: Win Prizes */}
+          <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+            <div className="text-center">
+              <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-xl font-bold text-yellow-400">4</span>
+              </div>
+              <h3 className="text-base font-semibold text-white mb-2">Win Amazing Prizes</h3>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Top performers win cash prizes and recognition in the electronic music community.
+              </p>
             </div>
           </div>
         </div>
@@ -1264,35 +1265,7 @@ export function PublicLeaderboard() {
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12 border-t border-white/10">
-          <div className="flex flex-col items-center justify-center gap-4">
-            <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-white/40" />
-              <span className="text-white/40 font-light tracking-wider">CROWN</span>
-            </div>
-            <div className="flex items-center gap-4 text-sm">
-              <Link 
-                to="/terms" 
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <span className="text-white/20">•</span>
-              <Link 
-                to="/privacy" 
-                className="text-white/60 hover:text-white transition-colors"
-              >
-                Privacy Policy
-              </Link>
-            </div>
-            <p className="text-white/40 text-xs text-center">
-              © {new Date().getFullYear()} Crown. All rights reserved.
-            </p>
-          </div>
-        </footer>
-      </div>
+      )}
 
       {/* Modals */}
       {showJoinModal && (
