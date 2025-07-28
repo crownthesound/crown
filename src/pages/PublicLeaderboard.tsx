@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import useEmblaCarousel from 'embla-carousel-react';
 import { supabase } from "../lib/supabase";
 import {
   Crown,
@@ -57,6 +56,7 @@ import {
   getTimeRemaining 
 } from "../lib/contestUtils";
 import { ContestCountdown } from "../components/ContestCountdown";
+import useEmblaCarousel from 'embla-carousel-react';
 
 interface Contest {
   id: string;
@@ -110,33 +110,15 @@ interface Participant {
   likes: number;
   comments: number;
   shares: number;
-}
-
-interface LeaderboardEntry {
-  rank: number;
-  user_id: string;
-  full_name: string;
-  tiktok_username: string;
-  tiktok_display_name: string;
-  tiktok_account_name: string;
-  tiktok_account_id: string;
-  video_id: string;
-  video_title: string;
-  video_url: string;
-  thumbnail: string;
-  views: number;
-  likes: number;
-  comments: number;
-  shares: number;
-  username?: string;
+  submission_date: string;
 }
 
 export function PublicLeaderboard() {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { session } = useAuth();
-  const { isTikTokConnected } = useTikTokConnection();
+  const navigate = useNavigate();
   const { redirectToAuth } = useAuthRedirect();
+  
   const [contest, setContest] = useState<Contest | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [featuredVideos, setFeaturedVideos] = useState<VideoData[]>([]);
@@ -146,46 +128,6 @@ export function PublicLeaderboard() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showMobileModal, setShowMobileModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<VideoData | null>(null);
-  // Embla carousel setup
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: 'center',
-    skipSnaps: false,
-    dragFree: false
-  });
-
-  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
-
-  const handlePlayVideo = (participant: LeaderboardEntry) => {
-    console.log('Playing video for participant:', participant);
-    
-    // Create video object from participant data
-    const videoData = {
-      id: participant.video_id,
-      title: participant.video_title || `Video by @${participant.tiktok_username}`,
-      url: participant.video_url || '',
-      video_url: participant.video_url,
-      thumbnail: participant.thumbnail || '',
-      username: participant.tiktok_username || 'unknown',
-      views: participant.views || 0,
-      likes: participant.likes || 0,
-      comments: participant.comments || 0,
-      shares: participant.shares || 0,
-      avatar_url: null, // Not available in leaderboard data
-      tiktok_display_name: participant.tiktok_display_name,
-      rank: participant.rank
-    };
-    
-    if (!videoData.video_url && !videoData.url) {
-      toast.error('Video not available');
-      return;
-    }
-    
-    setSelectedVideo(videoData);
-    setShowViewModal(true);
-  };
-
   const [userSubmission, setUserSubmission] = useState<any>(null);
   const [showTikTokSettings, setShowTikTokSettings] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -222,6 +164,15 @@ export function PublicLeaderboard() {
       tip: "Even if you don't win first place, being in the top rankings can lead to valuable networking opportunities."
     }
   ];
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'center',
+    skipSnaps: false,
+    dragFree: false
+  });
+
+  const { isTikTokConnected } = useTikTokConnection();
 
   useEffect(() => {
     if (id) {
@@ -390,6 +341,9 @@ export function PublicLeaderboard() {
       [videoId]: true
     }));
   };
+
+  const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
+  const scrollNext = () => emblaApi && emblaApi.scrollNext();
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -619,6 +573,10 @@ export function PublicLeaderboard() {
 
           {/* Section 3: How It Works */}
           <div className="text-center mt-12 sm:mt-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+              How It Works
+            </h2>
+            
             {/* Horizontal Scroll Implementation */}
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
@@ -743,22 +701,14 @@ export function PublicLeaderboard() {
                               {video.video_url ? (
                                 <video
                                   src={video.video_url}
+                                  className="w-full h-full object-cover rounded-2xl opacity-100"
                                   autoPlay
                                   loop
                                   muted={isMuted}
                                   playsInline
                                   controls={false}
-                                  className="w-full h-full object-cover"
-                                  onLoadedData={() => handleVideoLoad(video.id)}
                                 />
-                              ) : (
-                               <div 
-                                 className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
-                                 onClick={() => handlePlayVideo(video as LeaderboardEntry)}
-                               >
-                                  <Play className="h-12 w-12 text-white/60" />
-                                </div>
-                              )}
+                              ) : null}
                             </div>
                           )}
 
@@ -943,11 +893,10 @@ export function PublicLeaderboard() {
                           alt={participant.video_title}
                           className="w-full h-full object-cover"
                         />
-                        <div 
-                          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
-                          onClick={() => handlePlayVideo(participant)}
-                        >
-                          <Play className="h-4 w-4 text-white" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                          <div className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
+                            <Play className="h-3 w-3 text-black ml-0.5" />
+                          </div>
                         </div>
                       </div>
                     </div>
