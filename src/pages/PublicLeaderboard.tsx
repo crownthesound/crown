@@ -199,16 +199,6 @@ export function PublicLeaderboard() {
     }
   ];
 
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: 'center',
-    skipSnaps: false,
-    dragFree: false
-  });
-
-  const { isTikTokConnected } = useTikTokConnection();
-
-  useEffect(() => {
     if (id) {
       fetchContestData();
       fetchLeaderboard();
