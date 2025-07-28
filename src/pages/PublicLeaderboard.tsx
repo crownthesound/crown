@@ -690,8 +690,10 @@ export function PublicLeaderboard() {
             </div>
           </div>
         </div>
-                {/* Step 1: Submit Entry */}
-                <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
+      </div>
+
+      {/* Leaderboard Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <div className="text-center">
                     <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
                       <span className="text-xl font-bold text-blue-400">1</span>
