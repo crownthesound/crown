@@ -546,3 +546,6 @@ export function PublicLeaderboard() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
