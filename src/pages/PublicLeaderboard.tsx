@@ -138,32 +138,6 @@ export function PublicLeaderboard() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentHowItWorksSlide, setCurrentHowItWorksSlide] = useState(0);
   const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-  const howItWorksSteps = [
-    {
-      icon: UserPlus,
-      title: "Step 1: Submit Your Entry",
-      description: "Create and submit your festival-level original mix or set following the contest guidelines. Make sure your content is original and follows all contest rules.",
-      tip: "High-quality audio and engaging visuals will help your entry stand out from the competition."
-    },
-    {
-      icon: Share2,
-      title: "Step 2: Share & Promote",
-      description: "Share your entry across social media platforms to gain views and engagement. The more people who watch and interact with your content, the higher you'll rank.",
-      tip: "Use relevant hashtags and engage with your audience to maximize reach and views."
-    },
-    {
-      icon: TrendingUp,
-      title: "Step 3: Climb the Leaderboard",
-      description: "Your ranking is based on views, likes, comments, and shares. Monitor your position on the leaderboard and keep promoting to climb higher.",
-      tip: "Consistent promotion and audience engagement are key to maintaining a top position."
-    },
-    {
-      icon: Trophy,
-      title: "Step 4: Win Amazing Prizes",
-      description: "Top performers win cash prizes, recognition, and opportunities for career advancement. Winners are announced at the end of the contest period.",
-      tip: "Even if you don't win first place, being in the top rankings can lead to valuable networking opportunities."
-    }
-  ];
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
@@ -546,6 +520,36 @@ export function PublicLeaderboard() {
           ))}
         </div>
       </div>
+
+      {/* Modals */}
+      <ContestJoinModal
+        isOpen={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+        contest={contest}
+        onSuccess={handleContestJoined}
+      />
+
+      <TikTokSettingsModal
+        isOpen={showTikTokModal}
+        onClose={() => setShowTikTokModal(false)}
+      />
+
+      <TikTokSettingsModal
+        isOpen={showTikTokSettings}
+        onClose={() => setShowTikTokSettings(false)}
+      />
+
+      <ViewSubmissionModal
+        isOpen={showViewModal}
+        onClose={() => setShowViewModal(false)}
+        video={selectedVideo}
+      />
+
+      <MobileVideoModal
+        isOpen={showMobileModal}
+        onClose={() => setShowMobileModal(false)}
+        video={selectedVideo}
+      />
     </div>
   );
 }
