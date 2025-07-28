@@ -625,16 +625,71 @@ export function PublicLeaderboard() {
               </div>
             </div>
           </div>
-
-          {/* Section 3: How It Works */}
-          <div className="text-center mt-12 sm:mt-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              How It Works
+        {/* Prizes */}
+        <div className="mb-12">
+          <div className="text-center mb-8">
+            <h2 className="text-[1.75rem] xs:text-[2rem] sm:text-[2.5rem] font-black text-white tracking-tight">
+              Prizes
             </h2>
-            
-            {/* Horizontal Scroll Implementation */}
-            <div className="relative">
+          </div>
+          <div className="relative bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden p-6">
+            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+              {contest.prize_titles
+                .slice(0, contest.num_winners || contest.prize_titles.length)
+                .map((prize: any, index: number) => {
+                  const getRankIcon = (rank: number) => {
+                    const colors = {
+                      1: "text-yellow-400",
+                      2: "text-gray-400", 
+                      3: "text-amber-600",
+                      4: "text-blue-400",
+                      5: "text-green-400",
+                    };
+                    const color = colors[rank as keyof typeof colors] || "text-slate-400";
+                    if (rank === 1) {
+                      return <Crown className={`h-8 w-8 ${color}`} />;
+                    }
+                    return <Crown className={`h-8 w-8 ${color}`} />;
+                  };
+
+                  const getRankColor = (rank: number) => {
+                    if (rank === 1) return "text-yellow-400 bg-yellow-400/20 border-yellow-400/30";
+                    if (rank === 2) return "text-gray-400 bg-gray-400/20 border-gray-400/30";
+                    if (rank === 3) return "text-amber-600 bg-amber-600/20 border-amber-600/30";
+                    if (rank <= 10) return "text-blue-400 bg-blue-400/20 border-blue-400/30";
+                    return "text-white/80 bg-white/10 border-white/20";
+                  };
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                  return (
+                    <div
+                      key={index}
+                      className="flex-shrink-0 w-48 p-6 rounded-xl border snap-start bg-black/20 border-white/10 transition-all hover:bg-white/5"
+                    >
+                      <div className="text-center">
+                        <div className="flex items-center justify-center mb-4">
+                          {getRankIcon(index + 1)}
+                        </div>
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-bold mb-4 ${getRankColor(index + 1)}`}>
+                          <span>#{index + 1}</span>
+                          <span className="text-xs opacity-80">
+                            {index + 1 === 1 ? "1st" : index + 1 === 2 ? "2nd" : index + 1 === 3 ? "3rd" : `${index + 1}th`} Place
+                          </span>
+                        </div>
+                        <div className="text-lg font-bold text-white mb-2">
+                          {contest.prize_tier === "monetary"
+                            ? `$${formatCurrency((contest.prize_per_winner || 0) * (1 - index * 0.2))}`
+                            : prize.title}
+                        </div>
+                        <div className="text-sm text-white/60">
+                          {contest.prize_tier === "monetary" ? "Cash Prize" : "Achievement Title"}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        </div>
                 {/* Step 1: Submit Entry */}
                 <div className="flex-shrink-0 w-48 p-3 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 snap-start hover:bg-white/10 transition-all duration-300">
                   <div className="text-center">
