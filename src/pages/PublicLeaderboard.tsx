@@ -342,6 +342,23 @@ export function PublicLeaderboard() {
     }));
   };
 
+  const handlePlayVideo = (participant: any) => {
+    const video = {
+      id: participant.video_id,
+      title: participant.video_title,
+      url: participant.video_url,
+      video_url: participant.video_url,
+      thumbnail: participant.thumbnail,
+      username: participant.tiktok_username,
+      views: participant.views,
+      likes: participant.likes,
+      comments: participant.comments,
+      shares: participant.shares,
+      rank: participant.rank
+    };
+    handleVideoClick(video, participants.findIndex(p => p.video_id === participant.video_id));
+  };
+
   const scrollPrev = () => emblaApi && emblaApi.scrollPrev();
   const scrollNext = () => emblaApi && emblaApi.scrollNext();
 
@@ -697,17 +714,19 @@ export function PublicLeaderboard() {
                               {video.video_url ? (
                                 <video
                                   src={video.video_url}
-                               onClick={() => handlePlayVideo(participant)}
                                   autoPlay
                                   loop
                                   muted={isMuted}
                                   playsInline
                                   controls={false}
+                                  className="w-full h-full object-cover"
+                                  onLoadedData={() => handleVideoLoad(video.id)}
                                 />
-                               <div 
-                                 className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
-                                 onClick={() => handlePlayVideo(participant)}
-                               >
+                              ) : (
+                                <div className="w-full h-full bg-black flex items-center justify-center">
+                                  <Play className="h-12 w-12 text-white/60" />
+                                </div>
+                              )}
                             </div>
                           )}
 
