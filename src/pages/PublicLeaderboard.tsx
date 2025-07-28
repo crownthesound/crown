@@ -109,16 +109,6 @@ interface Participant {
   views: number;
   likes: number;
   comments: number;
-  shares: number;
-  submission_date: string;
-}
-
-export function PublicLeaderboard() {
-  const { id } = useParams<{ id: string }>();
-  const { session } = useAuth();
-  const navigate = useNavigate();
-  const { redirectToAuth } = useAuthRedirect();
-  
   const [contest, setContest] = useState<Contest | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [featuredVideos, setFeaturedVideos] = useState<VideoData[]>([]);
