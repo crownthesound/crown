@@ -41,6 +41,11 @@ export function VideoCarousel() {
     try {
       setError(null);
       
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        throw new Error('Supabase configuration is missing. Please check your environment variables.');
+      }
+      
       const { data, error: supabaseError } = await supabase
         .from('video_links')
         .select('*')
@@ -49,11 +54,13 @@ export function VideoCarousel() {
 
       if (supabaseError) {
         console.error('Supabase error:', supabaseError);
-        throw new Error(supabaseError.message);
+        throw new Error(`Database error: ${supabaseError.message}`);
       }
 
       if (!data) {
-        throw new Error('No data received from Supabase');
+        console.warn('No video data received from database');
+        setVideos([]);
+        return;
       }
 
       // Ensure all videos have valid thumbnails
@@ -72,10 +79,18 @@ export function VideoCarousel() {
       setCoverLoaded(initialLoadState);
       setVideoLoaded(initialLoadState);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load videos';
       console.error('Error fetching videos:', error);
-      setError(errorMessage);
       
+      let errorMessage = 'Failed to load videos';
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setError(errorMessage);
       toast.error(errorMessage);
       
       setVideos([]); // Set empty array on error
