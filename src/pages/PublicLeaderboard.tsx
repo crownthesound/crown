@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import useEmblaCarousel from 'embla-carousel-react';
 import { supabase } from "../lib/supabase";
@@ -112,7 +112,30 @@ interface Participant {
   shares: number;
 }
 
+interface LeaderboardEntry {
+  rank: number;
+  user_id: string;
+  full_name: string;
+  tiktok_username: string;
+  tiktok_display_name: string;
+  tiktok_account_name: string;
+  tiktok_account_id: string;
+  video_id: string;
+  video_title: string;
+  video_url: string;
+  thumbnail: string;
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+}
+
 export function PublicLeaderboard() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { session } = useAuth();
+  const { isTikTokConnected } = useTikTokConnection();
+  const { redirectToAuth } = useAuthRedirect();
   const [contest, setContest] = useState<Contest | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [featuredVideos, setFeaturedVideos] = useState<VideoData[]>([]);
@@ -199,6 +222,7 @@ export function PublicLeaderboard() {
     }
   ];
 
+  useEffect(() => {
     if (id) {
       fetchContestData();
       fetchLeaderboard();
@@ -354,6 +378,13 @@ export function PublicLeaderboard() {
 
   const handleCoverLoad = (videoId: string) => {
     setCoverLoaded(prev => ({
+      ...prev,
+      [videoId]: true
+    }));
+  };
+
+  const handleVideoLoad = (videoId: string) => {
+    setVideoLoaded(prev => ({
       ...prev,
       [videoId]: true
     }));
@@ -722,8 +753,7 @@ export function PublicLeaderboard() {
                               ) : (
                                <div 
                                  className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
-                                onClick={() => handlePlayVideo(participant)}
-                                 onClick={() => handlePlayVideo(participant)}
+                                 onClick={() => handlePlayVideo(video as any)}
                                >
                                   <Play className="h-12 w-12 text-white/60" />
                                 </div>
@@ -766,7 +796,6 @@ export function PublicLeaderboard() {
                           {/* Mute Button */}
                           {isSelected && (
                             <button
-                              onClick={() => handlePlayVideo(participant)}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setIsMuted(!isMuted);
@@ -1213,14 +1242,6 @@ export function PublicLeaderboard() {
           onSuccess={() => setShowTikTokSettings(false)}
         />
       )}
-      <ViewSubmissionModal
-        isOpen={showViewModal}
-        onClose={() => {
-          setShowViewModal(false);
-          setSelectedVideo(null);
-        }}
-        video={selectedVideo}
-      />
     </div>
   );
 }
