@@ -697,7 +697,7 @@ export function PublicLeaderboard() {
                               {video.video_url ? (
                                 <video
                                   src={video.video_url}
-                                  className="w-full h-full object-cover rounded-2xl opacity-100"
+                               onClick={() => handlePlayVideo(participant)}
                                   autoPlay
                                   loop
                                   muted={isMuted}
