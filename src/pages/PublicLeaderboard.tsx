@@ -704,7 +704,10 @@ export function PublicLeaderboard() {
                                   playsInline
                                   controls={false}
                                 />
-                              ) : null}
+                               <div 
+                                 className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                                 onClick={() => handlePlayVideo(participant)}
+                               >
                             </div>
                           )}
 
