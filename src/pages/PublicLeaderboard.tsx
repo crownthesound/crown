@@ -723,7 +723,10 @@ export function PublicLeaderboard() {
                                   onLoadedData={() => handleVideoLoad(video.id)}
                                 />
                               ) : (
-                                <div className="w-full h-full bg-black flex items-center justify-center">
+                               <div 
+                                 className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                                 onClick={() => handlePlayVideo(participant)}
+                               >
                                   <Play className="h-12 w-12 text-white/60" />
                                 </div>
                               )}
