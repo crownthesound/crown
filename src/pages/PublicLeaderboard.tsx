@@ -943,10 +943,11 @@ export function PublicLeaderboard() {
                           alt={participant.video_title}
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                          <div className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center">
-                            <Play className="h-3 w-3 text-black ml-0.5" />
-                          </div>
+                        <div 
+                          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center"
+                          onClick={() => handlePlayVideo(participant)}
+                        >
+                          <Play className="h-4 w-4 text-white" />
                         </div>
                       </div>
                     </div>
