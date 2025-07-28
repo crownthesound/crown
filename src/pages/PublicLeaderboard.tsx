@@ -109,6 +109,10 @@ interface Participant {
   views: number;
   likes: number;
   comments: number;
+  shares: number;
+}
+
+export function PublicLeaderboard() {
   const [contest, setContest] = useState<Contest | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [featuredVideos, setFeaturedVideos] = useState<VideoData[]>([]);
