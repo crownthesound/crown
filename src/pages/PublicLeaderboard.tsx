@@ -57,7 +57,6 @@ import {
   getTimeRemaining 
 } from "../lib/contestUtils";
 import { ContestCountdown } from "../components/ContestCountdown";
-import useEmblaCarousel from 'embla-carousel-react';
 
 interface Contest {
   id: string;
